@@ -11,15 +11,8 @@
     }
 
     .sidebar {
-      min-height: 100vh;
       background-color: #2f3e46;
       color: white;
-      padding-top: 20px;
-    }
-
-    .sidebar h5 {
-      margin-left: 20px;
-      margin-bottom: 30px;
     }
 
     .sidebar a {
@@ -39,11 +32,6 @@
       position: absolute;
       bottom: 20px;
       width: 100%;
-    }
-
-    .sidebar .image-box {
-      margin-top: 50px;
-      text-align: center;
     }
 
     .sidebar .image-box img {
@@ -82,60 +70,126 @@
   </style>
 </head>
 <body>
-<div class="container-fluid">
-  <div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-3 sidebar position-relative">
-      <h5>Pustakawan<br><small>admin</small></h5>
-      <a href="kelola_anggota.php">kelola anggota</a>
-      <a href="kelola_katalog.php">kelola katalog buku</a>
-      <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
-      <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
-      <a href="kelola_denda.php">kelola denda</a>
-      <a href="#" class="logout">Logout</a>
-      <div class="image-box">
-        <img src="https://via.placeholder.com/80" alt="icon" />
+  <div class="container-fluid">
+    <!-- Mobile Topbar -->
+    <div class="row d-md-none bg-dark text-white p-2">
+      <div class="col">
+        <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+          ☰ Menu
+        </button>
+        <span class="ms-3">Kelola Anggota</span>
       </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="col-md-9 main-content">
-      <h4>Kelola anggota</h4>
-      <div class="d-flex flex-wrap gap-2 align-items-center mb-3 mt-3">
-        <input type="text" class="form-control form-control-md me-2" placeholder="Nama anggota" style="max-width: 300px;" />
-        <button class="btn btn-tambah btn-md">Tambah Anggota</button>
+    <div class="row">
+      <!-- Sidebar Desktop -->
+      <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative pt-4">
+        <h5 class="ms-3">Pustakawan<br><small>admin</small></h5>
+        <a href="kelola_anggota.php" class="active">kelola anggota</a>
+        <a href="kelola_katalog.php">kelola katalog buku</a>
+        <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
+        <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
+        <a href="kelola_denda.php">kelola denda</a>
+        <a href="#" class="logout">Logout</a>
+        <div class="image-box text-center mt-5">
+          <img src="assets/Bootstrap_logo.png" alt="icon" />
+        </div>
+      </nav>
+
+      <!-- Sidebar Mobile Offcanvas -->
+      <div class="offcanvas offcanvas-start sidebar text-white" tabindex="-1" id="sidebarMenu">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Pustakawan</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+          <a href="kelola_anggota.php">kelola anggota</a>
+          <a href="kelola_katalog.php">kelola katalog buku</a>
+          <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
+          <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
+          <a href="kelola_denda.php">kelola denda</a>
+          <a href="#">Logout</a>
+          <div class="image-box text-center mt-5">
+            <img src="assets/Bootstrap_logo.png" alt="icon" />
+          </div>
+        </div>
       </div>
-      <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-          <thead>
-          <tr>
-            <th>No</th>
-            <th>Id siswa</th>
-            <th>Nama siswa</th>
-            <th>Jurusan</th>
-            <th>Kelas</th>
-            <th>Semester</th>
-            <th colspan="2">Action</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>1</td>
-            <td>RPL1111</td>
-            <td>WAWAN</td>
-            <td>Rekayasa perangkat lunak</td>
-            <td>XI</td>
-            <td>3</td>
-            <td><button class="btn btn-sm btn-edit">Edit</button></td>
-            <td><button class="btn btn-sm btn-delete">Delete</button></td>
-          </tr>
-          <!-- Baris data lain tetap sama -->
-          <!-- ... -->
-          </tbody>
-        </table>
-      </div>
+
+      <!-- Main Content -->
+      <main class="col-md-9 col-12 main-content">
+        <h4>Kelola Anggota</h4>
+        <div class="d-flex flex-wrap gap-2 align-items-center mb-3 mt-3">
+          <input type="text" class="form-control form-control-md me-2" placeholder="Nama anggota" style="max-width: 300px;" />
+          <button class="btn btn-tambah btn-md">Tambah Anggota</button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Id Siswa</th>
+                <th>Nama Siswa</th>
+                <th>Jurusan</th>
+                <th>Kelas</th>
+                <th>Semester</th>
+                <th colspan="2">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>RPL1111</td>
+                <td>WAWAN</td>
+                <td>Rekayasa Perangkat Lunak</td>
+                <td>XI</td>
+                <td>3</td>
+                <td><button class="btn btn-sm btn-edit">Edit</button></td>
+                <td><button class="btn btn-sm btn-delete">Delete</button></td>
+              </tr>
+              <!-- Tambahkan baris lain jika diperlukan -->
+            </tbody>
+          </table>
+        </div>
+      </main>
     </div>
   </div>
-</div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+
+<div class="table-responsive">
+          <table class="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>ID Buku</th>
+                <th>Judul Buku</th>
+                <th>Nama Penulis</th>
+                <th>Nama Penerbit</th>
+                <th>Jumlah Halaman</th>
+                <th>Foto</th>
+                <th colspan="2">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>AAAA</td>
+                <td>Judul A</td>
+                <td>Penulis A</td>
+                <td>Penerbit A</td>
+                <td>123</td>
+                <td><img src="https://via.placeholder.com/40" alt="Foto Buku" class="img-thumbnail" /></td>
+                <td><button class="btn btn-sm btn-edit">Edit</button></td>
+                <td><button class="btn btn-sm btn-delete">Delete</button></td>
+              </tr>
+              <!-- Tambahkan baris data lain sesuai kebutuhan -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
