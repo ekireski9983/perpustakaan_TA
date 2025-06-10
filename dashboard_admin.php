@@ -80,7 +80,7 @@
          <a href="kelola_denda.php">kelola denda</a>
         <a href="#" class="logout">Logout</a>
         <div class="image-box mt-5">
-          <img src="https://via.placeholder.com/80" alt="icon">
+          <img src="assets/Bootstrap_logo.png" alt="icon">
         </div>
       </nav>
 
