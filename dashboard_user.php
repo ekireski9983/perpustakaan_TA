@@ -86,7 +86,7 @@
 
       <!-- Main Content -->
       <main class="col-md-9 col-12 main-content">
-        <h4>Selamat datang di halaman admin</h4>
+        <h4>Selamat datang di halaman siswa</h4>
         <p>Silakan pilih menu di sebelah kiri untuk mengelola sistem perpustakaan.</p>
       </main>
     </div>
