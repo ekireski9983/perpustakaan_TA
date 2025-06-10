@@ -103,7 +103,7 @@
       <h4>Kelola katalog buku</h4>
       <div class="d-flex flex-wrap gap-2 align-items-center mb-3 mt-3">
         <input type="text" class="form-control form-control-md me-2" placeholder="judul buku" style="max-width: 300px;" />
-        <button class="btn btn-tambah btn-md">Tambah Anggota</button>
+        <button class="btn btn-tambah btn-md">Tambah buku</button>
       </div>
       <div class="table-responsive">
         <table class="table table-bordered table-striped">
