@@ -57,7 +57,7 @@ if (isset($_SESSION['username'])) {
                 <input type="password" name="password" class="form-control" id="password" placeholder="Masukkan password" required>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-4  w-50">
                 <label for="role" class="form-label">Pilih Sesi</label>
                 <select class="form-select" name="role" id="role" required>
                     <option value="" selected disabled>-- Pilih Sesi --</option>
