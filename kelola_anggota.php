@@ -19,9 +19,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $kelas = $_POST['kelas'];
     $semester = $_POST['semester'];
 
+    // Insert query
     $insert_query = "INSERT INTO data_anggota (id_siswa, nama, jurusan, kelas, semester) VALUES ('$id_siswa', '$nama', '$jurusan', '$kelas', '$semester')";
-    mysqli_query($koneksi, $insert_query);
-    header("Location: kelola_anggota.php"); // Redirect setelah penyimpanan
+    
+    if (mysqli_query($koneksi, $insert_query)) {
+        header("Location: kelola_anggota.php"); // Redirect setelah penyimpanan
+        exit();
+    } else {
+        echo "Error: " . mysqli_error($koneksi);
+    }
 }
 
 // Menangani pembaruan data anggota
@@ -35,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $update_query = "UPDATE data_anggota SET nama='$nama', jurusan='$jurusan', kelas='$kelas', semester='$semester' WHERE id_siswa='$id_siswa'";
     mysqli_query($koneksi, $update_query);
     header("Location: kelola_anggota.php"); // Redirect setelah pembaruan
+    exit();
 }
 
 // Menangani penghapusan data anggota
@@ -43,6 +50,7 @@ if (isset($_GET['id'])) {
     $delete_query = "DELETE FROM data_anggota WHERE id_siswa='$id_siswa'";
     mysqli_query($koneksi, $delete_query);
     header("Location: kelola_anggota.php"); // Redirect setelah penghapusan
+    exit();
 }
 ?>
 
@@ -87,7 +95,7 @@ if (isset($_GET['id'])) {
         <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
         <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
         <a href="kelola_denda.php">kelola denda</a>
-        <a href="#">Logout</a>
+        <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/Bootstrap_logo.png" alt="icon" />
         </div>
@@ -243,7 +251,7 @@ if (isset($_GET['id'])) {
 </div>
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
   // Script untuk mengisi data pada modal edit
@@ -256,7 +264,8 @@ if (isset($_GET['id'])) {
       const kelas = button.getAttribute('data-kelas');
       const semester = button.getAttribute('data-semester');
 
-      document.getElementById('editId').value = id;
+      document.getElementById('editId').value = id; // Hidden field for ID
+      document.getElementById('editid').value = id; // Set ID in the input field
       document.getElementById('editNama').value = nama;
       document.getElementById('editJurusan').value = jurusan;
       document.getElementById('editKelas').value = kelas;

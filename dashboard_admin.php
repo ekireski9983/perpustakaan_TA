@@ -96,7 +96,7 @@
           <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
           <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
           <a href="kelola_denda.php">kelola denda</a>
-          <a href="#" class="logout d-block mt-4">Logout</a>
+          <a href="logout.php" class="logout d-block mt-4">Logout</a>
           <div class="image-box text-center mt-5">
             <img src="assets/Bootstrap_logo.png" alt="icon" />
           </div>

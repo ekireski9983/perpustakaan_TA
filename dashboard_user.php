@@ -78,7 +78,7 @@
          <a href="">Peminjaman buku</a>
          <a href="">Pengembalian buku</a>
          <a href="">denda keterlambatan</a>
-        <a href="#" class="logout">Logout</a>
+        <a href="logout.php" class="logout">Logout</a>
         <div class="image-box mt-5">
           <img src="https://via.placeholder.com/80" alt="icon">
         </div>
