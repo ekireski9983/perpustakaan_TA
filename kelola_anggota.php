@@ -242,8 +242,8 @@ if (isset($_GET['id'])) {
       <div class="modal-footer">
         <form id="formHapusAnggota" method="GET" action="">
           <input type="hidden" id="hapusId" name="id">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-danger">Hapus</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">tidak</button>
+          <button type="submit" class="btn btn-danger">Ya</button>
         </form>
       </div>
     </div>
