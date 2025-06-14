@@ -78,30 +78,11 @@
         <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
         <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
         <a href="kelola_denda.php">kelola denda</a>
-        <a href="#">Logout</a>
+        <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/Bootstrap_logo.png" alt="icon" />
         </div>
       </nav>
-
-      <!-- Offcanvas sidebar for mobile -->
-      <div class="offcanvas offcanvas-start sidebar text-white" tabindex="-1" id="sidebarMenu">
-        <div class="offcanvas-header">
-          <h5 class="offcanvas-title">Pustakawan</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body">
-          <a href="kelola_anggota.php">kelola anggota</a>
-          <a href="kelola_katalog.php">kelola katalog buku</a>
-          <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
-          <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
-          <a href="kelola_denda.php">kelola denda</a>
-          <a href="logout.php" class="logout d-block mt-4">Logout</a>
-          <div class="image-box text-center mt-5">
-            <img src="assets/Bootstrap_logo.png" alt="icon" />
-          </div>
-        </div>
-      </div>
 
       <!-- Main Content -->
       <main class="col-md-9 col-12 main-content">
