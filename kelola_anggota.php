@@ -36,6 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     mysqli_query($koneksi, $update_query);
     header("Location: kelola_anggota.php"); // Redirect setelah pembaruan
 }
+
+// Menangani penghapusan data anggota
+if (isset($_GET['id'])) {
+    $id_siswa = $_GET['id'];
+    $delete_query = "DELETE FROM data_anggota WHERE id_siswa='$id_siswa'";
+    mysqli_query($koneksi, $delete_query);
+    header("Location: kelola_anggota.php"); // Redirect setelah penghapusan
+}
 ?>
 
 <!DOCTYPE html>
@@ -118,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
               echo "<td>" . htmlspecialchars($row['semester']) . "</td>";
               echo '<td>
                       <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#editAnggotaModal" data-id="' . htmlspecialchars($row['id_siswa']) . '" data-nama="' . htmlspecialchars($row['nama']) . '" data-jurusan="' . htmlspecialchars($row['jurusan']) . '" data-kelas="' . htmlspecialchars($row['kelas']) . '" data-semester="' . htmlspecialchars($row['semester']) . '">Edit</button>
-                      <a href="hapus_anggota.php?id=' . urlencode($row['id_siswa']) . '" class="btn btn-sm btn-delete" onclick="return confirm(\'Yakin ingin menghapus?\')">Delete</a>
+                      <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusAnggotaModal" data-id="' . htmlspecialchars($row['id_siswa']) . '">Delete</button>
                     </td>';
               echo "</tr>";
             }
@@ -161,8 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             <label for="semester" class="form-label">Semester</label>
             <input type="text" class="form-control" name="semester" required>
           </div>
-          <button type="submit" class="btn btn-primary">tambah anggota</button>
-          <button type="reset" class="btn btn-danger">reset</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
         </form>
       </div>
     </div>
@@ -201,8 +208,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             <label for="editSemester" class="form-label">Semester</label>
             <input type="text" class="form-control" id="editSemester" name="editSemester" required>
           </div>
-          <button type="submit" class="btn btn-primary">edit anggota</button>
-          <button type="reset" class="btn btn-danger">reset</button>
+          <button type="submit" class="btn btn-primary">Update</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Hapus Anggota -->
+<div class="modal fade" id="hapusAnggotaModal" tabindex="-1" aria-labelledby="hapusAnggotaModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="hapusAnggotaModalLabel">Hapus Anggota</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Apakah Anda yakin ingin menghapus anggota ini?</p>
+      </div>
+      <div class="modal-footer">
+        <form id="formHapusAnggota" method="GET" action="">
+          <input type="hidden" id="hapusId" name="id">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-danger">Hapus</button>
         </form>
       </div>
     </div>
@@ -228,6 +256,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
       document.getElementById('editJurusan').value = jurusan;
       document.getElementById('editKelas').value = kelas;
       document.getElementById('editSemester').value = semester;
+    });
+  });
+
+  // Script untuk mengisi data pada modal hapus
+  const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusAnggotaModal"]');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const id = button.getAttribute('data-id');
+      document.getElementById('hapusId').value = id;
     });
   });
 </script>
