@@ -79,29 +79,29 @@ if (isset($_GET['id'])) {
   </div>
 
   <div class="row">
-    <!-- Sidebar Desktop -->
-    <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative pt-4">
-      <h5 class="ms-3">Pustakawan<br><small>admin</small></h5>
-      <a href="kelola_anggota.php" class="active">kelola anggota</a>
-      <a href="kelola_katalog.php">kelola katalog buku</a>
-      <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
-      <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
-      <a href="kelola_denda.php">kelola denda</a>
-      <a href="#" class="logout">Logout</a>
-      <div class="image-box text-center mt-5">
-        <img src="assets/Bootstrap_logo.png" alt="icon" />
-      </div>
-    </nav>
+      <!-- Sidebar for md and up -->
+      <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
+        <h5 class="pt-4">Pustakawan<br /><small>admin</small></h5>
+        <a href="kelola_anggota.php">kelola anggota</a>
+        <a href="kelola_katalog.php">kelola katalog buku</a>
+        <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
+        <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
+        <a href="kelola_denda.php">kelola denda</a>
+        <a href="#">Logout</a>
+        <div class="image-box text-center mt-5">
+          <img src="assets/Bootstrap_logo.png" alt="icon" />
+        </div>
+      </nav>
 
     <!-- Main Content -->
     <main class="col-md-9 col-12 main-content">
       <h4>Kelola Anggota</h4>
       <div class="d-flex flex-wrap gap-2 align-items-center mb-3 mt-3">
-        <input type="text" class="form-control form-control-md me-2" placeholder="Nama anggota" style="max-width: 300px;" />
+        <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Nama anggota" style="max-width: 300px;" oninput="filterTable()" />
         <button class="btn btn-tambah btn-md" data-bs-toggle="modal" data-bs-target="#tambahAnggotaModal">Tambah Anggota</button>
       </div>
       <div class="table-responsive">
-        <table class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped" id="anggotaTable">
           <thead>
             <tr>
               <th>No</th>
@@ -110,6 +110,7 @@ if (isset($_GET['id'])) {
               <th>Jurusan</th>
               <th>Kelas</th>
               <th>Semester</th>
+              <th>Action</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -126,7 +127,9 @@ if (isset($_GET['id'])) {
               echo "<td>" . htmlspecialchars($row['semester']) . "</td>";
               echo '<td>
                       <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#editAnggotaModal" data-id="' . htmlspecialchars($row['id_siswa']) . '" data-nama="' . htmlspecialchars($row['nama']) . '" data-jurusan="' . htmlspecialchars($row['jurusan']) . '" data-kelas="' . htmlspecialchars($row['kelas']) . '" data-semester="' . htmlspecialchars($row['semester']) . '">Edit</button>
-                      <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusAnggotaModal" data-id="' . htmlspecialchars($row['id_siswa']) . '">Delete</button>
+                    </td>';
+              echo '<td>
+                    <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusAnggotaModal" data-id="' . htmlspecialchars($row['id_siswa']) . '">Delete</button>
                     </td>';
               echo "</tr>";
             }
@@ -169,7 +172,8 @@ if (isset($_GET['id'])) {
             <label for="semester" class="form-label">Semester</label>
             <input type="text" class="form-control" name="semester" required>
           </div>
-          <button type="submit" class="btn btn-primary">Simpan</button>
+          <button type="submit" class="btn btn-primary">tambah anggota</button>
+          <button type="reset" class="btn btn-danger">reset</button>
         </form>
       </div>
     </div>
@@ -208,7 +212,8 @@ if (isset($_GET['id'])) {
             <label for="editSemester" class="form-label">Semester</label>
             <input type="text" class="form-control" id="editSemester" name="editSemester" required>
           </div>
-          <button type="submit" class="btn btn-primary">Update</button>
+          <button type="submit" class="btn btn-primary">edit anggota</button>
+          <button type="reset" class="btn btn-danger">reset</button>
         </form>
       </div>
     </div>
@@ -224,7 +229,7 @@ if (isset($_GET['id'])) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Apakah Anda yakin ingin menghapus anggota ini?</p>
+        <p>Apakah Anda yakin ingin hapus?</p>
       </div>
       <div class="modal-footer">
         <form id="formHapusAnggota" method="GET" action="">
@@ -267,6 +272,31 @@ if (isset($_GET['id'])) {
       document.getElementById('hapusId').value = id;
     });
   });
+
+  // Function to filter table rows based on search input
+  function filterTable() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toLowerCase();
+    const table = document.getElementById('anggotaTable');
+    const tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+      const td = tr[i].getElementsByTagName('td');
+      let found = false;
+
+      for (let j = 0; j < td.length; j++) {
+        if (td[j]) {
+          const txtValue = td[j].textContent || td[j].innerText;
+          if (txtValue.toLowerCase().indexOf(filter) > -1) {
+            found = true;
+            break;
+          }
+        }
+      }
+
+      tr[i].style.display = found ? "" : "none"; // Show or hide the row
+    }
+  }
 </script>
 </body>
 </html>
