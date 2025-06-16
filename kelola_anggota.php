@@ -19,10 +19,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $kelas = $_POST['kelas'];
     $semester = $_POST['semester'];
 
-    // Insert query
+    // Insert query untuk data anggota
     $insert_query = "INSERT INTO data_anggota (id_siswa, nama, jurusan, kelas, semester) VALUES ('$id_siswa', '$nama', '$jurusan', '$kelas', '$semester')";
     
     if (mysqli_query($koneksi, $insert_query)) {
+        // Insert query untuk tabel users
+        $username = $nama; // Nama siswa sebagai username
+        $password = $id_siswa; // ID siswa sebagai password
+        $role = 'user'; // Role
+
+        $user_query = "INSERT INTO users (username, password, role) VALUES ('$username', '$password', '$role')";
+        mysqli_query($koneksi, $user_query);
+
         header("Location: kelola_anggota.php"); // Redirect setelah penyimpanan
         exit();
     } else {
@@ -53,6 +61,7 @@ if (isset($_GET['id'])) {
     exit();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

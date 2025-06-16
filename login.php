@@ -1,8 +1,12 @@
 <?php
 session_start();
 if (isset($_SESSION['username'])) {
-    header("Location: dashboard_admin.php");
-    header("Location: dashboard_user.php");
+    // Redirect to the appropriate dashboard based on the role
+    if ($_SESSION['role'] === 'admin') {
+        header("Location: dashboard_admin.php");
+    } else {
+        header("Location: dashboard_user.php");
+    }
     exit;
 }
 ?>
@@ -47,22 +51,21 @@ if (isset($_SESSION['username'])) {
 
         <form action="auth.php" method="POST">
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" id="username" placeholder="Masukkan username" required autofocus>
+                <label for="identifier" class="form-label">Username</label>
+                <input type="text" name="identifier" class="form-control" id="identifier" placeholder="Masukkan username" required autofocus>
             </div>
             
-
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" name="password" class="form-control" id="password" placeholder="Masukkan password" required>
             </div>
 
-            <div class="mb-4  w-50">
+            <div class="mb-4 w-50">
                 <label for="role" class="form-label">Pilih Sesi</label>
                 <select class="form-select" name="role" id="role" required>
                     <option value="" selected disabled>-- Pilih Sesi --</option>
                     <option value="admin">Admin</option>
-                    <option value="user">User</option>
+                    <option value="user">User </option>
                 </select>
             </div>
 
