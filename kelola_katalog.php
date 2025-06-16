@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
     if (in_array($foto_ext, $allowed_extensions) && $foto_error === 0) {
         // Tentukan direktori untuk menyimpan gambar
-        $foto_destination = 'uploads/' . uniqid('', true) . '.' . $foto_ext;
+        $foto_destination = 'upload/' . uniqid('', true) . '.' . $foto_ext;
 
         // Pindahkan file ke direktori
         move_uploaded_file($foto_tmp, $foto_destination);
