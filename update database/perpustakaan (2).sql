@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2025 at 10:39 AM
+-- Generation Time: Jun 16, 2025 at 02:33 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 7.4.33
 
@@ -40,7 +40,11 @@ CREATE TABLE `data_anggota` (
 --
 
 INSERT INTO `data_anggota` (`id_siswa`, `nama`, `jurusan`, `kelas`, `semester`) VALUES
-('PM111', 'anton', 'pemasaran', '10', '3'),
+('ABI22', 'ilham nurkarim', 'administrasi bisnis internasio', 'B2', '7'),
+('AKL111', 'Intan', 'Akuntansi', '11', '4'),
+('MI21', 'Amel', 'Manajemen informatika', 'B1', '4'),
+('MI22', 'jabal', 'Manajemen informatika', 'B1', '6'),
+('PM111', 'ilham sukiman', 'pemasaran', '10', '1'),
 ('RPL222', 'Muhammad Jammaludin', 'Rekayasa perangkat lunak', '11', '3');
 
 -- --------------------------------------------------------
@@ -94,7 +98,12 @@ INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES
 (22, '22', '22', 'user'),
 (444, 'iman', '444', 'admin'),
 (446, 'Muhammad Jammaludin', 'RPL222', 'user'),
-(447, 'anton', 'PM111', 'user');
+(447, 'anton', 'PM111', 'user'),
+(448, 'jabal', 'MI22', 'user'),
+(449, 'Intan', 'AKL111', 'user'),
+(450, 'ilham sukiman', 'PM111', 'user'),
+(451, 'ilham nurkarim', 'ABI22', 'user'),
+(452, 'Amel', 'MI21', 'user');
 
 --
 -- Indexes for dumped tables
@@ -107,9 +116,9 @@ ALTER TABLE `data_anggota`
   ADD PRIMARY KEY (`id_siswa`);
 
 --
--- Indexes for table `katalog_buku`
+-- Indexes for table `data_buku`
 --
-ALTER TABLE `katalog_buku`
+ALTER TABLE `data_buku`
   ADD PRIMARY KEY (`id_buku`);
 
 --
@@ -124,16 +133,16 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `katalog_buku`
+-- AUTO_INCREMENT for table `data_buku`
 --
-ALTER TABLE `katalog_buku`
+ALTER TABLE `data_buku`
   MODIFY `id_buku` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=448;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=453;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
