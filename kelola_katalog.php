@@ -357,10 +357,14 @@ if (isset($_GET['id'])) {
   function filterTable() {
     const input = document.getElementById('searchInput');
     const filter = input.value.toLowerCase();
-    const table = document.getElementById('katalogTable');
+    const table = document.getElementById('KatalogTable');
     const tr = table.getElementsByTagName('tr');
 
- for (let j = 0; j < td.length; j++) {
+    for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+      const td = tr[i].getElementsByTagName('td');
+      let found = false;
+
+      for (let j = 0; j < td.length; j++) {
         if (td[j]) {
           const txtValue = td[j].textContent || td[j].innerText;
           if (txtValue.toLowerCase().indexOf(filter) > -1) {
