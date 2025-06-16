@@ -19,16 +19,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $nama_penulis = $_POST['nama_penulis'];
     $nama_penerbit = $_POST['nama_penerbit'];
     $jumlah_halaman = $_POST['jumlah_halaman'];
-    $foto = $_POST['foto']; // Assuming you handle file uploads separately
 
-    // Insert query
-    $insert_query = "INSERT INTO data_buku (id_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto) VALUES ('$id_buku', '$isbn', '$nama_penulis', '$nama_penerbit', '$jumlah_halaman', '$foto')";
-    
-    if (mysqli_query($koneksi, $insert_query)) {
-        header("Location: kelola_buku.php"); // Redirect setelah penyimpanan
-        exit();
+    // Menangani upload foto
+    $foto = $_FILES['foto'];
+    $foto_name = $foto['name'];
+    $foto_tmp = $foto['tmp_name'];
+    $foto_size = $foto['size'];
+    $foto_error = $foto['error'];
+
+    // Validasi format gambar
+    $allowed_extensions = ['jpg', 'jpeg', 'png'];
+    $foto_ext = strtolower(pathinfo($foto_name, PATHINFO_EXTENSION));
+
+    if (in_array($foto_ext, $allowed_extensions) && $foto_error === 0) {
+        // Tentukan direktori untuk menyimpan gambar
+        $foto_destination = 'uploads/' . uniqid('', true) . '.' . $foto_ext;
+
+        // Pindahkan file ke direktori
+        move_uploaded_file($foto_tmp, $foto_destination);
+
+        // Insert query
+        $insert_query = "INSERT INTO data_buku (id_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto) VALUES ('$id_buku', '$isbn', '$nama_penulis', '$nama_penerbit', '$jumlah_halaman', '$foto_destination')";
+        
+        if (mysqli_query($koneksi, $insert_query)) {
+            header("Location: kelola_buku.php"); // Redirect setelah penyimpanan
+            exit();
+        } else {
+            echo "Error: " . mysqli_error($koneksi);
+        }
     } else {
-        echo "Error: " . mysqli_error($koneksi);
+        echo "Format file tidak valid atau terjadi kesalahan saat upload.";
     }
 }
 
@@ -40,9 +60,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $nama_penulis = $_POST['editNamaPenulis'];
     $nama_penerbit = $_POST['editNamaPenerbit'];
     $jumlah_halaman = $_POST['editJumlahHalaman'];
-    $foto = $_POST['editFoto']; // Assuming you handle file uploads separately
 
-    $update_query = "UPDATE data_buku SET isbn='$isbn', nama_penulis='$nama_penulis', nama_penerbit='$nama_penerbit', jumlah_halaman='$jumlah_halaman', foto='$foto' WHERE id_buku='$id_buku'";
+    // Menangani upload foto
+    if (isset($_FILES['editFoto']) && $_FILES['editFoto']['error'] === 0) {
+        $foto = $_FILES['editFoto'];
+        $foto_name = $foto['name'];
+        $foto_tmp = $foto['tmp_name'];
+        $foto_size = $foto['size'];
+        $foto_error = $foto['error'];
+
+        // Validasi format gambar
+        $allowed_extensions = ['jpg', 'jpeg', 'png'];
+        $foto_ext = strtolower(pathinfo($foto_name, PATHINFO_EXTENSION));
+
+        if (in_array($foto_ext, $allowed_extensions)) {
+            // Tentukan direktori untuk menyimpan gambar
+            $foto_destination = 'uploads/' . uniqid('', true) . '.' . $foto_ext;
+
+            // Pindahkan file ke direktori
+            move_uploaded_file($foto_tmp, $foto_destination);
+
+            // Update query
+            $update_query = "UPDATE data_buku SET isbn='$isbn', nama_penulis='$nama_penulis', nama_penerbit='$nama_penerbit', jumlah_halaman='$jumlah_halaman', foto='$foto_destination' WHERE id_buku='$id_buku'";
+        }
+    } else {
+        // Jika tidak ada file baru, tetap gunakan foto lama
+        $update_query = "UPDATE data_buku SET isbn='$isbn', nama_penulis='$nama_penulis', nama_penerbit='$nama_penerbit', jumlah_halaman='$jumlah_halaman' WHERE id_buku='$id_buku'";
+    }
     
     if (mysqli_query($koneksi, $update_query)) {
         header("Location: kelola_buku.php"); // Redirect setelah pembaruan
