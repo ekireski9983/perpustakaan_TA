@@ -84,13 +84,21 @@
         </div>
       </nav>
       
-      <!--isi konten -->
-    <div class="card" style="width: 18rem;">
-     <div class="card-body">
-     <h5 class="card-title">data anggota</h5>
-     <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+      <!-- Isi konten -->
+      <div class="col-md-9 main-content">
+        <div class="card" style="width: 100%;">
+          <div class="card-body">
+            <ul>
+              <li>Anggota 1</li>
+              <li>Anggota 2</li>
+              <li>Anggota 3</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-</div>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
     if (in_array($foto_ext, $allowed_extensions) && $foto_error === 0) {
         // Tentukan direktori untuk menyimpan gambar
-        $foto_destination = 'upload/' . uniqid('', true) . '.' . $foto_ext;
+        $foto_destination = 'upload/images' . uniqid('', true) . '.' . $foto_ext;
 
         // Pindahkan file ke direktori
         move_uploaded_file($foto_tmp, $foto_destination);
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         $insert_query = "INSERT INTO data_buku (id_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto) VALUES ('$id_buku', '$isbn', '$nama_penulis', '$nama_penerbit', '$jumlah_halaman', '$foto_destination')";
         
         if (mysqli_query($koneksi, $insert_query)) {
-            header("Location: kelola_buku.php"); // Redirect setelah penyimpanan
+            header("Location: kelola_katalog.php"); // Redirect setelah penyimpanan
             exit();
         } else {
             echo "Error: " . mysqli_error($koneksi);
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
     
     if (mysqli_query($koneksi, $update_query)) {
-        header("Location: kelola_buku.php"); // Redirect setelah pembaruan
+        header("Location: kelola_katalog.php"); // Redirect setelah pembaruan
         exit();
     } else {
         echo "Error: " . mysqli_error($koneksi);
@@ -101,7 +101,7 @@ if (isset($_GET['id'])) {
     $id_buku = $_GET['id'];
     $delete_query = "DELETE FROM data_buku WHERE id_buku='$id_buku'";
     mysqli_query($koneksi, $delete_query);
-    header("Location: kelola_buku.php"); // Redirect setelah penghapusan
+    header("Location: kelola_katalog.php"); // Redirect setelah penghapusan
     exit();
 }
 ?>
@@ -158,7 +158,7 @@ if (isset($_GET['id'])) {
       <h4>Kelola katalog Buku</h4>
       <div class="d-flex flex-wrap gap-2 align-items-center mb-3 mt-3">
         <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Nama buku" style="max-width: 300px;" oninput="filterTable()" />
-        <button class="btn btn-tambah btn-md" data-bs-toggle="modal" data-bs-target="#tambahAnggotaModal">Tambah Buku</button>
+        <button class="btn btn-tambah btn-md" data-bs-toggle="modal" data-bs-target="#tambahKatalogModal">Tambah Buku</button>
       </div>
       <div class="table-responsive">
         <table class="table table-bordered table-striped" id="anggotaTable">
@@ -206,11 +206,11 @@ if (isset($_GET['id'])) {
 </div>
 
 <!-- Modal Tambah Buku -->
-<div class="modal fade" id="tambahAnggotaModal" tabindex="-1" aria-labelledby="tambahAnggotaModalLabel" aria-hidden="true">
+<div class="modal fade" id="tambahKatalogModal" tabindex="-1" aria-labelledby="tambahKatalogModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="tambahAnggotaModalLabel">Tambah Buku</h5>
+        <h5 class="modal-title" id="tambahKatalogModalLabel">Tambah Buku</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -249,7 +249,7 @@ if (isset($_GET['id'])) {
 </div>
 
 <!-- Modal Edit Buku -->
-<div class="modal fade" id="editAnggotaModal" tabindex="-1" aria-labelledby="editAnggotaModalLabel" aria-hidden="true">
+<div class="modal fade" id="editKatalogModal" tabindex="-1" aria-labelledby="editAnggotaModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -296,7 +296,7 @@ if (isset($_GET['id'])) {
 </div>
 
 <!-- Modal Hapus Buku -->
-<div class="modal fade" id="hapusAnggotaModal" tabindex="-1" aria-labelledby="hapusAnggotaModalLabel" aria-hidden="true">
+<div class="modal fade" id="hapusKatalogModal" tabindex="-1" aria-labelledby="hapusAnggotaModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -322,7 +322,7 @@ if (isset($_GET['id'])) {
 
 <script>
   // Script untuk mengisi data pada modal edit
-  const editButtons = document.querySelectorAll('[data-bs-target="#editAnggotaModal"]');
+  const editButtons = document.querySelectorAll('[data-bs-target="#editKatalogModal"]');
   editButtons.forEach(button => {
     button.addEventListener('click', () => {
       const id = button.getAttribute('data-id');
@@ -345,7 +345,7 @@ if (isset($_GET['id'])) {
   });
 
   // Script untuk mengisi data pada modal hapus
-  const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusAnggotaModal"]');
+  const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusKelolaModal"]');
   deleteButtons.forEach(button => {
     button.addEventListener('click', () => {
       const id = button.getAttribute('data-id');
@@ -357,7 +357,7 @@ if (isset($_GET['id'])) {
   function filterTable() {
     const input = document.getElementById('searchInput');
     const filter = input.value.toLowerCase();
-    const table = document.getElementById('anggotaTable');
+    const table = document.getElementById('katalogTable');
     const tr = table.getElementsByTagName('tr');
 
  for (let j = 0; j < td.length; j++) {
