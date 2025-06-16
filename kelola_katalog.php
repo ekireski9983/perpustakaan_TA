@@ -8,7 +8,7 @@ if (!$koneksi) {
 }
 
 // Ambil data dari tabel data_buku
-$query = "SELECT * FROM katalog_buku";
+$query = "SELECT * FROM data_buku";
 $result = mysqli_query($koneksi, $query);
 
 // Menangani penyimpanan data buku baru
