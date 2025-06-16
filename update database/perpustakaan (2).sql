@@ -46,10 +46,10 @@ INSERT INTO `data_anggota` (`id_siswa`, `nama`, `jurusan`, `kelas`, `semester`) 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `katalog_buku`
+-- Table structure for table `data_buku`
 --
 
-CREATE TABLE `katalog_buku` (
+CREATE TABLE `data_buku` (
   `id_buku` int(11) NOT NULL,
   `judul_buku` varchar(255) NOT NULL,
   `nama_penulis` varchar(255) NOT NULL,
