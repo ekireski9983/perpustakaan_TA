@@ -309,8 +309,8 @@ if (isset($_GET['id'])) {
             <input type="number" class="form-control" id="editJumlahHalaman" name="editJumlahHalaman" required>
           </div>
           <div class="mb-3">
-            <label for="editFoto" class="form-label">Foto (Opsional: Pilih untuk mengubah)</label>
-            <input type="file" class="form-control" id="editFoto" name="editFoto" accept="image/*"> <small class="form-text text-muted">Biarkan kosong jika tidak ingin mengubah foto.</small>
+            <label for="editFoto" class="form-label">Foto</label>
+            <input type="file" class="form-control" id="editFoto" name="editFoto" accept="image/*"> 
           </div>
           <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
           <button type="reset" class="btn btn-danger">Reset</button>
