@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
     if (in_array($foto_ext, $allowed_extensions) && $foto_error === 0) {
         // Tentukan direktori untuk menyimpan gambar
-        // Pastikan direktori 'uploads/' ada dan dapat ditulis
+        // Pastikan direktori 'upload/' ada dan dapat ditulis
         $foto_destination = 'upload/' . uniqid('', true) . '.' . $foto_ext;
 
         // Pindahkan file ke direktori
@@ -237,7 +237,7 @@ if (isset($_GET['id'])) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="formTambahkatalog" method="POST" action="" enctype="multipart/form-data"> <input type="hidden" name="action" value="tambah">
+        <form id="formTambahKatalog" method="POST" action="" enctype="multipart/form-data"> <input type="hidden" name="action" value="tambah">
           <div class="mb-3">
             <label for="id" class="form-label">ID Buku</label>
             <input type="text" class="form-control" name="id" required>
@@ -282,7 +282,7 @@ if (isset($_GET['id'])) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="formEditkatalog" method="POST" action="" enctype="multipart/form-data"> <input type="hidden" name="action" value="edit">
+        <form id="formEditKatalog" method="POST" action="" enctype="multipart/form-data"> <input type="hidden" name="action" value="edit">
           <input type="hidden" id="editId" name="editId"> <div class="mb-3">
             <label for="editid" class="form-label">ID Buku</label>
             <input type="text" class="form-control" id="editid" name="editid_display" readonly> </div>
@@ -326,7 +326,7 @@ if (isset($_GET['id'])) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Apakah Anda yakin ingin menghapus buku ini?</p>
+        <p>Apakah Anda yakin ingin menghapus data ini</p>
       </div>
       <div class="modal-footer">
         <form id="formHapusAnggota" method="GET" action="">
@@ -348,7 +348,7 @@ if (isset($_GET['id'])) {
     button.addEventListener('click', () => {
       const id = button.getAttribute('data-id');
       const isbn = button.getAttribute('data-isbn');
-      const judul_buku = button.getAttribute('data-judul_buku'); // Corrected
+      const judul_buku = button.getAttribute('data-judul_buku');
       const nama_penulis = button.getAttribute('data-nama_penulis');
       const nama_penerbit = button.getAttribute('data-nama_penerbit');
       const jumlah_halaman = button.getAttribute('data-jumlah_halaman');
@@ -357,7 +357,7 @@ if (isset($_GET['id'])) {
       document.getElementById('editId').value = id; // Hidden field for ID
       document.getElementById('editid').value = id; // Display field for ID
       document.getElementById('editIsbn').value = isbn;
-      document.getElementById('editJudulbuku').value = judul_buku; // Corrected
+      document.getElementById('editJudulbuku').value = judul_buku;
       document.getElementById('editNamaPenulis').value = nama_penulis;
       document.getElementById('editNamaPenerbit').value = nama_penerbit;
       document.getElementById('editJumlahHalaman').value = jumlah_halaman;
