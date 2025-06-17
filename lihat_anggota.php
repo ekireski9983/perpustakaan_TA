@@ -85,20 +85,43 @@
       </nav>
       
       <!-- Isi konten -->
-      <div class="col-md-9 main-content">
-        <div class="card" style="width: 100%;">
-          <div class="card-body">
-            <ul>
-              <li>Anggota 1</li>
-              <li>Anggota 2</li>
-              <li>Anggota 3</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
+     <?php
+     session_start(); // Tambahkan ini
 
+    $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
+    if (!$koneksi) {
+    die("Koneksi gagal: " . mysqli_connect_error());
+    }
+
+    $nama_user = $_SESSION['username'] ?? ''; // Ambil nama dari session
+
+    // Ambil data hanya untuk nama user yang sedang login
+       $query = "SELECT * FROM data_anggota WHERE nama = '$nama_user'";
+       $result = mysqli_query($koneksi, $query);
+       ?>
+<div class="col-md-9 main-content">
+  <div class="card" style="width: 100%;">
+    <div class="card-body">
+      <?php if (mysqli_num_rows($result) > 0): ?>
+        <ul>
+          <?php while ($row = mysqli_fetch_assoc($result)): ?>
+            <li>
+              Nama Siswa: <?= htmlspecialchars($row['nama']) ?><br>
+              Kelas: <?= htmlspecialchars($row['kelas']) ?><br>
+              Jurusan: <?= htmlspecialchars($row['jurusan']) ?><br>
+              Semester: <?= htmlspecialchars($row['semester']) ?>
+            </li><br>
+          <?php endwhile; ?>
+        </ul>
+      <?php else: ?>
+        <p>Data tidak ditemukan atau Anda belum terdaftar sebagai anggota.</p>
+      <?php endif; ?>
+    </div>
   </div>
+</div>
+
+
+  
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

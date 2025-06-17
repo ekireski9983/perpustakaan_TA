@@ -65,14 +65,14 @@
         <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
           ☰ Menu
         </button>
-        <span class="ms-3">Dashboard Pustakawan</span>
+        <span class="ms-3">Dashboard pustakawan</span>
       </div>
     </div>
 
     <div class="row">
       <!-- Sidebar for md and up -->
       <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
-        <h5 class="pt-4">Pustakawan<br /><small>admin</small></h5>
+        <h5 class="pt-4">Pustakawan<br /><small>siswa</small></h5>
         <a href="kelola_anggota.php">kelola anggota</a>
         <a href="kelola_katalog.php">kelola katalog buku</a>
         <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
