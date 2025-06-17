@@ -76,7 +76,6 @@
       margin-top: 1rem;
     }
 
-
     @media (max-width: 768px) {
       .sidebar .logout {
         position: static;
@@ -113,103 +112,93 @@
         </div>
       </nav>
 
+      <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="sidebarMenuLabel">Siswa<br /><small>user</small></h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <a href="lihat_anggota.php">Lihat Anggota</a>
+          <a href="katalog_buku.php">Katalog Buku</a>
+          <a href="peminjaman_buku.php">Peminjaman Buku</a>
+          <a href="pengembalian_buku.php">Pengembalian Buku</a>
+          <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
+          <a href="logout.php">Logout</a>
+        </div>
+      </div>
+
       <main class="col-md-9 col-12 main-content">
         <h4>Katalog Buku</h4>
         <div class="mb-4 mt-3">
-          <input type="text" id="searchInput" class="form-control form-control-md" placeholder="Cari Judul Buku" style="max-width: 400px;" oninput="filterCards()" />
+          <input type="text" id="searchInput" class="form-control form-control-md" placeholder="Cari Judul Buku atau Penulis..." style="max-width: 400px;" oninput="filterCards()" />
         </div>
 
-       <?php
-// --- Database Connection ---
-// IMPORTANT: Replace these with your actual database credentials
-$servername = "localhost"; // Usually 'localhost'
-$username = "root";       // Your MySQL username
-$password = "";           // Your MySQL password (often empty for root on local setup)
-$dbname = "perpustakaan"; // The name of your database
+        <hr />
 
-// Create connection
-$koneksi = new mysqli($servername, $username, $password, $dbname);
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="katalogBukuContainer">
+          <?php
+            // --- Database Connection ---
+            // IMPORTANT: Replace these with your actual database credentials
+            $servername = "localhost"; // Usually 'localhost'
+            $username = "root";        // Your MySQL username
+            $password = "";            // Your MySQL password (often empty for root on local setup)
+            $dbname = "perpustakaan";  // The name of your database
 
-// Check connection
-if ($koneksi->connect_error) {
-    die("Koneksi database gagal: " . $koneksi->connect_error);
-}
+            // Create connection
+            $koneksi = new mysqli($servername, $username, $password, $dbname);
 
-// --- Fetch Book Data ---
-// Query to select all relevant columns from the data_buku table
-$sql = "SELECT id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku ORDER BY judul_buku ASC";
-$result = $koneksi->query($sql);
+            // Check connection
+            if ($koneksi->connect_error) {
+                die("Koneksi database gagal: " . $koneksi->connect_error);
+            }
 
-// Check for query errors
-if (!$result) {
-    die("Error retrieving books: " . $koneksi->error);
-}
-?>
+            // --- Fetch Book Data ---
+            // Query to select all relevant columns from the data_buku table
+            $sql = "SELECT id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku ORDER BY judul_buku ASC";
+            $result = $koneksi->query($sql);
 
-<?php
-// --- Database Connection ---
-// IMPORTANT: Replace these with your actual database credentials
-$servername = "localhost"; // Usually 'localhost'
-$username = "root";        // Your MySQL username
-$password = "";            // Your MySQL password (often empty for root on local setup)
-$dbname = "perpustakaan";  // The name of your database
+            // Check for query errors
+            if (!$result) {
+                die("Error retrieving books: " . $koneksi->error);
+            }
 
-// Create connection
-$koneksi = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($koneksi->connect_error) {
-    die("Koneksi database gagal: " . $koneksi->connect_error);
-}
-
-// --- Fetch Book Data ---
-// Query to select all relevant columns from the data_buku table
-$sql = "SELECT id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku ORDER BY judul_buku ASC";
-$result = $koneksi->query($sql);
-
-// Check for query errors
-if (!$result) {
-    die("Error retrieving books: " . $koneksi->error);
-}
-?>
-
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="katalogBukuContainer">
-    <?php
-    // Check if there are results from the database query
-    if ($result->num_rows > 0) {
-        // Loop through each row of data
-        while ($row = $result->fetch_assoc()) {
-            // Determine image path:
-            // Use 'upload/' directory (singular) as specified by you.
-            // If 'foto' exists in the database, use it; otherwise, use a default image.
-            $imagePath = !empty($row['foto']) ? 'upload/' . htmlspecialchars($row['foto']) : 'assets/default_book.jpg';
-            ?>
-            <div class="col">
-                <div class="card h-100 book-card">
-                    <img src="<?php echo $imagePath; ?>" class="card-img-top" alt="Cover Buku <?php echo htmlspecialchars($row['judul_buku']); ?>">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($row['judul_buku']); ?></h5>
-                        <p class="card-text">
-                            <small class="text-muted">ID Buku: <?php echo htmlspecialchars($row['id_buku']); ?></small>
-                            <small class="text-muted">ISBN: <?php echo htmlspecialchars($row['isbn']); ?></small>
-                            <small class="text-muted">Penulis: <?php echo htmlspecialchars($row['nama_penulis']); ?></small>
-                            <small class="text-muted">Penerbit: <?php echo htmlspecialchars($row['nama_penerbit']); ?></small>
-                            <small class="text-muted">Halaman: <?php echo htmlspecialchars($row['jumlah_halaman']); ?></small>
-                        </p>
-                        <button class="btn btn-primary btn-sm">Pinjam</button>
+            // Check if there are results from the database query
+            if ($result->num_rows > 0) {
+                // Loop through each row of data
+                while ($row = $result->fetch_assoc()) {
+                    // Determine image path:
+                    // Use 'upload/' directory. If 'foto' exists, use it; otherwise, use a default image.
+                    $imagePath = !empty($row['foto']) ? 'upload/' . htmlspecialchars($row['foto']) : 'assets/default_book.jpg';
+          ?>
+                    <div class="col">
+                        <div class="card h-100 book-card">
+                            <img src="<?php echo $imagePath; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['judul_buku']); ?> Cover">
+                            <div class="card-body">
+                                <h5 class="card-title"><?php echo htmlspecialchars($row['judul_buku']); ?></h5>
+                                <p class="card-text">
+                                    <small>ID Buku: <?php echo htmlspecialchars($row['id_buku']); ?></small>
+                                    <small>ISBN: <?php echo htmlspecialchars($row['isbn']); ?></small>
+                                    <small>Penulis: <?php echo htmlspecialchars($row['nama_penulis']); ?></small>
+                                    <small>Penerbit: <?php echo htmlspecialchars($row['nama_penerbit']); ?></small>
+                                    <small>Halaman: <?php echo htmlspecialchars($row['jumlah_halaman']); ?></small>
+                                </p>
+                                <button class="btn btn-primary btn-sm">Pinjam</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <?php
-        }
-    } else {
-        // Message if no books are found in the database
-        echo '<div class="col-12"><p class="text-center text-muted">Tidak ada buku yang ditemukan dalam katalog.</p></div>';
-    }
-    // Close the database connection
-    $koneksi->close();
-    ?>
-</div>
+          <?php
+                }
+            } else {
+                // Message if no books are found in the database
+                echo '<div class="col-12"><p class="text-center text-muted">Tidak ada buku yang ditemukan dalam katalog.</p></div>';
+            }
+            // Close the database connection
+            $koneksi->close();
+          ?>
+        </div>
+      </main>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -227,18 +216,18 @@ if (!$result) {
         if (!card) continue; // Skip if no card found in the column
 
         const titleElement = card.querySelector('.card-title');
-        const textElements = card.querySelectorAll('.card-text small'); // Get all small text elements
+        const smallTextElements = card.querySelectorAll('.card-text small'); // Get all small text elements
 
-        let cardText = '';
+        let cardSearchableText = '';
         if (titleElement) {
-          cardText += titleElement.textContent.toLowerCase() + ' ';
+          cardSearchableText += titleElement.textContent.toLowerCase() + ' ';
         }
-        textElements.forEach(small => {
-          cardText += small.textContent.toLowerCase() + ' ';
+        smallTextElements.forEach(small => {
+          cardSearchableText += small.textContent.toLowerCase() + ' ';
         });
 
         // Check if the filter text is present in the combined card text
-        if (cardText.includes(filter)) {
+        if (cardSearchableText.includes(filter)) {
           col.style.display = ""; // Show the column (and card)
         } else {
           col.style.display = "none"; // Hide the column (and card)
