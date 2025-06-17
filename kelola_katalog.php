@@ -191,7 +191,9 @@ if (isset($_GET['id'])) {
               <th>Nama Penerbit</th>
               <th>Jumlah Halaman</th>
               <th>Foto</th>
-              <th colspan="2">Action</th> </tr>
+              <th>Action</th>
+              <th>Action</th> 
+            </tr>
           </thead>
           <tbody>
             <?php
