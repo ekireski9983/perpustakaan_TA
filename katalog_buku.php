@@ -119,59 +119,97 @@
           <input type="text" id="searchInput" class="form-control form-control-md" placeholder="Cari Judul Buku" style="max-width: 400px;" oninput="filterCards()" />
         </div>
 
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="katalogBukuContainer">
-          <div class="col">
-            <div class="card h-100 book-card">
-              <img src="assets/default_book.jpg" class="card-img-top" alt="The Great Gatsby Cover">
-              <div class="card-body">
-                <h5 class="card-title">The Great Gatsby</h5>
-                <p class="card-text">
-                  <small class="text-muted">ID Buku: B001</small>
-                  <small class="text-muted">ISBN: 978-0321765723</small>
-                  <small class="text-muted">Penulis: F. Scott Fitzgerald</small>
-                  <small class="text-muted">Penerbit: Scribner</small>
-                  <small class="text-muted">Halaman: 180</small>
-                </p>
-                <button class="btn btn-primary btn-sm">Pinjam</button>
-              </div>
+       <?php
+// --- Database Connection ---
+// IMPORTANT: Replace these with your actual database credentials
+$servername = "localhost"; // Usually 'localhost'
+$username = "root";       // Your MySQL username
+$password = "";           // Your MySQL password (often empty for root on local setup)
+$dbname = "perpustakaan"; // The name of your database
+
+// Create connection
+$koneksi = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($koneksi->connect_error) {
+    die("Koneksi database gagal: " . $koneksi->connect_error);
+}
+
+// --- Fetch Book Data ---
+// Query to select all relevant columns from the data_buku table
+$sql = "SELECT id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku ORDER BY judul_buku ASC";
+$result = $koneksi->query($sql);
+
+// Check for query errors
+if (!$result) {
+    die("Error retrieving books: " . $koneksi->error);
+}
+?>
+
+<?php
+// --- Database Connection ---
+// IMPORTANT: Replace these with your actual database credentials
+$servername = "localhost"; // Usually 'localhost'
+$username = "root";        // Your MySQL username
+$password = "";            // Your MySQL password (often empty for root on local setup)
+$dbname = "perpustakaan";  // The name of your database
+
+// Create connection
+$koneksi = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($koneksi->connect_error) {
+    die("Koneksi database gagal: " . $koneksi->connect_error);
+}
+
+// --- Fetch Book Data ---
+// Query to select all relevant columns from the data_buku table
+$sql = "SELECT id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku ORDER BY judul_buku ASC";
+$result = $koneksi->query($sql);
+
+// Check for query errors
+if (!$result) {
+    die("Error retrieving books: " . $koneksi->error);
+}
+?>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="katalogBukuContainer">
+    <?php
+    // Check if there are results from the database query
+    if ($result->num_rows > 0) {
+        // Loop through each row of data
+        while ($row = $result->fetch_assoc()) {
+            // Determine image path:
+            // Use 'upload/' directory (singular) as specified by you.
+            // If 'foto' exists in the database, use it; otherwise, use a default image.
+            $imagePath = !empty($row['foto']) ? 'upload/' . htmlspecialchars($row['foto']) : 'assets/default_book.jpg';
+            ?>
+            <div class="col">
+                <div class="card h-100 book-card">
+                    <img src="<?php echo $imagePath; ?>" class="card-img-top" alt="Cover Buku <?php echo htmlspecialchars($row['judul_buku']); ?>">
+                    <div class="card-body">
+                        <h5 class="card-title"><?php echo htmlspecialchars($row['judul_buku']); ?></h5>
+                        <p class="card-text">
+                            <small class="text-muted">ID Buku: <?php echo htmlspecialchars($row['id_buku']); ?></small>
+                            <small class="text-muted">ISBN: <?php echo htmlspecialchars($row['isbn']); ?></small>
+                            <small class="text-muted">Penulis: <?php echo htmlspecialchars($row['nama_penulis']); ?></small>
+                            <small class="text-muted">Penerbit: <?php echo htmlspecialchars($row['nama_penerbit']); ?></small>
+                            <small class="text-muted">Halaman: <?php echo htmlspecialchars($row['jumlah_halaman']); ?></small>
+                        </p>
+                        <button class="btn btn-primary btn-sm">Pinjam</button>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="col">
-            <div class="card h-100 book-card">
-              <img src="assets/default_book.jpg" class="card-img-top" alt="To Kill a Mockingbird Cover">
-              <div class="card-body">
-                <h5 class="card-title">To Kill a Mockingbird</h5>
-                <p class="card-text">
-                  <small class="text-muted">ID Buku: B002</small>
-                  <small class="text-muted">ISBN: 978-0743273565</small>
-                  <small class="text-muted">Penulis: Harper Lee</small>
-                  <small class="text-muted">Penerbit: J.B. Lippincott & Co.</small>
-                  <small class="text-muted">Halaman: 324</small>
-                </p>
-                <button class="btn btn-primary btn-sm">Pinjam</button>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="card h-100 book-card">
-              <img src="assets/default_book.jpg" class="card-img-top" alt="1984 Cover">
-              <div class="card-body">
-                <h5 class="card-title">1984</h5>
-                <p class="card-text">
-                  <small class="text-muted">ID Buku: B003</small>
-                  <small class="text-muted">ISBN: 978-0451524935</small>
-                  <small class="text-muted">Penulis: George Orwell</small>
-                  <small class="text-muted">Penerbit: Signet Classic</small>
-                  <small class="text-muted">Halaman: 328</small>
-                </p>
-                <button class="btn btn-primary btn-sm">Pinjam</button>
-              </div>
-            </div>
-          </div>
-          </div>
-      </main>
-    </div>
-  </div>
+            <?php
+        }
+    } else {
+        // Message if no books are found in the database
+        echo '<div class="col-12"><p class="text-center text-muted">Tidak ada buku yang ditemukan dalam katalog.</p></div>';
+    }
+    // Close the database connection
+    $koneksi->close();
+    ?>
+</div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
