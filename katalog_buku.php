@@ -164,7 +164,7 @@ if ($koneksi->connect_error) {
 
 // --- Fetch Book Data ---
 // Query to select all relevant columns from the data_buku table
-$sql = "SELECT id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku ORDER BY judul_buku ASC";
+$sql = "SELECT id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku ORDER BY foto ASC";
 $result = $koneksi->query($sql);
 
 // Check for query errors
@@ -186,7 +186,7 @@ if (!$result) {
             ?>
             <div class="col">
                 <div class="card h-100 book-card">
-                    <img src="<?php echo $imagePath; ?>" class="card-img-top" alt="Cover Buku <?php echo htmlspecialchars($row['judul_buku']); ?>">
+                    <img src="<?php echo $imagePath; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['foto']); ?>">
                     <div class="card-body">
                         <h5 class="card-title"><?php echo htmlspecialchars($row['judul_buku']); ?></h5>
                         <p class="card-text">
