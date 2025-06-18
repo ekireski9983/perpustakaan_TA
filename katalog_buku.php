@@ -49,41 +49,10 @@
       padding: 40px;
     }
 
-    /* Card Specific Styles */
-    .book-card .card-img-top {
-      height: 200px; /* Fixed height for consistent image display */
-      object-fit: cover; /* Ensures images cover the area without distortion */
-      border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* Separator for image */
-    }
-
-    .book-card .card-body {
-      padding: 1rem;
-    }
-
-    .book-card .card-title {
-      font-size: 1.25rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-    }
-
-    .book-card .card-text small {
-      display: block;
-      color: #6c757d;
-      font-size: 0.875em;
-    }
-
-    .book-card .btn {
-      margin-top: 1rem;
-    }
-
-
     @media (max-width: 768px) {
       .sidebar .logout {
         position: static;
         margin-top: 30px;
-      }
-      .main-content {
-        padding: 20px; /* Adjust padding for smaller screens */
       }
     }
   </style>
@@ -101,12 +70,12 @@
 
     <div class="row">
       <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
-        <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-        <a href="lihat_anggota.php">Lihat Anggota</a>
-        <a href="katalog_buku.php">Katalog Buku</a>
-        <a href="peminjaman_buku.php">Peminjaman Buku</a>
-        <a href="pengembalian_buku.php">Pengembalian Buku</a>
-        <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
+        <h5 class="pt-4">siswa<br /><small>user</small></h5>
+        <a href="lihat_anggota.php">lihat anggota</a>
+        <a href="katalog_buku.php">katalog buku</a>
+        <a href="peminjaman_buku.php">Peminjaman buku</a>
+        <a href="pengembalian_buku.php">Pengembalian buku</a>
+        <a href="denda_keterlambatan.php">denda keterlambatan</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/Bootstrap_logo.png" alt="icon" />
@@ -115,133 +84,89 @@
 
       <main class="col-md-9 col-12 main-content">
         <h4>Katalog Buku</h4>
-        <div class="mb-4 mt-3">
-          <input type="text" id="searchInput" class="form-control form-control-md" placeholder="Cari Judul Buku" style="max-width: 400px;" oninput="filterCards()" />
+
+        <div class="input-group mb-3">
+          <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Judul buku" style="max-width: 300px;" oninput="filterCards()" />
         </div>
 
-       <?php
-// --- Database Connection ---
-// IMPORTANT: Replace these with your actual database credentials
-$servername = "localhost"; // Usually 'localhost'
-$username = "root";       // Your MySQL username
-$password = "";           // Your MySQL password (often empty for root on local setup)
-$dbname = "perpustakaan"; // The name of your database
+        <?php
+        // Database connection details
+        $servername = "localhost"; // Your database server
+        $username = "root"; // Your database username
+        $password = ""; // Your database password
+        $dbname = "perpustakaan"; // **IMPORTANT: Change this to your actual database name**
 
-// Create connection
-$koneksi = new mysqli($servername, $username, $password, $dbname);
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
-if ($koneksi->connect_error) {
-    die("Koneksi database gagal: " . $koneksi->connect_error);
-}
-
-// --- Fetch Book Data ---
-// Query to select all relevant columns from the data_buku table
-$sql = "SELECT id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku ORDER BY judul_buku ASC";
-$result = $koneksi->query($sql);
-
-// Check for query errors
-if (!$result) {
-    die("Error retrieving books: " . $koneksi->error);
-}
-?>
-
-<?php
-// --- Database Connection ---
-// IMPORTANT: Replace these with your actual database credentials
-$servername = "localhost"; // Usually 'localhost'
-$username = "root";        // Your MySQL username
-$password = "";            // Your MySQL password (often empty for root on local setup)
-$dbname = "perpustakaan";  // The name of your database
-
-// Create connection
-$koneksi = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($koneksi->connect_error) {
-    die("Koneksi database gagal: " . $koneksi->connect_error);
-}
-
-// --- Fetch Book Data ---
-// Query to select all relevant columns from the data_buku table
-$sql = "SELECT id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku ORDER BY foto ASC";
-$result = $koneksi->query($sql);
-
-// Check for query errors
-if (!$result) {
-    die("Error retrieving books: " . $koneksi->error);
-}
-?>
-
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="katalogBukuContainer">
-    <?php
-    // Check if there are results from the database query
-    if ($result->num_rows > 0) {
-        // Loop through each row of data
-        while ($row = $result->fetch_assoc()) {
-            // Determine image path:
-            // Use 'upload/' directory (singular) as specified by you.
-            // If 'foto' exists in the database, use it; otherwise, use a default image.
-            $imagePath = !empty($row['foto']) ? 'upload/' . htmlspecialchars($row['foto']) : 'assets/default_book.jpg';
-            ?>
-            <div class="col">
-                <div class="card h-100 book-card">
-                    <img src="<?php echo $imagePath; ?>" class="card-img-top" alt="<?php echo htmlspecialchars($row['foto']); ?>">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($row['judul_buku']); ?></h5>
-                        <p class="card-text">
-                            <small class="text-muted">ID Buku: <?php echo htmlspecialchars($row['id_buku']); ?></small>
-                            <small class="text-muted">ISBN: <?php echo htmlspecialchars($row['isbn']); ?></small>
-                            <small class="text-muted">Penulis: <?php echo htmlspecialchars($row['nama_penulis']); ?></small>
-                            <small class="text-muted">Penerbit: <?php echo htmlspecialchars($row['nama_penerbit']); ?></small>
-                            <small class="text-muted">Halaman: <?php echo htmlspecialchars($row['jumlah_halaman']); ?></small>
-                        </p>
-                        <button class="btn btn-primary btn-sm">Pinjam</button>
-                    </div>
-                </div>
-            </div>
-            <?php
+        // Check connection
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
         }
-    } else {
-        // Message if no books are found in the database
-        echo '<div class="col-12"><p class="text-center text-muted">Tidak ada buku yang ditemukan dalam katalog.</p></div>';
-    }
-    // Close the database connection
-    $koneksi->close();
-    ?>
-</div>
+
+        // Initialize search query
+        $search_query = "";
+        if (isset($_GET['search']) && !empty($_GET['search'])) {
+            $search_term = $conn->real_escape_string($_GET['search']);
+            $search_query = " WHERE judul_buku LIKE '%$search_term%' OR id_buku LIKE '%$search_term%' OR nama_penulis LIKE '%$search_term%'";
+        }
+
+        // SQL query to fetch data from the 'buku' table
+        // Adjust column names according to your 'buku' table schema
+        $sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku" . $search_query;
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            // Output data for each row
+            while ($row = $result->fetch_assoc()) {
+                ?>
+                <div class="card mb-4 book-card">
+                  <div class="row g-0">
+                    <div class="col-md-4">
+                      <img src="<?php echo htmlspecialchars($row['foto']); ?>" class="img-fluid rounded-start" alt="Book Cover" style="max-width: 150px; max-height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title book-title"><?php echo htmlspecialchars($row['id_buku']); ?></h5>
+                        <p class="card-text"><?php echo htmlspecialchars($row['judul_buku']); ?></p>
+                        <p class="card-text"><?php echo htmlspecialchars($row['nama_penulis']); ?></p>
+                        <p class="card-text"><small class="text-muted">Penerbit: <?php echo htmlspecialchars($row['nama_penerbit']); ?> | jumlah halaman: <?php echo htmlspecialchars($row['jumlah_halaman']); ?></small></p>
+                        <a href="peminjaman.php?id=<?php echo htmlspecialchars($row['id_buku']); ?>" class="btn btn-success">Pinjam buku</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <?php
+            }
+        } else {
+            echo "<p>No books found in the catalog.</p>";
+        }
+
+        $conn->close();
+        ?>
+
+      </main>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
   <script>
-    // Function to filter book cards based on search input
     function filterCards() {
-      const input = document.getElementById('searchInput');
-      const filter = input.value.toLowerCase();
-      const container = document.getElementById('katalogBukuContainer');
-      const bookCols = container.getElementsByClassName('col'); // Get all column divs holding cards
+      let input, filter, cards, card, title, i, txtValue;
+      input = document.getElementById("searchInput");
+      filter = input.value.toUpperCase();
+      cards = document.getElementsByClassName("book-card");
 
-      for (let i = 0; i < bookCols.length; i++) {
-        const col = bookCols[i];
-        const card = col.querySelector('.card');
-        if (!card) continue; // Skip if no card found in the column
-
-        const titleElement = card.querySelector('.card-title');
-        const textElements = card.querySelectorAll('.card-text small'); // Get all small text elements
-
-        let cardText = '';
-        if (titleElement) {
-          cardText += titleElement.textContent.toLowerCase() + ' ';
-        }
-        textElements.forEach(small => {
-          cardText += small.textContent.toLowerCase() + ' ';
-        });
-
-        // Check if the filter text is present in the combined card text
-        if (cardText.includes(filter)) {
-          col.style.display = ""; // Show the column (and card)
-        } else {
-          col.style.display = "none"; // Hide the column (and card)
+      for (i = 0; i < cards.length; i++) {
+        card = cards[i];
+        title = card.querySelector(".book-title"); // Assuming book title is inside a h5 with class 'book-title'
+        if (title) {
+          txtValue = title.textContent || title.innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            card.style.display = "";
+          } else {
+            card.style.display = "none";
+          }
         }
       }
     }
