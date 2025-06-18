@@ -114,7 +114,7 @@
         <h4>Katalog Buku</h4>
 
         <div class="input-group mb-3">
-          <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Judul buku" style="max-width: 300px;" oninput="filterCards()" />
+          <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Mencari buku yang mau dipinjam" style="max-width: 300px;" oninput="filterCards()" />
         </div>
 
         <?php
@@ -161,7 +161,7 @@
                         <p class="card-text"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($row['nama_penulis']); ?></p>
                         <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($row['nama_penerbit']); ?></p>
                         <p class="card-text"><strong>jumlah halaman:</strong> <?php echo htmlspecialchars($row['jumlah_halaman']); ?></p>
-                        <a href="peminjaman.php?id=<?php echo htmlspecialchars($row['id_buku']); ?>" class="btn btn-success">Pinjam buku</a>
+                        <a href="peminjaman_buku.php?id=<?php echo htmlspecialchars($row['id_buku']); ?>" class="btn btn-success">Pinjam buku</a>
                       </div>
                     </div>
                   </div>
