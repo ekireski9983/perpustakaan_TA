@@ -160,6 +160,7 @@
                         <p class="card-text"><strong>ISBN:</strong> <?php echo htmlspecialchars($row['isbn']); ?></p>
                         <p class="card-text"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($row['nama_penulis']); ?></p>
                         <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($row['nama_penerbit']); ?></p>
+                        <p class="card-text"><strong>jumlah halaman:</strong> <?php echo htmlspecialchars($row['jumlah_halaman']); ?></p>
                         <a href="peminjaman.php?id=<?php echo htmlspecialchars($row['id_buku']); ?>" class="btn btn-success">Pinjam buku</a>
                       </div>
                     </div>
