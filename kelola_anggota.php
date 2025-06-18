@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
 // Menangani pembaruan data anggota
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
-    $id_siswa = $_POST['editId'];
+    $id_siswa = $_POST['editId']; // Use the hidden ID for the WHERE clause
     $nama = $_POST['editNama'];
     $jurusan = $_POST['editJurusan'];
     $kelas = $_POST['editKelas'];
@@ -87,7 +87,6 @@ if (isset($_GET['id'])) {
 </head>
 <body>
 <div class="container-fluid">
-  <!-- Mobile Topbar -->
   <div class="row d-md-none bg-dark text-white p-2">
     <div class="col">
       <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">☰ Menu</button>
@@ -96,21 +95,37 @@ if (isset($_GET['id'])) {
   </div>
 
   <div class="row">
-      <!-- Sidebar for md and up -->
       <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
         <h5 class="pt-4">Pustakawan<br /><small>admin</small></h5>
-        <a href="kelola_anggota.php">kelola anggota</a>
-        <a href="kelola_katalog.php">kelola katalog buku</a>
-        <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
-        <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
-        <a href="kelola_denda.php">kelola denda</a>
+        <a href="kelola_anggota.php">Kelola Anggota</a>
+        <a href="kelola_katalog.php">Kelola Katalog Buku</a>
+        <a href="kelola_peminjaman.php">Kelola Peminjaman Buku</a>
+        <a href="kelola_pengembalian.php">Kelola Pengembalian Buku</a>
+        <a href="kelola_denda.php">Kelola Denda</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/Bootstrap_logo.png" alt="icon" />
         </div>
       </nav>
+      
+      <div class="offcanvas offcanvas-start sidebar text-white" tabindex="-1" id="sidebarMenu">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title">Pustakawan</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+          <a href="kelola_anggota.php">kelola anggota</a> 
+          <a href="kelola_katalog.php">kelola katalog buku</a>
+          <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
+          <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
+          <a href="kelola_denda.php">kelola denda</a>
+          <a href="logout.php">Logout</a>
+          <div class="image-box text-center mt-5">
+            <img src="assets/Bootstrap_logo.png" alt="icon" />
+          </div>
+        </div>
+      </div>
 
-    <!-- Main Content -->
     <main class="col-md-9 col-12 main-content">
       <h4>Kelola Anggota</h4>
       <div class="d-flex flex-wrap gap-2 align-items-center mb-3 mt-3">
@@ -146,7 +161,7 @@ if (isset($_GET['id'])) {
                       <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#editAnggotaModal" data-id="' . htmlspecialchars($row['id_siswa']) . '" data-nama="' . htmlspecialchars($row['nama']) . '" data-jurusan="' . htmlspecialchars($row['jurusan']) . '" data-kelas="' . htmlspecialchars($row['kelas']) . '" data-semester="' . htmlspecialchars($row['semester']) . '">Edit</button>
                     </td>';
               echo '<td>
-                    <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusAnggotaModal" data-id="' . htmlspecialchars($row['id_siswa']) . '">Delete</button>
+                      <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusAnggotaModal" data-id="' . htmlspecialchars($row['id_siswa']) . '">Delete</button>
                     </td>';
               echo "</tr>";
             }
@@ -158,7 +173,6 @@ if (isset($_GET['id'])) {
   </div>
 </div>
 
-<!-- Modal Tambah Anggota -->
 <div class="modal fade" id="tambahAnggotaModal" tabindex="-1" aria-labelledby="tambahAnggotaModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -197,7 +211,6 @@ if (isset($_GET['id'])) {
   </div>
 </div>
 
-<!-- Modal Edit Anggota -->
 <div class="modal fade" id="editAnggotaModal" tabindex="-1" aria-labelledby="editAnggotaModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -211,8 +224,7 @@ if (isset($_GET['id'])) {
           <input type="hidden" id="editId" name="editId">
           <div class="mb-3">
             <label for="editid" class="form-label">id Siswa</label>
-            <input type="text" class="form-control" id="editid" name="editid" required>
-          </div>
+            <input type="text" class="form-control" id="editid" name="editid" readonly> </div>
           <div class="mb-3">
             <label for="editNama" class="form-label">Nama Siswa</label>
             <input type="text" class="form-control" id="editNama" name="editNama" required>
@@ -237,7 +249,6 @@ if (isset($_GET['id'])) {
   </div>
 </div>
 
-<!-- Modal Hapus Anggota -->
 <div class="modal fade" id="hapusAnggotaModal" tabindex="-1" aria-labelledby="hapusAnggotaModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -259,7 +270,6 @@ if (isset($_GET['id'])) {
   </div>
 </div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>

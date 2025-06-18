@@ -164,10 +164,10 @@ if (isset($_GET['id'])) {
       <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
         <h5 class="pt-4">Pustakawan<br /><small>admin</small></h5>
         <a href="kelola_anggota.php">Kelola Anggota</a>
-        <a href="kelola_katalog.php" class="active">Kelola Katalog Buku</a>
+        <a href="kelola_katalog.php">Kelola Katalog Buku</a>
         <a href="kelola_peminjaman.php">Kelola Peminjaman Buku</a>
         <a href="kelola_pengembalian.php">Kelola Pengembalian Buku</a>
-        <a href="kelola_denda.php">Kelola Denda</a>
+        <a href="kelola_denda.php">Kelola denda</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/Bootstrap_logo.png" alt="icon" />
