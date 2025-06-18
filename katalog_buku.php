@@ -181,7 +181,7 @@
                 <?php
             }
         } else {
-            echo "<p>No books found in the catalog.</p>";
+            echo "<p>buku belum ditambahkan</p>";
         }
 
         $conn->close();
