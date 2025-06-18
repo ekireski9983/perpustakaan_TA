@@ -49,10 +49,38 @@
       padding: 40px;
     }
 
+    /* --- Image and Card Styling Improvements --- */
+    .book-card .col-md-4 {
+        display: flex; /* Use flexbox for vertical centering */
+        align-items: center; /* Center image vertically */
+        justify-content: center; /* Center image horizontally */
+        padding: 15px; /* Add some padding around the image */
+    }
+
+    .book-card img {
+      width: 100%; /* Make image take full width of its column */
+      max-width: 180px; /* Set a maximum width for the image */
+      height: auto; /* Maintain aspect ratio */
+      object-fit: contain; /* Ensure the whole image is visible within its bounds */
+      border-radius: var(--bs-border-radius); /* Use Bootstrap's default border-radius */
+    }
+
+    /* Optional: Adjust card-body padding if needed */
+    .book-card .card-body {
+        padding-left: 0; /* Remove default left padding to align with image on small screens */
+    }
+
     @media (max-width: 768px) {
       .sidebar .logout {
         position: static;
         margin-top: 30px;
+      }
+      .book-card .col-md-4 {
+        padding-bottom: 0; /* Less padding on small screens if image is above text */
+      }
+      .book-card img {
+        max-width: 100%; /* Allow image to fill its column on smaller screens */
+        max-height: 250px; /* Adjust max height for smaller screens if necessary */
       }
     }
   </style>
@@ -123,14 +151,15 @@
                 <div class="card mb-4 book-card">
                   <div class="row g-0">
                     <div class="col-md-4">
-                      <img src="<?php echo htmlspecialchars($row['foto']); ?>" class="img-fluid rounded-start" alt="Book Cover" style="max-width: 150px; max-height: 200px; object-fit: cover;">
+                      <img src="<?php echo htmlspecialchars($row['foto']); ?>" class="img-fluid rounded-start" alt="Book Cover">
                     </div>
                     <div class="col-md-8">
                       <div class="card-body">
                         <h5 class="card-title book-title"><?php echo htmlspecialchars($row['id_buku']); ?></h5>
-                        <p class="card-text"><?php echo htmlspecialchars($row['judul_buku']); ?></p>
-                        <p class="card-text"><?php echo htmlspecialchars($row['nama_penulis']); ?></p>
-                        <p class="card-text"><small class="text-muted">Penerbit: <?php echo htmlspecialchars($row['nama_penerbit']); ?> | jumlah halaman: <?php echo htmlspecialchars($row['jumlah_halaman']); ?></small></p>
+                        <p class="card-text"><strong>Judul Buku:</strong> <?php echo htmlspecialchars($row['judul_buku']); ?></p>
+                        <p class="card-text"><strong>ISBN:</strong> <?php echo htmlspecialchars($row['isbn']); ?></p>
+                        <p class="card-text"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($row['nama_penulis']); ?></p>
+                        <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($row['nama_penerbit']); ?></p>
                         <a href="peminjaman.php?id=<?php echo htmlspecialchars($row['id_buku']); ?>" class="btn btn-success">Pinjam buku</a>
                       </div>
                     </div>
@@ -159,7 +188,9 @@
 
       for (i = 0; i < cards.length; i++) {
         card = cards[i];
-        title = card.querySelector(".book-title"); // Assuming book title is inside a h5 with class 'book-title'
+        // Target the book title for filtering. Ensure your PHP output has a unique identifier for the title,
+        // or adapt this to match the content you want to filter by (e.g., card-text for book title).
+        title = card.querySelector(".card-text:nth-of-type(1)"); // Targeting the first <p> with class card-text for the book title
         if (title) {
           txtValue = title.textContent || title.innerText;
           if (txtValue.toUpperCase().indexOf(filter) > -1) {
