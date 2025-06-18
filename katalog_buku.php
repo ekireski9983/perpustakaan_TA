@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard siswa</title>
+  <title>Dashboard Siswa</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
     body {
@@ -92,29 +92,45 @@
         <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
           ☰ Menu
         </button>
-        <span class="ms-3">Dashboard siswa</span>
+        <span class="ms-3">Dashboard Siswa</span>
       </div>
     </div>
 
     <div class="row">
       <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
-        <h5 class="pt-4">siswa<br /><small>user</small></h5>
-        <a href="lihat_anggota.php">lihat anggota</a>
-        <a href="katalog_buku.php">katalog buku</a>
-        <a href="peminjaman_buku.php">Peminjaman buku</a>
-        <a href="pengembalian_buku.php">Pengembalian buku</a>
-        <a href="denda_keterlambatan.php">denda keterlambatan</a>
+        <h5 class="pt-4">Siswa<br /><small>user</small></h5>
+        <a href="lihat_anggota.php">Lihat Anggota</a>
+        <a href="katalog_buku.php">Katalog Buku</a>
+        <a href="peminjaman_buku.php">Peminjaman Buku</a>
+        <a href="pengembalian_buku.php">Pengembalian Buku</a>
+        <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/Bootstrap_logo.png" alt="icon" />
         </div>
       </nav>
 
+      <div class="offcanvas offcanvas-start sidebar" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+        <div class="offcanvas-header">
+          <h5 class="offcanvas-title" id="sidebarMenuLabel">Siswa</h5>
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+          <h5 class="pt-4">Siswa<br /><small>user</small></h5>
+          <a href="lihat_anggota.php">Lihat Anggota</a>
+          <a href="katalog_buku.php">Katalog Buku</a>
+          <a href="peminjaman_buku.php">Peminjaman Buku</a>
+          <a href="pengembalian_buku.php">Pengembalian Buku</a>
+          <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
+          <a href="logout.php">Logout</a>
+        </div>
+      </div>
+
       <main class="col-md-9 col-12 main-content">
         <h4>Katalog Buku</h4>
 
         <div class="input-group mb-3">
-          <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Mencari buku yang mau dipinjam" style="max-width: 300px;" oninput="filterCards()" />
+          <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="mencari buku yang mau dipinjam" style="max-width: 400px;" onkeyup="filterCards()" />
         </div>
 
         <?php
@@ -132,16 +148,15 @@
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Initialize search query
-        $search_query = "";
-        if (isset($_GET['search']) && !empty($_GET['search'])) {
-            $search_term = $conn->real_escape_string($_GET['search']);
-            $search_query = " WHERE judul_buku LIKE '%$search_term%' OR id_buku LIKE '%$search_term%' OR nama_penulis LIKE '%$search_term%'";
+        // Initialize search query for PHP
+        $php_search_query = "";
+        if (isset($_GET['php_search']) && !empty($_GET['php_search'])) {
+            $search_term_php = $conn->real_escape_string($_GET['php_search']);
+            $php_search_query = " WHERE judul_buku LIKE '%$search_term_php%' OR id_buku LIKE '%$search_term_php%' OR nama_penulis LIKE '%$search_term_php%'";
         }
 
-        // SQL query to fetch data from the 'buku' table
-        // Adjust column names according to your 'buku' table schema
-        $sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku" . $search_query;
+        // SQL query to fetch data from the 'data_buku' table
+        $sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku" . $php_search_query;
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
@@ -155,12 +170,9 @@
                     </div>
                     <div class="col-md-8">
                       <div class="card-body">
-                        <h5 class="card-title book-title"><?php echo htmlspecialchars($row['id_buku']); ?></h5>
-                        <p class="card-text"><strong>Judul Buku:</strong> <?php echo htmlspecialchars($row['judul_buku']); ?></p>
-                        <p class="card-text"><strong>ISBN:</strong> <?php echo htmlspecialchars($row['isbn']); ?></p>
-                        <p class="card-text"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($row['nama_penulis']); ?></p>
-                        <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($row['nama_penerbit']); ?></p>
-                        <p class="card-text"><strong>jumlah halaman:</strong> <?php echo htmlspecialchars($row['jumlah_halaman']); ?></p>
+                        <h5 class="card-title book-id"><?php echo htmlspecialchars($row['id_buku']); ?></h5> <p class="card-text book-title"><strong>Judul Buku:</strong> <?php echo htmlspecialchars($row['judul_buku']); ?></p> <p class="card-text"><strong>ISBN:</strong> <?php echo htmlspecialchars($row['isbn']); ?></p>
+                        <p class="card-text book-author"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($row['nama_penulis']); ?></p> <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($row['nama_penerbit']); ?></p>
+                        <p class="card-text"><strong>Jumlah Halaman:</strong> <?php echo htmlspecialchars($row['jumlah_halaman']); ?></p>
                         <a href="peminjaman_buku.php?id=<?php echo htmlspecialchars($row['id_buku']); ?>" class="btn btn-success">Pinjam buku</a>
                       </div>
                     </div>
@@ -182,23 +194,42 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     function filterCards() {
-      let input, filter, cards, card, title, i, txtValue;
+      let input, filter, cards, card, bookTitle, bookAuthor, bookId, i, titleTxt, authorTxt, idTxt;
       input = document.getElementById("searchInput");
       filter = input.value.toUpperCase();
       cards = document.getElementsByClassName("book-card");
 
       for (i = 0; i < cards.length; i++) {
         card = cards[i];
-        // Target the book title for filtering. Ensure your PHP output has a unique identifier for the title,
-        // or adapt this to match the content you want to filter by (e.g., card-text for book title).
-        title = card.querySelector(".card-text:nth-of-type(1)"); // Targeting the first <p> with class card-text for the book title
-        if (title) {
-          txtValue = title.textContent || title.innerText;
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            card.style.display = "";
-          } else {
-            card.style.display = "none";
+        bookTitle = card.querySelector(".book-title"); // Select by specific class for title
+        bookAuthor = card.querySelector(".book-author"); // Select by specific class for author
+        bookId = card.querySelector(".book-id"); // Select by specific class for book ID
+
+        let match = false;
+
+        if (bookTitle) {
+          titleTxt = bookTitle.textContent || bookTitle.innerText;
+          if (titleTxt.toUpperCase().indexOf(filter) > -1) {
+            match = true;
           }
+        }
+        if (!match && bookAuthor) {
+          authorTxt = bookAuthor.textContent || bookAuthor.innerText;
+          if (authorTxt.toUpperCase().indexOf(filter) > -1) {
+            match = true;
+          }
+        }
+        if (!match && bookId) {
+          idTxt = bookId.textContent || bookId.innerText;
+          if (idTxt.toUpperCase().indexOf(filter) > -1) {
+            match = true;
+          }
+        }
+
+        if (match) {
+          card.style.display = "";
+        } else {
+          card.style.display = "none";
         }
       }
     }
