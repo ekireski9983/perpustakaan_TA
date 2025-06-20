@@ -344,29 +344,7 @@ if (isset($_GET['id'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // Script untuk mengisi data pada modal edit
-  const editButtons = document.querySelectorAll('[data-bs-target="#editKatalogModal"]');
-  editButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const id = button.getAttribute('data-id');
-      const isbn = button.getAttribute('data-isbn');
-      const judul_buku = button.getAttribute('data-judul_buku');
-      const nama_penulis = button.getAttribute('data-nama_penulis');
-      const nama_penerbit = button.getAttribute('data-nama_penerbit');
-      const jumlah_halaman = button.getAttribute('data-jumlah_halaman');
-      // const foto = button.getAttribute('data-foto'); // Not needed for file input value
 
-      document.getElementById('editId').value = id; // Hidden field for ID
-      document.getElementById('editid').value = id; // Display field for ID
-      document.getElementById('editIsbn').value = isbn;
-      document.getElementById('editJudulbuku').value = judul_buku;
-      document.getElementById('editNamaPenulis').value = nama_penulis;
-      document.getElementById('editNamaPenerbit').value = nama_penerbit;
-      document.getElementById('editJumlahHalaman').value = jumlah_halaman;
-      // Note: You cannot set the value of a file input for security reasons.
-      // If you want to show the current photo, you'd need an <img> tag.
-    });
-  });
 
   // Script untuk mengisi data pada modal hapus
   const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusKatalogModal"]'); // Corrected target
