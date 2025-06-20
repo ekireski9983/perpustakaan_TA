@@ -99,7 +99,7 @@
     <div class="row">
       <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
         <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-        <a href="lihat_anggota.php">Lihat Anggota</a>
+        <a href="lihat_anggota.php">lihat Anggota</a>
         <a href="katalog_buku.php">Katalog Buku</a>
         <a href="peminjaman_buku.php">Peminjaman Buku</a>
         <a href="pengembalian_buku.php">Pengembalian Buku</a>
@@ -117,7 +117,7 @@
         </div>
         <div class="offcanvas-body">
           <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-          <a href="lihat_anggota.php">Lihat Anggota</a>
+          <a href="lihat_anggota.php">lihat Anggota</a>
           <a href="katalog_buku.php">Katalog Buku</a>
           <a href="peminjaman_buku.php">Peminjaman Buku</a>
           <a href="pengembalian_buku.php">Pengembalian Buku</a>

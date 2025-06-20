@@ -120,7 +120,7 @@
         <div class="row">
       <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
         <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-        <a href="lihat_anggota.php">Lihat Anggota</a>
+        <a href="lihat_anggota.php">lihat Anggota</a>
         <a href="katalog_buku.php">Katalog Buku</a>
         <a href="peminjaman_buku.php">Peminjaman Buku</a>
         <a href="pengembalian_buku.php">Pengembalian Buku</a>
@@ -138,7 +138,7 @@
         </div>
         <div class="offcanvas-body">
           <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-          <a href="lihat_anggota.php">Lihat Anggota</a>
+          <a href="lihat_anggota.php">lihat Anggota</a>
           <a href="katalog_buku.php">Katalog Buku</a>
           <a href="peminjaman_buku.php">Peminjaman Buku</a>
           <a href="pengembalian_buku.php">Pengembalian Buku</a>
@@ -147,61 +147,61 @@
         </div>
       </div>
 
-            <main class="col-md-9 col-12 main-content">
-                <h4>Peminjaman Buku</h4>
+                <main class="col-md-9 col-12 main-content">
+                    <h4>Peminjaman Buku</h4>
 
-                <div class="input-group mb-3">
-                    <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Cari buku berdasarkan judul, ID, atau penulis..." style="max-width: 400px;" onkeyup="filterCards()" aria-label="Search Book" />
-                </div>
+                    <div class="input-group mb-3">
+                        <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Cari buku berdasarkan judul, ID, atau penulis..." style="max-width: 400px;" onkeyup="filterCards()" aria-label="Search Book" />
+                    </div>
 
-                <div id="bookCardsContainer">
-                    <div class="card mb-4 book-card">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="upload/68552287ad0f52.88016925.jpg" class="img-fluid rounded-start" alt="Book Cover">
+                    <div id="bookCardsContainer">
+                        <div class="card mb-4 book-card">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="upload/68552287ad0f52.88016925.jpg" class="img-fluid rounded-start" alt="Book Cover">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title book-id">BOOK001</h5>
+                                        <p class="card-text book-title"><strong>Judul Buku:</strong> The Great Adventure</p>
+                                        <p class="card-text"><strong>ISBN:</strong> 978-0123456789</p>
+                                        <p class="card-text book-author"><strong>Nama Penulis:</strong> Jane Doe</p>
+                                        <p class="card-text"><strong>Nama Penerbit:</strong> Adventure Publishing</p>
+                                        <p class="card-text"><strong>Jumlah Halaman:</strong> 320</p>
+                                        <p class="card-text"><strong>tanggal pinjam:</strong> 00/00/00</p>
+                                        <p class="card-text"><strong>tanggal pengembalian:</strong> 00/00/00</p>
+                                        <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal('BOOK001', 'The Great Adventure', '978-0123456789', 'Jane Doe', 'Adventure Publishing', 320, 'upload/68552287ad0f52.88016925.jpg')">Pinjam buku</button>
+                                        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick="showEditModal({id_buku: 'BOOK001', judul_buku: 'The Great Adventure', isbn: '978-0123456789', nama_penulis: 'Jane Doe', nama_penerbit: 'Adventure Publishing', jumlah_halaman: 320, foto: 'upload/68552287ad0f52.88016925.jpg', tanggal_pinjam: '2025-06-13', tanggal_pengembalian: '2025-06-20'})">Edit</button>
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId('BOOK001')">Hapus</button>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title book-id">BOOK001</h5>
-                                    <p class="card-text book-title"><strong>Judul Buku:</strong> The Great Adventure</p>
-                                    <p class="card-text"><strong>ISBN:</strong> 978-0123456789</p>
-                                    <p class="card-text book-author"><strong>Nama Penulis:</strong> Jane Doe</p>
-                                    <p class="card-text"><strong>Nama Penerbit:</strong> Adventure Publishing</p>
-                                    <p class="card-text"><strong>Jumlah Halaman:</strong> 320</p>
-                                    <p class="card-text"><strong>tanggal pinjam:</strong> 00/00/00</p>
-                                    <p class="card-text"><strong>tanggal pengembalian:</strong> 00/00/00</p>
-                                    <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal('BOOK001')">Pinjam buku</button>
-                                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick="showEditModal({id_buku: 'BOOK001', judul_buku: 'The Great Adventure', isbn: '978-0123456789', nama_penulis: 'Jane Doe', nama_penerbit: 'Adventure Publishing', jumlah_halaman: 320, foto: 'upload/68552287ad0f52.88016925.jpg'})">Edit</button>
-                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId('BOOK001')">Hapus</button>
+                        </div>
+
+                        <div class="card mb-4 book-card">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img src="upload/68552287ad0f52.88016925.jpg" class="img-fluid rounded-start" alt="Book Cover">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title book-id">BOOK002</h5>
+                                        <p class="card-text book-title"><strong>Judul Buku:</strong> Mystery of the Old House</p>
+                                        <p class="card-text"><strong>ISBN:</strong> 978-9876543210</p>
+                                        <p class="card-text book-author"><strong>Nama Penulis:</strong> John Smith</p>
+                                        <p class="card-text"><strong>Nama Penerbit:</strong> Whodunit Books</p>
+                                        <p class="card-text"><strong>Jumlah Halaman:</strong> 280</p>
+                                        <p class="card-text"><strong>tanggal pinjam:</strong> 00/00/00</p>
+                                        <p class="card-text"><strong>tanggal pengembalian:</strong> 00/00/00</p>
+                                        <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal('BOOK002', 'Mystery of the Old House', '978-9876543210', 'John Smith', 'Whodunit Books', 280, 'upload/68552287ad0f52.88016925.jpg')">Pinjam buku</button>
+                                        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick="showEditModal({id_buku: 'BOOK002', judul_buku: 'Mystery of the Old House', isbn: '978-9876543210', nama_penulis: 'John Smith', nama_penerbit: 'Whodunit Books', jumlah_halaman: 280, foto: 'upload/68552287ad0f52.88016925.jpg', tanggal_pinjam: '2025-06-10', tanggal_pengembalian: '2025-06-17'})">Edit</button>
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId('BOOK002')">Hapus</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="card mb-4 book-card">
-                        <div class="row g-0">
-                            <div class="col-md-4">
-                                <img src="upload/68552287ad0f52.88016925.jpg" class="img-fluid rounded-start" alt="Book Cover">
-                            </div>
-                            <div class="col-md-8">
-                                <div class="card-body">
-                                    <h5 class="card-title book-id">BOOK002</h5>
-                                    <p class="card-text book-title"><strong>Judul Buku:</strong> Mystery of the Old House</p>
-                                    <p class="card-text"><strong>ISBN:</strong> 978-9876543210</p>
-                                    <p class="card-text book-author"><strong>Nama Penulis:</strong> John Smith</p>
-                                    <p class="card-text"><strong>Nama Penerbit:</strong> Whodunit Books</p>
-                                    <p class="card-text"><strong>Jumlah Halaman:</strong> 280</p>
-                                    <p class="card-text"><strong>tanggal pinjam:</strong> 00/00/00</p>
-                                    <p class="card-text"><strong>tanggal pengembalian:</strong> 00/00/00</p>
-                                    <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal">Pinjam buku</button>
-                                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick="showEditModal">Edit</button>
-                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId">Hapus</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+                </main>
         </div>
     </div>
 
@@ -214,39 +214,42 @@
                 </div>
                 <form id="borrowForm" action="process_borrow.php" method="POST">
                     <div class="modal-body">
-                        <input type="hidden" id="id_buku" name="id_buku">
                         <div class="mb-3">
-                            <label for="tambahidbuku" class="form-label">id buku</label>
-                            <input type="text" class="form-control" id="text" name="id_buku" required>
-                        </div>
-                         <div class="mb-3">
-                            <label for="judulbuku" class="form-label">judul buku</label>
-                            <input type="text" class="form-control" id="text" name="judul_buku" required>
-                        </div>
-                         <div class="mb-3">
-                            <label for="isbn" class="form-label">isbn</label>
-                            <input type="text" class="form-control" id="text" name="isbn" required>
+                            <label for="borrowBookId" class="form-label">ID Buku</label>
+                            <input type="text" class="form-control" id="borrowBookId" name="id_buku" readonly>
                         </div>
                         <div class="mb-3">
-                            <label for="editPenulis" class="form-label">Nama Penulis</label>
-                            <input type="text" class="form-control" id="editPenulis" name="nama_penulis" required>
+                            <label for="borrowJudulBuku" class="form-label">Judul Buku</label>
+                            <input type="text" class="form-control" id="borrowJudulBuku" name="judul_buku" readonly>
                         </div>
                         <div class="mb-3">
-                            <label for="editPenerbit" class="form-label">Nama Penerbit</label>
-                            <input type="text" class="form-control" id="editPenerbit" name="nama_penerbit">
+                            <label for="borrowISBN" class="form-label">ISBN</label>
+                            <input type="text" class="form-control" id="borrowISBN" name="isbn" readonly>
                         </div>
                         <div class="mb-3">
-                            <label for="tanggalpinjam" class="form-label">Tanggal Pinjam</label>
-                            <input type="date" class="form-control" id="Date" name="tanggal_pinjam" required>
+                            <label for="borrowNamaPenulis" class="form-label">Nama Penulis</label>
+                            <input type="text" class="form-control" id="borrowNamaPenulis" name="nama_penulis" readonly>
                         </div>
                         <div class="mb-3">
-                            <label for="tanggalpengembalian" class="form-label">Tanggal pengembalian</label>
-                            <input type="date" class="form-control" id="returnDate" name="tanggal_pengembalian" required>
+                            <label for="borrowNamaPenerbit" class="form-label">Nama Penerbit</label>
+                            <input type="text" class="form-control" id="borrowNamaPenerbit" name="nama_penerbit" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="borrowJumlahHalaman" class="form-label">Jumlah Halaman</label>
+                            <input type="number" class="form-control" id="borrowJumlahHalaman" name="jumlah_halaman" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="borrowDate" class="form-label">Tanggal Pinjam</label>
+                            <input type="date" class="form-control" id="borrowDate" name="tanggal_pinjam" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="borrowReturnDate" class="form-label">Tanggal Pengembalian</label>
+                            <input type="date" class="form-control" id="borrowReturnDate" name="tanggal_pengembalian" required>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-success">Pinjam buku</button>
-                        <button type="reset" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                     </div>
                 </form>
             </div>
@@ -257,41 +260,44 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editBookModalLabel">Edit pinjam Buku</h5>
+                    <h5 class="modal-title" id="editBookModalLabel">Edit Peminjaman Buku</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="editForm" action="process_edit_book.php" method="POST">
-                    <div class="modal-body">
-                        <input type="hidden" id="edit_book_id" name="book_id">
+                      <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="editBookId" class="form-label">ID Buku</label>
+                            <input type="text" class="form-control" id="editBookId" name="id_buku" readonly>
+                        </div>
                         <div class="mb-3">
                             <label for="editJudul" class="form-label">Judul Buku</label>
-                            <input type="text" class="form-control" id="editJudul" name="judul_buku" required>
+                            <input type="text" class="form-control" id="editJudul" name="judul_buku" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="editISBN" class="form-label">ISBN</label>
-                            <input type="text" class="form-control" id="editISBN" name="isbn">
+                            <input type="text" class="form-control" id="editISBN" name="isbn" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="editPenulis" class="form-label">Nama Penulis</label>
-                            <input type="text" class="form-control" id="editPenulis" name="nama_penulis" required>
+                            <input type="text" class="form-control" id="editPenulis" name="nama_penulis" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="editPenerbit" class="form-label">Nama Penerbit</label>
-                            <input type="text" class="form-control" id="editPenerbit" name="nama_penerbit">
+                            <input type="text" class="form-control" id="editPenerbit" name="nama_penerbit" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="editHalaman" class="form-label">Jumlah Halaman</label>
-                            <input type="number" class="form-control" id="editHalaman" name="jumlah_halaman">
+                            <input type="number" class="form-control" id="editHalaman" name="jumlah_halaman" readonly>
                         </div>
                         <div class="mb-3">
-                            <label for="editpinjam" class="form-label">tanggal_pinjam</label>
-                            <input type="date" class="form-control" id="editHalaman" name="tanggal_pinjam">
+                            <label for="editTanggalPinjam" class="form-label">Tanggal Pinjam</label>
+                            <input type="date" class="form-control" id="editTanggalPinjam" name="tanggal_pinjam" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editPengembalian" class="form-label">tanggal pengembalian</label>
-                            <input type="date" class="form-control" id="editHalaman" name="tanggal_pengembalian">
+                            <label for="editTanggalPengembalian" class="form-label">Tanggal Pengembalian</label>
+                            <input type="date" class="form-control" id="editTanggalPengembalian" name="tanggal_pengembalian" required>
                         </div>
-                        </div>
+                    </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -309,7 +315,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menghapus data ini</p>
+                    <p>Apakah Anda yakin ingin menghapus data buku dengan ID: <strong id="deleteBookIdPlaceholder"></strong>?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -354,26 +360,40 @@
             }
         }
 
-        // Function to show the Borrow Book Modal and set the book ID
-        function showBorrowModal(bookId) {
-            document.getElementById('borrow_book_id').value = bookId;
-            document.getElementById('borrowDate').valueAsDate = new Date();
+        // Function to show the Borrow Book Modal and set the book details
+        function showBorrowModal(id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto) {
+            document.getElementById('borrowBookId').value = id_buku;
+            document.getElementById('borrowJudulBuku').value = judul_buku;
+            document.getElementById('borrowISBN').value = isbn;
+            document.getElementById('borrowNamaPenulis').value = nama_penulis;
+            document.getElementById('borrowNamaPenerbit').value = nama_penerbit;
+            document.getElementById('borrowJumlahHalaman').value = jumlah_halaman;
+
             const today = new Date();
+            document.getElementById('borrowDate').valueAsDate = today;
+
             const returnDate = new Date(today);
-            returnDate.setDate(today.getDate() + 7);
-            document.getElementById('returnDate').valueAsDate = returnDate;
+            returnDate.setDate(today.getDate() + 7); // Default return date: 7 days from today
+            document.getElementById('borrowReturnDate').valueAsDate = returnDate;
         }
 
-        // Function to show the Edit Book Modal and pre-fill its fields
+        // Function to show the Edit Borrow Book Modal and pre-fill its fields
         function showEditModal(bookData) {
-            document.getElementById('edit_book_id').value = bookData.id_buku;
+            document.getElementById('edit_original_book_id').value = bookData.id_buku; // Store original ID for update
+            document.getElementById('editBookId').value = bookData.id_buku;
             document.getElementById('editJudul').value = bookData.judul_buku;
             document.getElementById('editISBN').value = bookData.isbn;
             document.getElementById('editPenulis').value = bookData.nama_penulis;
             document.getElementById('editPenerbit').value = bookData.nama_penerbit;
             document.getElementById('editHalaman').value = bookData.jumlah_halaman;
-            // You might remove this line if you're not pre-filling the image path
-            // document.getElementById('editFoto').value = bookData.foto;
+
+            // Set dates for editing, ensure they are in YYYY-MM-DD format
+            if (bookData.tanggal_pinjam) {
+                document.getElementById('editTanggalPinjam').value = bookData.tanggal_pinjam;
+            }
+            if (bookData.tanggal_pengembalian) {
+                document.getElementById('editTanggalPengembalian').value = bookData.tanggal_pengembalian;
+            }
         }
 
         // Variable to store the ID of the book to be deleted
@@ -431,7 +451,7 @@
                                             <p class="card-text book-author"><strong>Nama Penulis:</strong> ${book.nama_penulis}</p>
                                             <p class="card-text"><strong>Nama Penerbit:</strong> ${book.nama_penerbit}</p>
                                             <p class="card-text"><strong>Jumlah Halaman:</strong> ${book.jumlah_halaman}</p>
-                                            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal('${book.id_buku}')">Pinjam buku</button>
+                                            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal('${book.id_buku}', '${book.judul_buku}', '${book.isbn}', '${book.nama_penulis}', '${book.nama_penerbit}', ${book.jumlah_halaman}, '${book.foto}')">Pinjam buku</button>
                                             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick='showEditModal(${JSON.stringify(book)})'>Edit</button>
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId('${book.id_buku}')">Hapus</button>
                                         </div>
