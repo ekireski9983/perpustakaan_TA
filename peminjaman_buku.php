@@ -1,3 +1,31 @@
+<?php
+// Database connection details
+$servername = "localhost";
+$username = "root"; // Replace with your database username
+$password = "";     // Replace with your database password
+$dbname = "perpustakaan";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch book data
+$sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian FROM data_pinjam";
+$result = $conn->query($sql);
+
+$books = [];
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $books[] = $row;
+    }
+}
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,90 +146,75 @@
         </div>
 
         <div class="row">
-      <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
-        <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-        <a href="lihat_anggota.php">lihat Anggota</a>
-        <a href="katalog_buku.php">Katalog Buku</a>
-        <a href="peminjaman_buku.php">Peminjaman Buku</a>
-        <a href="pengembalian_buku.php">Pengembalian Buku</a>
-        <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
-        <a href="logout.php">Logout</a>
-        <div class="image-box text-center mt-5">
-          <img src="assets/Bootstrap_logo.png" alt="icon" />
-        </div>
-      </nav>
+            <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
+                <h5 class="pt-4">Siswa<br /><small>user</small></h5>
+                <a href="lihat_anggota.php">lihat Anggota</a>
+                <a href="katalog_buku.php">Katalog Buku</a>
+                <a href="peminjaman_buku.php">Peminjaman Buku</a>
+                <a href="pengembalian_buku.php">Pengembalian Buku</a>
+                <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
+                <a href="logout.php">Logout</a>
+                <div class="image-box text-center mt-5">
+                    <img src="assets/Bootstrap_logo.png" alt="icon" />
+                </div>
+            </nav>
 
-      <div class="offcanvas offcanvas-start sidebar" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-        <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="sidebarMenuLabel">Siswa</h5>
-          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-          <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-          <a href="lihat_anggota.php">lihat Anggota</a>
-          <a href="katalog_buku.php">Katalog Buku</a>
-          <a href="peminjaman_buku.php">Peminjaman Buku</a>
-          <a href="pengembalian_buku.php">Pengembalian Buku</a>
-          <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
-          <a href="logout.php">Logout</a>
-        </div>
-      </div>
+            <div class="offcanvas offcanvas-start sidebar" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="sidebarMenuLabel">Siswa</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <h5 class="pt-4">Siswa<br /><small>user</small></h5>
+                    <a href="lihat_anggota.php">lihat Anggota</a>
+                    <a href="katalog_buku.php">Katalog Buku</a>
+                    <a href="peminjaman_buku.php">Peminjaman Buku</a>
+                    <a href="pengembalian_buku.php">Pengembalian Buku</a>
+                    <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
+                    <a href="logout.php">Logout</a>
+                </div>
+            </div>
 
-                <main class="col-md-9 col-12 main-content">
-                    <h4>Peminjaman Buku</h4>
+            <main class="col-md-9 col-12 main-content">
+                <h4>Peminjaman Buku</h4>
 
-                    <div class="input-group mb-3">
-                        <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Cari buku berdasarkan judul, ID, atau penulis..." style="max-width: 400px;" onkeyup="filterCards()" aria-label="Search Book" />
-                    </div>
+                <div class="input-group mb-3">
+                    <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Cari buku berdasarkan judul, ID, atau penulis..." style="max-width: 400px;" onkeyup="filterCards()" aria-label="Search Book" />
+                </div>
 
-                    <div id="bookCardsContainer">
-                        <div class="card mb-4 book-card">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    <img src="upload/68552287ad0f52.88016925.jpg" class="img-fluid rounded-start" alt="Book Cover">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title book-id">BOOK001</h5>
-                                        <p class="card-text book-title"><strong>Judul Buku:</strong> The Great Adventure</p>
-                                        <p class="card-text"><strong>ISBN:</strong> 978-0123456789</p>
-                                        <p class="card-text book-author"><strong>Nama Penulis:</strong> Jane Doe</p>
-                                        <p class="card-text"><strong>Nama Penerbit:</strong> Adventure Publishing</p>
-                                        <p class="card-text"><strong>Jumlah Halaman:</strong> 320</p>
-                                        <p class="card-text"><strong>tanggal pinjam:</strong> 00/00/00</p>
-                                        <p class="card-text"><strong>tanggal pengembalian:</strong> 00/00/00</p>
-                                        <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal('BOOK001', 'The Great Adventure', '978-0123456789', 'Jane Doe', 'Adventure Publishing', 320, 'upload/68552287ad0f52.88016925.jpg')">Pinjam buku</button>
-                                        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick="showEditModal({id_buku: 'BOOK001', judul_buku: 'The Great Adventure', isbn: '978-0123456789', nama_penulis: 'Jane Doe', nama_penerbit: 'Adventure Publishing', jumlah_halaman: 320, foto: 'upload/68552287ad0f52.88016925.jpg', tanggal_pinjam: '2025-06-13', tanggal_pengembalian: '2025-06-20'})">Edit</button>
-                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId('BOOK001')">Hapus</button>
+                <div id="bookCardsContainer">
+                    <?php if (!empty($books)): ?>
+                        <?php foreach ($books as $book): ?>
+                            <div class="card mb-4 book-card">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <img src="<?php echo htmlspecialchars($book['foto']); ?>" class="img-fluid rounded-start" alt="Book Cover">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title book-id"><?php echo htmlspecialchars($book['id_buku']); ?></h5>
+                                            <p class="card-text book-title"><strong>Judul Buku:</strong> <?php echo htmlspecialchars($book['judul_buku']); ?></p>
+                                            <p class="card-text"><strong>ISBN:</strong> <?php echo htmlspecialchars($book['isbn']); ?></p>
+                                            <p class="card-text book-author"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($book['nama_penulis']); ?></p>
+                                            <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($book['nama_penerbit']); ?></p>
+                                            <p class="card-text"><strong>Jumlah Halaman:</strong> <?php echo htmlspecialchars($book['jumlah_halaman']); ?></p>
+                                            <p class="card-text"><strong>tanggal pinjam:</strong> <?php echo htmlspecialchars($book['tanggal_pinjam'] ?? '00/00/00'); ?></p>
+                                            <p class="card-text"><strong>tanggal pengembalian:</strong> <?php echo htmlspecialchars($book['tanggal_pengembalian'] ?? '00/00/00'); ?></p>
+                                            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal"
+                                                    onclick="showBorrowModal('<?php echo htmlspecialchars($book['id_buku']); ?>', '<?php echo htmlspecialchars($book['judul_buku']); ?>', '<?php echo htmlspecialchars($book['isbn']); ?>', '<?php echo htmlspecialchars($book['nama_penulis']); ?>', '<?php echo htmlspecialchars($book['nama_penerbit']); ?>', <?php echo htmlspecialchars($book['jumlah_halaman']); ?>, '<?php echo htmlspecialchars($book['foto']); ?>')">Pinjam buku</button>
+                                            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal"
+                                                    onclick='showEditModal(<?php echo json_encode($book); ?>)'>Edit</button>
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
+                                                    onclick="setDeleteBookId('<?php echo htmlspecialchars($book['id_buku']); ?>')">Hapus</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="card mb-4 book-card">
-                            <div class="row g-0">
-                                <div class="col-md-4">
-                                    <img src="upload/68552287ad0f52.88016925.jpg" class="img-fluid rounded-start" alt="Book Cover">
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="card-body">
-                                        <h5 class="card-title book-id">BOOK002</h5>
-                                        <p class="card-text book-title"><strong>Judul Buku:</strong> Mystery of the Old House</p>
-                                        <p class="card-text"><strong>ISBN:</strong> 978-9876543210</p>
-                                        <p class="card-text book-author"><strong>Nama Penulis:</strong> John Smith</p>
-                                        <p class="card-text"><strong>Nama Penerbit:</strong> Whodunit Books</p>
-                                        <p class="card-text"><strong>Jumlah Halaman:</strong> 280</p>
-                                        <p class="card-text"><strong>tanggal pinjam:</strong> 00/00/00</p>
-                                        <p class="card-text"><strong>tanggal pengembalian:</strong> 00/00/00</p>
-                                        <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal('BOOK002', 'Mystery of the Old House', '978-9876543210', 'John Smith', 'Whodunit Books', 280, 'upload/68552287ad0f52.88016925.jpg')">Pinjam buku</button>
-                                        <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick="showEditModal({id_buku: 'BOOK002', judul_buku: 'Mystery of the Old House', isbn: '978-9876543210', nama_penulis: 'John Smith', nama_penerbit: 'Whodunit Books', jumlah_halaman: 280, foto: 'upload/68552287ad0f52.88016925.jpg', tanggal_pinjam: '2025-06-10', tanggal_pengembalian: '2025-06-17'})">Edit</button>
-                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId('BOOK002')">Hapus</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                    <?php endif; ?>
+                </div>
+            </main>
         </div>
     </div>
 
@@ -212,7 +225,6 @@
                     <h5 class="modal-title" id="borrowBookModalLabel">Peminjaman Buku</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="borrowForm" action="process_borrow.php" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="borrowBookId" class="form-label">ID Buku</label>
@@ -249,7 +261,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-success">Pinjam buku</button>
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
+                        <button type="reset" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                     </div>
                 </form>
             </div>
@@ -263,8 +275,8 @@
                     <h5 class="modal-title" id="editBookModalLabel">Edit Peminjaman Buku</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="editForm" action="process_edit_book.php" method="POST">
-                      <div class="modal-body">
+                     <div class="modal-body">
+                        <input type="hidden" id="edit_original_book_id" name="original_id_buku">
                         <div class="mb-3">
                             <label for="editBookId" class="form-label">ID Buku</label>
                             <input type="text" class="form-control" id="editBookId" name="id_buku" readonly>
@@ -299,8 +311,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">edit</button>
+                        <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">reset</button>
                     </div>
                 </form>
             </div>
@@ -379,7 +391,9 @@
 
         // Function to show the Edit Borrow Book Modal and pre-fill its fields
         function showEditModal(bookData) {
-            document.getElementById('edit_original_book_id').value = bookData.id_buku; // Store original ID for update
+            // Set the value for the hidden input field
+            document.getElementById('edit_original_book_id').value = bookData.id_buku;
+
             document.getElementById('editBookId').value = bookData.id_buku;
             document.getElementById('editJudul').value = bookData.judul_buku;
             document.getElementById('editISBN').value = bookData.isbn;
@@ -412,65 +426,6 @@
                 window.location.href = `process_delete_book.php?id=${bookIdToDelete}`;
             }
         });
-
-        // --- OPTIONAL: JavaScript for fetching and rendering dynamic book data ---
-        // This section demonstrates how you would fetch data from a backend (e.g., a PHP API)
-        // and dynamically create the book cards. This replaces the PHP loop you had.
-
-        /*
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchBooks();
-        });
-
-        async function fetchBooks() {
-            try {
-                // Replace 'your_api_endpoint.php' with the actual URL to your PHP script
-                // that returns book data (e.g., as JSON)
-                const response = await fetch('your_api_endpoint.php');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const books = await response.json(); // Assuming your PHP returns JSON
-
-                const container = document.getElementById('bookCardsContainer');
-                container.innerHTML = ''; // Clear any existing hardcoded cards
-
-                if (books.length > 0) {
-                    books.forEach(book => {
-                        const cardHtml = `
-                            <div class="card mb-4 book-card">
-                                <div class="row g-0">
-                                    <div class="col-md-4">
-                                        <img src="${book.foto}" class="img-fluid rounded-start" alt="Book Cover">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <h5 class="card-title book-id">${book.id_buku}</h5>
-                                            <p class="card-text book-title"><strong>Judul Buku:</strong> ${book.judul_buku}</p>
-                                            <p class="card-text"><strong>ISBN:</strong> ${book.isbn}</p>
-                                            <p class="card-text book-author"><strong>Nama Penulis:</strong> ${book.nama_penulis}</p>
-                                            <p class="card-text"><strong>Nama Penerbit:</strong> ${book.nama_penerbit}</p>
-                                            <p class="card-text"><strong>Jumlah Halaman:</strong> ${book.jumlah_halaman}</p>
-                                            <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal('${book.id_buku}', '${book.judul_buku}', '${book.isbn}', '${book.nama_penulis}', '${book.nama_penerbit}', ${book.jumlah_halaman}, '${book.foto}')">Pinjam buku</button>
-                                            <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick='showEditModal(${JSON.stringify(book)})'>Edit</button>
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId('${book.id_buku}')">Hapus</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        container.insertAdjacentHTML('beforeend', cardHtml);
-                    });
-                } else {
-                    container.innerHTML = '<p>Buku belum ditambahkan.</p>';
-                }
-
-            } catch (error) {
-                console.error("Error fetching books:", error);
-                document.getElementById('bookCardsContainer').innerHTML = '<p>Gagal memuat katalog buku. Silakan coba lagi nanti.</p>';
-            }
-        }
-        */
     </script>
 </body>
 </html>
