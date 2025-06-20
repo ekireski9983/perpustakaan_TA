@@ -40,16 +40,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
         // Pindahkan file ke direktori
         if (move_uploaded_file($foto_tmp, $foto_destination)) {
+            // Start a transaction for atomicity
+            mysqli_begin_transaction($koneksi);
+
             // Insert query into data_pinjam table
             // Ensure column names match your data_pinjam table structure
-            $insert_query = "INSERT INTO data_pinjam (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian) 
-                             VALUES ('$id_buku', '$isbn', '$judul_buku', '$nama_penulis', '$nama_penerbit', '$jumlah_halaman', '$foto_destination', '$tanggal_pinjam', '$tanggal_pengembalian')";
-            
-            if (mysqli_query($koneksi, $insert_query)) {
-                header("Location: kelola_peminjaman.php"); // Redirect setelah penyimpanan
-                exit();
+            $insert_pinjam_query = "INSERT INTO data_pinjam (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian) 
+                                 VALUES ('$id_buku', '$isbn', '$judul_buku', '$nama_penulis', '$nama_penerbit', '$jumlah_halaman', '$foto_destination', '$tanggal_pinjam', '$tanggal_pengembalian')";
+
+            if (mysqli_query($koneksi, $insert_pinjam_query)) {
+                // Insert query into data_pengembalian table
+                // Ensure column names match your data_pengembalian table structure
+                $insert_pengembalian_query = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian)
+                                          VALUES ('$id_buku', '$judul_buku', '$tanggal_pinjam', '$tanggal_pengembalian')";
+
+                if (mysqli_query($koneksi, $insert_pengembalian_query)) {
+                    mysqli_commit($koneksi); // Commit the transaction if both inserts are successful
+                    header("Location: kelola_peminjaman.php"); // Redirect after saving
+                    exit();
+                } else {
+                    mysqli_rollback($koneksi); // Rollback if pengembalian insert fails
+                    echo "Error inserting into data_pengembalian: " . mysqli_error($koneksi);
+                }
             } else {
-                echo "Error: " . mysqli_error($koneksi);
+                mysqli_rollback($koneksi); // Rollback if pinjam insert fails
+                echo "Error inserting into data_pinjam: " . mysqli_error($koneksi);
             }
         } else {
             echo "Error: Gagal memindahkan file yang diunggah.";
@@ -63,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 if (isset($_GET['id'])) {
     $id_buku = mysqli_real_escape_string($koneksi, $_GET['id']);
     
+    // Start a transaction for atomicity
+    mysqli_begin_transaction($koneksi);
+
     // Optional: Get the photo path before deleting the record to delete the file as well
     $get_photo_query = "SELECT foto FROM data_pinjam WHERE id_buku='$id_buku'";
     $photo_result = mysqli_query($koneksi, $get_photo_query);
@@ -74,10 +92,22 @@ if (isset($_GET['id'])) {
         }
     }
 
-    $delete_query = "DELETE FROM data_pinjam WHERE id_buku='$id_buku'";
-    mysqli_query($koneksi, $delete_query);
-    header("Location: kelola_peminjaman.php"); // Redirect setelah penghapusan
-    exit();
+    // Delete from data_pengembalian first to avoid foreign key constraints if they exist
+    $delete_pengembalian_query = "DELETE FROM data_pengembalian WHERE id_buku='$id_buku'";
+    if (mysqli_query($koneksi, $delete_pengembalian_query)) {
+        $delete_pinjam_query = "DELETE FROM data_pinjam WHERE id_buku='$id_buku'";
+        if (mysqli_query($koneksi, $delete_pinjam_query)) {
+            mysqli_commit($koneksi); // Commit if both deletes are successful
+            header("Location: kelola_peminjaman.php"); // Redirect after deletion
+            exit();
+        } else {
+            mysqli_rollback($koneksi); // Rollback if pinjam delete fails
+            echo "Error deleting from data_pinjam: " . mysqli_error($koneksi);
+        }
+    } else {
+        mysqli_rollback($koneksi); // Rollback if pengembalian delete fails
+        echo "Error deleting from data_pengembalian: " . mysqli_error($koneksi);
+    }
 }
 ?>
 
