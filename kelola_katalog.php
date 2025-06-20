@@ -331,7 +331,7 @@ if (isset($_GET['id'])) {
         <p>Apakah Anda yakin ingin menghapus data ini</p>
       </div>
       <div class="modal-footer">
-        <form id="formHapusAnggota" method="GET" action="">
+        <form id="formHapuspeminjam" method="GET" action="">
           <input type="hidden" id="hapusId" name="id">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
           <button type="submit" class="btn btn-danger">Hapus</button>
