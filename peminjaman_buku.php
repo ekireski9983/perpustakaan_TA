@@ -1,364 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard Siswa</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <style>
-    body {
-      background-color: #f1f5f9;
-      margin: 0;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard Siswa</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f1f5f9;
+            margin: 0;
+        }
 
-    .sidebar {
-      background-color: #2f3e46;
-      color: white;
-    }
+        .sidebar {
+            background-color: #2f3e46;
+            color: white;
+            padding-top: 20px; /* Added padding to align content better */
+        }
 
-    .sidebar h5 {
-      margin-left: 20px;
-      margin-bottom: 30px;
-    }
+        .sidebar h5 {
+            margin-left: 20px;
+            margin-bottom: 30px;
+        }
 
-    .sidebar a {
-      display: block;
-      color: white;
-      padding: 10px 20px;
-      text-decoration: none;
-    }
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            transition: background-color 0.3s ease; /* Smooth transition for hover */
+        }
 
-    .sidebar a:hover,
-    .sidebar a.active {
-      background-color: #00b4d8;
-      border-radius: 5px;
-    }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #00b4d8;
+            border-radius: 5px;
+        }
 
-    .sidebar .logout {
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-    }
+        .sidebar .logout {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            padding-left: 20px; /* Align logout button with other links */
+        }
 
-    .image-box img {
-      width: 80px;
-      opacity: 0.7;
-    }
+        .image-box img {
+            width: 80px;
+            opacity: 0.7;
+        }
 
-    .main-content {
-      padding: 40px;
-    }
+        .main-content {
+            padding: 40px;
+        }
 
-    /* Style for the search bar */
-    .search-bar {
-      margin-bottom: 20px;
-    }
+        /* --- Image and Card Styling Improvements --- */
+        .book-card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Added subtle shadow for depth */
+            border-radius: 8px; /* Slightly more rounded corners */
+        }
 
-    @media (max-width: 768px) {
-      .sidebar .logout {
-        position: static;
-        margin-top: 30px;
-      }
-    }
-  </style>
+        .book-card .col-md-4 {
+            display: flex; /* Use flexbox for vertical centering */
+            align-items: center; /* Center image vertically */
+            justify-content: center; /* Center image horizontally */
+            padding: 15px; /* Add some padding around the image */
+        }
+
+        .book-card img {
+            width: 100%; /* Make image take full width of its column */
+            max-width: 180px; /* Set a maximum width for the image */
+            height: auto; /* Maintain aspect ratio */
+            object-fit: contain; /* Ensure the whole image is visible within its bounds */
+            border-radius: var(--bs-border-radius); /* Use Bootstrap's default border-radius */
+        }
+
+        /* Optional: Adjust card-body padding if needed */
+        .book-card .card-body {
+            padding: 20px; /* Consistent padding inside card body */
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                padding-top: 0; /* Remove top padding for offcanvas on small screens */
+            }
+            .sidebar h5 {
+                margin-left: 0; /* Reset margin for offcanvas title */
+                text-align: center; /* Center title in offcanvas */
+            }
+            .sidebar a {
+                padding: 10px 15px; /* Adjust padding for offcanvas links */
+                text-align: center;
+            }
+            .sidebar .logout {
+                position: static;
+                margin-top: 30px;
+                padding-left: 0;
+                text-align: center;
+            }
+            .book-card .col-md-4 {
+                padding-bottom: 0; /* Less padding on small screens if image is above text */
+            }
+            .book-card img {
+                max-width: 100%; /* Allow image to fill its column on smaller screens */
+                max-height: 250px; /* Adjust max height for smaller screens if necessary */
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container-fluid">
-    <div class="row d-md-none bg-dark text-white p-2">
-      <div class="col">
-        <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-          ☰ Menu
-        </button>
-        <span class="ms-3">Dashboard Siswa</span>
-      </div>
+    <div class="container-fluid">
+        <div class="row d-md-none bg-dark text-white p-2">
+            <div class="col d-flex align-items-center">
+                <button class="btn btn-outline-light me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+                    <span class="navbar-toggler-icon"></span> Menu
+                </button>
+                <span class="fs-5">Dashboard Siswa</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
+                <h5 class="pt-4">Siswa<br /><small>user</small></h5>
+                <a href="lihat_anggota.php">Lihat Anggota</a>
+                <a href="katalog_buku.php" class="active">Katalog Buku</a> <a href="peminjaman_buku.php">Peminjaman Buku</a>
+                <a href="pengembalian_buku.php">Pengembalian Buku</a>
+                <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
+                <div class="logout">
+                    <a href="logout.php">Logout</a>
+                </div>
+                <div class="image-box text-center mt-5">
+                    <img src="assets/Bootstrap_logo.png" alt="icon" />
+                </div>
+            </nav>
+
+            <div class="offcanvas offcanvas-start sidebar" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="sidebarMenuLabel">Siswa</h5>
+                    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <h5 class="pt-4">Siswa<br /><small>user</small></h5>
+                    <a href="lihat_anggota.php">Lihat Anggota</a>
+                    <a href="katalog_buku.php" class="active">Katalog Buku</a>
+                    <a href="peminjaman_buku.php">Peminjaman Buku</a>
+                    <a href="pengembalian_buku.php">Pengembalian Buku</a>
+                    <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
+                    <a href="logout.php">Logout</a>
+                </div>
+            </div>
+
+            <main class="col-md-9 col-12 main-content">
+                <h4>Katalog Buku</h4>
+
+                <div class="input-group mb-3">
+                    <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="Cari buku berdasarkan judul, ID, atau penulis..." style="max-width: 400px;" onkeyup="filterCards()" aria-label="Search Book" />
+                </div>
+
+                <div id="bookCardsContainer">
+                    <div class="card mb-4 book-card">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="upload/68552287ad0f52.88016925.jpg" class="img-fluid rounded-start" alt="Book Cover">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title book-id">BOOK001</h5>
+                                    <p class="card-text book-title"><strong>Judul Buku:</strong> The Great Adventure</p>
+                                    <p class="card-text"><strong>ISBN:</strong> 978-0123456789</p>
+                                    <p class="card-text book-author"><strong>Nama Penulis:</strong> Jane Doe</p>
+                                    <p class="card-text"><strong>Nama Penerbit:</strong> Adventure Publishing</p>
+                                    <p class="card-text"><strong>Jumlah Halaman:</strong> 320</p>
+                                    <a href="peminjaman_buku.php?id=BOOK001" class="btn btn-success">Pinjam buku</a>
+                                    <a href="peminjaman_buku.php?id=BOOK001" class="btn btn-primary">edit</a>
+                                    <a href="peminjaman_buku.php?id=BOOK001" class="btn btn-danger">hapus</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+            </main>
+        </div>
     </div>
 
-    <div class="row">
-      <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
-        <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-        <a href="lihat_anggota.php">Lihat Anggota</a>
-        <a href="katalog_buku.php">Katalog Buku</a>
-        <a href="peminjaman_buku.php">Peminjaman Buku</a>
-        <a href="pengembalian_buku.php">Pengembalian Buku</a>
-        <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
-        <a href="logout.php">Logout</a>
-        <div class="image-box text-center mt-5">
-          <img src="assets/Bootstrap_logo.png" alt="icon" />
-        </div>
-      </nav>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // JavaScript for filtering cards (client-side)
+        function filterCards() {
+            let input, filter, cards, card, bookTitle, bookAuthor, bookId, i, titleTxt, authorTxt, idTxt;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            cards = document.getElementsByClassName("book-card"); // Gets all elements with this class
 
-      <div class="offcanvas offcanvas-start sidebar" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-        <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="sidebarMenuLabel">Siswa</h5>
-          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-          <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-          <a href="lihat_anggota.php">Lihat Anggota</a>
-          <a href="katalog_buku.php">Katalog Buku</a>
-          <a href="peminjaman_buku.php">Peminjaman Buku</a>
-          <a href="pengembalian_buku.php">Pengembalian Buku</a>
-          <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
-          <a href="logout.php">Logout</a>
-        </div>
-      </div>
+            for (i = 0; i < cards.length; i++) {
+                card = cards[i];
+                bookTitle = card.querySelector(".book-title");
+                bookAuthor = card.querySelector(".book-author");
+                bookId = card.querySelector(".book-id");
 
-      <main class="col-md-9 col-12 main-content">
-        <h4>Peminjaman buku</h4>
+                let match = false;
 
-        <div class="input-group search-bar">
-            <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="mencari buku yang mau dipinjam" style="max-width: 300px;" oninput="filterCards()" />
-        </div>
+                // Check if any of the text content matches the filter
+                if (bookTitle && (bookTitle.textContent || bookTitle.innerText).toUpperCase().indexOf(filter) > -1) {
+                    match = true;
+                }
+                if (!match && bookAuthor && (bookAuthor.textContent || bookAuthor.innerText).toUpperCase().indexOf(filter) > -1) {
+                    match = true;
+                }
+                if (!match && bookId && (bookId.textContent || bookId.innerText).toUpperCase().indexOf(filter) > -1) {
+                    match = true;
+                }
 
-        <div class="row" id="bookCardsContainer">
-          <div class="col-md-6 col-lg-4 mb-4 book-card">
-            <div class="card shadow-sm">
-              <img src="upload/68522c0484a1e3.49333472.jpg" class="card-img-top" alt="Book Cover 1">
-              <div class="card-body">
-                <h5 class="card-title">Judul Buku 1</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Penulis: Nama Penulis 1</h6>
-                <p class="card-text">Deskripsi singkat tentang Buku 1. Ini adalah tempat untuk memberikan ringkasan atau detail penting.</p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <button type="button" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#bookModal"
-                          data-action="pinjam"
-                          data-book-id="1"
-                          data-title="Judul Buku 1"
-                          data-author="Nama Penulis 1"
-                          data-publisher="Penerbit 1"
-                          data-isbn="978-1234567890"
-                          data-pages="250">Pinjam</button>
-                  <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#bookModal"
-                          data-action="edit"
-                          data-book-id="1"
-                          data-title="Judul Buku 1"
-                          data-author="Nama Penulis 1"
-                          data-publisher="Penerbit 1"
-                          data-isbn="978-1234567890"
-                          data-pages="250">Edit</button>
-                  <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#bookModal"
-                          data-action="hapus"
-                          data-book-id="1"
-                          data-title="Judul Buku 1">Hapus</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4 mb-4 book-card">
-            <div class="card shadow-sm">
-              <img src="upload/68522c0484a1e3.49333472.jpg" class="card-img-top" alt="Book Cover 2">
-              <div class="card-body">
-                <h5 class="card-title">Judul Buku 2</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Penulis: Nama Penulis 2</h6>
-                <p class="card-text">Deskripsi singkat tentang Buku 2. Ini adalah tempat untuk memberikan ringkasan atau detail penting.</p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <button type="button" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#bookModal"
-                          data-action="pinjam"
-                          data-book-id="2"
-                          data-title="Judul Buku 2"
-                          data-author="Nama Penulis 2"
-                          data-publisher="Penerbit 2"
-                          data-isbn="978-0987654321"
-                          data-pages="300">Pinjam</button>
-                  <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#bookModal"
-                          data-action="edit"
-                          data-book-id="2"
-                          data-title="Judul Buku 2"
-                          data-author="Nama Penulis 2"
-                          data-publisher="Penerbit 2"
-                          data-isbn="978-0987654321"
-                          data-pages="300">Edit</button>
-                  <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#bookModal"
-                          data-action="hapus"
-                          data-book-id="2"
-                          data-title="Judul Buku 2">Hapus</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4 mb-4 book-card">
-            <div class="card shadow-sm">
-              <img src="upload/68522c0484a1e3.49333472.jpg" class="card-img-top" alt="Book Cover 3">
-              <div class="card-body">
-                <h5 class="card-title">Judul Buku 3</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Penulis: Nama Penulis 3</h6>
-                <p class="card-text">Deskripsi singkat tentang Buku 3. Ini adalah tempat untuk memberikan ringkasan atau detail penting.</p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <button type="button" class="btn btn-success btn-sm me-2" data-bs-toggle="modal" data-bs-target="#bookModal"
-                          data-action="pinjam"
-                          data-book-id="3"
-                          data-title="Judul Buku 3"
-                          data-author="Nama Penulis 3"
-                          data-publisher="Penerbit 3"
-                          data-isbn="978-1122334455"
-                          data-pages="180">Pinjam</button>
-                  <button type="button" class="btn btn-info btn-sm me-2" data-bs-toggle="modal" data-bs-target="#bookModal"
-                          data-action="edit"
-                          data-book-id="3"
-                          data-title="Judul Buku 3"
-                          data-author="Nama Penulis 3"
-                          data-publisher="Penerbit 3"
-                          data-isbn="978-1122334455"
-                          data-pages="180">Edit</button>
-                  <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#bookModal"
-                          data-action="hapus"
-                          data-book-id="3"
-                          data-title="Judul Buku 3">Hapus</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  </div>
-
-  <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="bookModalLabel"></h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="bookForm" action="#" method="POST">
-            <input type="hidden" id="modalBookId" name="book_id">
-            <input type="hidden" id="modalAction" name="action">
-
-            <div class="mb-3">
-              <label for="modalTitle" class="form-label">id buku</label>
-              <input type="text" class="form-control" id="modalTitle" readonly>
-            </div>
-            <div class="mb-3">
-              <label for="modalAuthor" class="form-label">isbn</label>
-              <input type="text" class="form-control" id="modalAuthor" readonly>
-            </div>
-            <div class="mb-3">
-              <label for="modalPublisher" class="form-label">nama penulis</label>
-              <input type="text" class="form-control" id="modalPublisher" readonly>
-            </div>
-            <div class="mb-3">
-              <label for="modalISBN" class="form-label">nama penerbut</label>
-              <input type="text" class="form-control" id="modalISBN" readonly>
-            </div>
-            <div class="mb-3">
-              <label for="modalPages" class="form-label">Jumlah Halaman</label>
-              <input type="text" class="form-control" id="modalPages" readonly>
-            </div>
-
-            <div id="pinjamEditFields">
-              <div class="mb-3">
-                <label for="borrowDate" class="form-label">Tanggal Pinjam</label>
-                <input type="date" class="form-control" id="borrowDate" name="borrow_date" required>
-              </div>
-              <div class="mb-3">
-                <label for="returnDate" class="form-label">Tanggal Pengembalian</label>
-                <input type="date" class="form-control" id="returnDate" name="return_date" required>
-              </div>
-            </div>
-
-            <div id="hapusConfirmation" class="alert alert-danger" role="alert" style="display: none;">
-              Apakah Anda yakin ingin menghapus buku "<span id="deleteBookTitle"></span>"?
-            </div>
-
-            <button type="submit" class="btn btn-primary" id="modalSubmitButton"></button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const bookModal = document.getElementById('bookModal');
-    bookModal.addEventListener('show.bs.modal', event => {
-      const button = event.relatedTarget;
-      const action = button.getAttribute('data-action');
-      const bookId = button.getAttribute('data-book-id');
-      const title = button.getAttribute('data-title');
-      const author = button.getAttribute('data-author');
-      const publisher = button.getAttribute('data-publisher');
-      const isbn = button.getAttribute('data-isbn');
-      const pages = button.getAttribute('data-pages');
-
-      const modalTitle = bookModal.querySelector('.modal-title');
-      const modalBookIdInput = bookModal.querySelector('#modalBookId');
-      const modalActionInput = bookModal.querySelector('#modalAction');
-      const modalBookTitleInput = bookModal.querySelector('#modalTitle');
-      const modalAuthorInput = bookModal.querySelector('#modalAuthor');
-      const modalPublisherInput = bookModal.querySelector('#modalPublisher');
-      const modalISBNInput = bookModal.querySelector('#modalISBN');
-      const modalPagesInput = bookModal.querySelector('#modalPages');
-      const pinjamEditFields = bookModal.querySelector('#pinjamEditFields');
-      const hapusConfirmation = bookModal.querySelector('#hapusConfirmation');
-      const deleteBookTitleSpan = bookModal.querySelector('#deleteBookTitle');
-      const modalSubmitButton = bookModal.querySelector('#modalSubmitButton');
-      const bookForm = bookModal.querySelector('#bookForm');
-      const borrowDateInput = bookModal.querySelector('#borrowDate');
-      const returnDateInput = bookModal.querySelector('#returnDate');
-
-      // Reset form fields
-      bookForm.reset();
-      borrowDateInput.removeAttribute('required');
-      returnDateInput.removeAttribute('required');
-
-      modalBookIdInput.value = bookId;
-      modalActionInput.value = action;
-      modalBookTitleInput.value = title;
-      modalAuthorInput.value = author;
-      modalPublisherInput.value = publisher;
-      modalISBNInput.value = isbn;
-      modalPagesInput.value = pages;
-
-      pinjamEditFields.style.display = 'none';
-      hapusConfirmation.style.display = 'none';
-
-      if (action === 'pinjam') {
-        modalTitle.textContent = 'Pinjam Buku: ' + title;
-        pinjamEditFields.style.display = 'block';
-        modalSubmitButton.textContent = 'Pinjam Buku';
-        modalSubmitButton.className = 'btn btn-success';
-        bookForm.action = 'pinjam_buku.php'; // Example action for borrowing
-        borrowDateInput.setAttribute('required', 'true');
-        returnDateInput.setAttribute('required', 'true');
-      } else if (action === 'edit') {
-        modalTitle.textContent = 'Edit Peminjaman: ' + title;
-        pinjamEditFields.style.display = 'block';
-        modalSubmitButton.textContent = 'Simpan Perubahan';
-        modalSubmitButton.className = 'btn btn-info';
-        bookForm.action = 'edit_peminjaman.php'; // Example action for editing
-        // You would typically fetch existing borrow/return dates for editing here
-        borrowDateInput.setAttribute('required', 'true');
-        returnDateInput.setAttribute('required', 'true');
-      } else if (action === 'hapus') {
-        modalTitle.textContent = 'Hapus Buku: ' + title;
-        hapusConfirmation.style.display = 'block';
-        deleteBookTitleSpan.textContent = title;
-        modalSubmitButton.textContent = 'Konfirmasi Hapus';
-        modalSubmitButton.className = 'btn btn-danger';
-        bookForm.action = 'hapus_buku.php'; // Example action for deleting
-      }
-    });
-
-    // Function for searching/filtering cards
-    function filterCards() {
-      const searchInput = document.getElementById('searchInput');
-      const filter = searchInput.value.toLowerCase();
-      const bookCards = document.querySelectorAll('.book-card');
-
-      bookCards.forEach(card => {
-        const title = card.querySelector('.card-title').textContent.toLowerCase();
-        const author = card.querySelector('.card-subtitle').textContent.toLowerCase();
-        const description = card.querySelector('.card-text').textContent.toLowerCase();
-
-        if (title.includes(filter) || author.includes(filter) || description.includes(filter)) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
+                // Show or hide the card based on whether a match was found
+                if (match) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            }
         }
-      });
-    }
-  </script>
+
+        // --- OPTIONAL: JavaScript for fetching and rendering dynamic book data ---
+        // This section demonstrates how you would fetch data from a backend (e.g., a PHP API)
+        // and dynamically create the book cards. This replaces the PHP loop you had.
+
+        /*
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchBooks();
+        });
+
+        async function fetchBooks() {
+            try {
+                // Replace 'your_api_endpoint.php' with the actual URL to your PHP script
+                // that returns book data (e.g., as JSON)
+                const response = await fetch('your_api_endpoint.php');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const books = await response.json(); // Assuming your PHP returns JSON
+
+                const container = document.getElementById('bookCardsContainer');
+                container.innerHTML = ''; // Clear any existing hardcoded cards
+
+                if (books.length > 0) {
+                    books.forEach(book => {
+                        const cardHtml = `
+                            <div class="card mb-4 book-card">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <img src="${book.foto}" class="img-fluid rounded-start" alt="Book Cover">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title book-id">${book.id_buku}</h5>
+                                            <p class="card-text book-title"><strong>Judul Buku:</strong> ${book.judul_buku}</p>
+                                            <p class="card-text"><strong>ISBN:</strong> ${book.isbn}</p>
+                                            <p class="card-text book-author"><strong>Nama Penulis:</strong> ${book.nama_penulis}</p>
+                                            <p class="card-text"><strong>Nama Penerbit:</strong> ${book.nama_penerbit}</p>
+                                            <p class="card-text"><strong>Jumlah Halaman:</strong> ${book.jumlah_halaman}</p>
+                                            <a href="peminjaman_buku.php?id=${book.id_buku}" class="btn btn-success">Pinjam buku</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', cardHtml);
+                    });
+                } else {
+                    container.innerHTML = '<p>Buku belum ditambahkan.</p>';
+                }
+
+            } catch (error) {
+                console.error("Error fetching books:", error);
+                document.getElementById('bookCardsContainer').innerHTML = '<p>Gagal memuat katalog buku. Silakan coba lagi nanti.</p>';
+            }
+        }
+        */
+    </script>
 </body>
 </html>
