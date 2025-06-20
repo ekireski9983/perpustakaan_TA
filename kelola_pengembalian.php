@@ -7,12 +7,6 @@ if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-// Ambil data dari tabel data_pengembalian
-// Make sure 'status' column exists in data_pengembalian table.
-// If not, you'll need to add it: ALTER TABLE data_pengembalian ADD COLUMN status VARCHAR(50) DEFAULT 'Belum Dikembalikan';
-$query = "SELECT * FROM data_pengembalian";
-$result = mysqli_query($koneksi, $query);
-
 // Menangani perubahan status pengembalian
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'update_status') {
     $id_buku_to_update = mysqli_real_escape_string($koneksi, $_POST['id_buku_status']);
@@ -20,28 +14,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
     $update_query = "UPDATE data_pengembalian SET status='$new_status' WHERE id_buku='$id_buku_to_update'";
     if (mysqli_query($koneksi, $update_query)) {
-        header("Location: kelola_pengembalian.php"); // Redirect after update
+        // Jika berhasil diupdate di database, kirim respons JSON
+        // Ini akan digunakan oleh JavaScript untuk memperbarui tampilan tanpa reload
+        echo json_encode(['success' => true, 'id_buku' => $id_buku_to_update, 'new_status' => $new_status]);
         exit();
     } else {
-        echo "Error updating status: " . mysqli_error($koneksi);
+        echo json_encode(['success' => false, 'message' => "Error updating status: " . mysqli_error($koneksi)]);
+        exit();
     }
 }
 
 // Menangani penghapusan data pengembalian
-if (isset($_GET['id'])) {
+if (isset($_GET['action']) && $_GET['action'] == 'delete_pengembalian' && isset($_GET['id'])) {
     $id_buku_to_delete = mysqli_real_escape_string($koneksi, $_GET['id']);
-    // You might also want to update the status in data_pinjam if a book is deleted from pengembalian
-    // For simplicity, this example just deletes from data_pengembalian.
-    // Consider adding a transaction here if you need to update other tables.
 
     $delete_query = "DELETE FROM data_pengembalian WHERE id_buku='$id_buku_to_delete'";
     if (mysqli_query($koneksi, $delete_query)) {
-        header("Location: kelola_pengembalian.php"); // Redirect after deletion
+        echo json_encode(['success' => true, 'id_buku' => $id_buku_to_delete]);
         exit();
     } else {
-        echo "Error deleting data: " . mysqli_error($koneksi);
+        echo json_encode(['success' => false, 'message' => "Error deleting data: " . mysqli_error($koneksi)]);
+        exit();
     }
 }
+
+// Ambil data dari tabel data_pengembalian (tetap di sini untuk tampilan awal)
+$query = "SELECT * FROM data_pengembalian";
+$result = mysqli_query($koneksi, $query);
 ?>
 
 <!DOCTYPE html>
@@ -60,8 +59,11 @@ if (isset($_GET['id'])) {
     .sidebar .image-box img { width: 80px; opacity: 0.7; }
     .main-content { padding: 40px; }
     .table thead { background-color: #f8f9fa; }
-    .btn-edit { background-color: #48cae4; color: white; }
-    .btn-delete { background-color: #f94144; color: white; }
+    /* Updated button colors for consistency and better visual feedback */
+    .btn-update-status-belum { background-color: #dc3545; color: white; } /* Bootstrap danger */
+    .btn-update-status-sudah { background-color: #28a745; color: white; } /* Bootstrap success */
+    .btn-edit { background-color: #007bff; color: white; } /* Bootstrap primary for edit */
+    .btn-delete { background-color: #6c757d; color: white; } /* Bootstrap secondary for delete */
     .btn-tambah { background-color: #00b4d8; color: white; }
     @media (max-width: 768px) { .main-content { padding: 20px; } }
   </style>
@@ -110,10 +112,11 @@ if (isset($_GET['id'])) {
     <main class="col-md-9 col-12 main-content">
       <h4>Kelola Pengembalian Buku</h4>
       <div class="d-flex flex-wrap gap-2 align-items-center mb-3 mt-3">
-        <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="ketik id buku" style="max-width: 300px;" oninput="filterTable()" />
+        <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="ketik id buku atau judul buku" style="max-width: 300px;" oninput="filterTable()" />
       </div>
       <div class="table-responsive">
-        <table class="table table-bordered table-striped" id="pengembalianTable"> <thead>
+        <table class="table table-bordered table-striped" id="pengembalianTable">
+          <thead>
             <tr>
               <th>No</th>
               <th>Id Buku</th>
@@ -123,31 +126,36 @@ if (isset($_GET['id'])) {
               <th>Status</th>
               <th>Action</th>
               <th>Action</th>
-             </tr>
+            </tr>
           </thead>
           <tbody>
             <?php
             $no = 1;
-            while ($row = mysqli_fetch_assoc($result)) {
-              echo "<tr>";
-              echo "<td>" . $no++ . "</td>";
-              echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
-              echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
-              echo "<td>" . htmlspecialchars($row['tanggal_pinjam']) . "</td>";
-              echo "<td>" . htmlspecialchars($row['tanggal_pengembalian']) . "</td>";
-              echo "<td>" . htmlspecialchars($row['status']) . "</td>";
-              echo '<td>
-                        <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#ubahStatusPengembalianModal" 
-                                data-id="' . htmlspecialchars($row['id_buku']) . '" data-status="' . htmlspecialchars($row['status']) . '">
-                            Ubah Status
-                        </button>
-                    </td>';
-              echo '<td>
-                        <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusPengembalianModal" data-id="' . htmlspecialchars($row['id_buku']) . '">
-                            Delete
-                        </button>
-                    </td>';
-              echo "</tr>";
+            if (mysqli_num_rows($result) > 0) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    // Tambahkan data-row-id untuk identifikasi baris yang unik
+                    echo '<tr data-id-buku="' . htmlspecialchars($row['id_buku']) . '">';
+                    echo "<td>" . $no++ . "</td>";
+                    echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['tanggal_pinjam']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['tanggal_pengembalian']) . "</td>";
+                    echo '<td class="status-cell">' . htmlspecialchars($row['status']) . '</td>'; // Tambahkan class untuk akses mudah
+                    echo '<td>
+                            <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#ubahStatusPengembalianModal" 
+                                    data-id="' . htmlspecialchars($row['id_buku']) . '" data-status="' . htmlspecialchars($row['status']) . '">
+                                Ubah Status
+                            </button>
+                        </td>';
+                    echo '<td>
+                            <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusPengembalianModal" data-id="' . htmlspecialchars($row['id_buku']) . '">
+                                Delete
+                            </button>
+                        </td>';
+                    echo "</tr>";
+                }
+            } else {
+                echo '<tr><td colspan="8" class="text-center">Tidak ada data pengembalian.</td></tr>';
             }
             ?>
           </tbody>
@@ -161,18 +169,14 @@ if (isset($_GET['id'])) {
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="ubahStatusPengembalianModalLabel">Status Pengembalian</h5>
+        <h5 class="modal-title" id="ubahStatusPengembalianModalLabel">Ubah Status Pengembalian</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-      <form id="formUbahStatusPengembalian" method="POST" action="">
-      <input type="hidden" name="action" value="update_status">
-      <input type="hidden" id="idBukuStatus" name="id_buku_status">
-       <div class="d-flex justify-content-between"> <button type="submit" name="new_status" value="Belum Dikembalikan" class="btn btn-danger">Belum Dikembalikan</button>
-      <button type="submit" name="new_status" value="Sudah Dikembalikan" class="btn btn-success">Sudah Dikembalikan</button>
-      </div>
-     </form>
-     </div>
-        </form>
+        <div class="d-flex justify-content-between mt-3">
+          <button type="button" class="btn btn-update-status-belum" data-status-value="Belum Dikembalikan">Belum Dikembalikan</button>
+          <button type="button" class="btn btn-update-status-sudah" data-status-value="Sudah Dikembalikan">Sudah Dikembalikan</button>
+        </div>
       </div>
     </div>
   </div>
@@ -186,14 +190,11 @@ if (isset($_GET['id'])) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Apakah Anda yakin ingin menghapus data pengembalian ini?</p>
+        <p>Apakah Anda yakin ingin menghapus data?</p>
       </div>
       <div class="modal-footer">
-        <form id="formHapusPengembalian" method="GET" action="">
-          <input type="hidden" id="hapusIdPengembalian" name="id">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
-          <button type="submit" class="btn btn-danger">Ya, Hapus</button>
-        </form>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Ya, Hapus</button>
       </div>
     </div>
   </div>
@@ -202,48 +203,138 @@ if (isset($_GET['id'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+  let currentBookIdToUpdate = null; // Menyimpan ID buku yang sedang dioperasikan
+  let currentTableRow = null;       // Menyimpan referensi ke baris tabel yang sedang dioperasikan
+
+  // Inisialisasi modal Ubah Status
+  const ubahStatusPengembalianModal = new bootstrap.Modal(document.getElementById('ubahStatusPengembalianModal'));
+
   // Script untuk mengisi data pada modal ubah status
-  const ubahStatusButtons = document.querySelectorAll('[data-bs-target="#ubahStatusPengembalianModal"]'); 
-  ubahStatusButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const id = button.getAttribute('data-id');
-      const currentStatus = button.getAttribute('data-status');
-      document.getElementById('modalBookId').textContent = id;
-      document.getElementById('idBukuStatus').value = id;
+  document.querySelectorAll('[data-bs-target="#ubahStatusPengembalianModal"]').forEach(button => {
+    button.addEventListener('click', function() {
+      currentBookIdToUpdate = this.getAttribute('data-id');
+      const currentStatus = this.getAttribute('data-status');
+      currentTableRow = this.closest('tr'); // Dapatkan referensi ke baris <tr>
+
+      document.getElementById('modalBookId').textContent = currentBookIdToUpdate;
+      const currentStatusBadge = document.getElementById('currentStatusBadge');
+      currentStatusBadge.textContent = currentStatus;
+
+      
     });
   });
 
-  // Script untuk mengisi data pada modal hapus (updated ID for consistency)
-  const deleteButtonsPengembalian = document.querySelectorAll('[data-bs-target="#hapusPengembalianModal"]');
-  deleteButtonsPengembalian.forEach(button => {
-    button.addEventListener('click', () => {
-      const id = button.getAttribute('data-id');
-      document.getElementById('hapusIdPengembalian').value = id;
+  // Listener untuk tombol "Belum Dikembalikan" dan "Sudah Dikembalikan" di dalam modal
+  document.querySelectorAll('#ubahStatusPengembalianModal .btn').forEach(button => {
+    button.addEventListener('click', function() {
+      if (currentBookIdToUpdate) {
+        const newStatus = this.getAttribute('data-status-value');
+
+        // Kirim permintaan fetch ke PHP
+        fetch('kelola_pengembalian.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `action=update_status&id_buku_status=${encodeURIComponent(currentBookIdToUpdate)}&new_status=${encodeURIComponent(newStatus)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Perbarui status di tabel secara langsung tanpa reload
+            if (currentTableRow) {
+              const statusCell = currentTableRow.querySelector('.status-cell');
+              if (statusCell) {
+                statusCell.textContent = data.new_status; // Perbarui teks status
+                // Optional: perbarui warna latar belakang sel status jika diinginkan
+                // statusCell.style.backgroundColor = (data.new_status === 'Sudah Dikembalikan') ? '#d4edda' : '#f8d7da';
+              }
+            }
+            ubahStatusPengembalianModal.hide(); // Sembunyikan modal
+          } else {
+            alert('Gagal mengubah status: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat berkomunikasi dengan server.');
+        });
+      }
     });
   });
 
-  // Function to filter table rows based on search input
+  // Inisialisasi modal Hapus
+  const hapusPengembalianModal = new bootstrap.Modal(document.getElementById('hapusPengembalianModal'));
+  let idBukuToDelete = null; // Menyimpan ID buku yang akan dihapus
+
+  // Script untuk mengisi data pada modal hapus
+  document.querySelectorAll('[data-bs-target="#hapusPengembalianModal"]').forEach(button => {
+    button.addEventListener('click', function() {
+      idBukuToDelete = this.getAttribute('data-id');
+      document.getElementById('hapusIdPengembalianDisplay').textContent = idBukuToDelete;
+    });
+  });
+
+  // Listener untuk tombol "Ya, Hapus" di modal hapus
+  document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    if (idBukuToDelete) {
+      // Kirim permintaan fetch ke PHP untuk menghapus
+      fetch(`kelola_pengembalian.php?action=delete_pengembalian&id=${encodeURIComponent(idBukuToDelete)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Hapus baris dari tabel secara langsung
+            const rowToRemove = document.querySelector(`tr[data-id-buku="${data.id_buku}"]`);
+            if (rowToRemove) {
+              rowToRemove.remove();
+              // Opsional: perbarui nomor urut jika ada
+              updateRowNumbers();
+            }
+            hapusPengembalianModal.hide(); // Sembunyikan modal
+          } else {
+            alert('Gagal menghapus data: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Terjadi kesalahan saat menghapus data.');
+        });
+    }
+  });
+
+  // Fungsi untuk memperbarui nomor urut (No) setelah penghapusan
+  function updateRowNumbers() {
+    const tableRows = document.querySelectorAll('#pengembalianTable tbody tr');
+    tableRows.forEach((row, index) => {
+      const noCell = row.querySelector('td:first-child');
+      if (noCell) {
+        noCell.textContent = index + 1;
+      }
+    });
+  }
+
+  // Fungsi untuk memfilter baris tabel berdasarkan input pencarian
   function filterTable() {
     const input = document.getElementById('searchInput');
     const filter = input.value.toLowerCase();
-    const table = document.getElementById('pengembalianTable'); // Corrected table ID
+    const table = document.getElementById('pengembalianTable');
     const tr = table.getElementsByTagName('tr');
 
-    for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+    for (let i = 1; i < tr.length; i++) { // Mulai dari 1 untuk melewati baris header
       const td = tr[i].getElementsByTagName('td');
       let found = false;
 
-      // Search by ID Buku (column index 1) or Judul Buku (column index 2)
-      const idBukuCol = td[1]; 
-      const judulBukuCol = td[2]; 
-
-      if (idBukuCol && idBukuCol.textContent.toLowerCase().indexOf(filter) > -1) {
-        found = true;
-      } else if (judulBukuCol && judulBukuCol.textContent.toLowerCase().indexOf(filter) > -1) {
-        found = true;
+      // Iterasi melalui setiap kolom di baris saat ini (kecuali kolom "No" di index 0)
+      for (let j = 1; j < td.length; j++) { // Mulai dari index 1 (Id Buku)
+        if (td[j]) {
+          const txtValue = td[j].textContent || td[j].innerText;
+          if (txtValue.toLowerCase().indexOf(filter) > -1) {
+            found = true;
+            break; 
+          }
+        }
       }
-
-      tr[i].style.display = found ? "" : "none"; // Show or hide the row
+      tr[i].style.display = found ? "" : "none";
     }
   }
 </script>
