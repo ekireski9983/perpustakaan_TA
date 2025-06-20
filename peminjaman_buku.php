@@ -193,9 +193,9 @@
                                     <p class="card-text"><strong>Jumlah Halaman:</strong> 280</p>
                                     <p class="card-text"><strong>tanggal pinjam:</strong> 00/00/00</p>
                                     <p class="card-text"><strong>tanggal pengembalian:</strong> 00/00/00</p>
-                                    <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal('BOOK002')">Pinjam buku</button>
-                                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick="showEditModal({id_buku: 'BOOK002', judul_buku: 'Mystery of the Old House', isbn: '978-9876543210', nama_penulis: 'John Smith', nama_penerbit: 'Whodunit Books', jumlah_halaman: 280, foto: 'https://via.placeholder.com/150/FF0000/FFFFFF?text=Book+Cover+2'})">Edit</button>
-                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId('BOOK002')">Hapus</button>
+                                    <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal" onclick="showBorrowModal">Pinjam buku</button>
+                                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal" onclick="showEditModal">Edit</button>
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteBookId">Hapus</button>
                                 </div>
                             </div>
                         </div>
