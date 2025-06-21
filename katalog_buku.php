@@ -173,7 +173,10 @@
                         <h5 class="card-title book-id"><?php echo htmlspecialchars($row['id_buku']); ?></h5> <p class="card-text book-title"><strong>Judul Buku:</strong> <?php echo htmlspecialchars($row['judul_buku']); ?></p> <p class="card-text"><strong>ISBN:</strong> <?php echo htmlspecialchars($row['isbn']); ?></p>
                         <p class="card-text book-author"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($row['nama_penulis']); ?></p> <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($row['nama_penerbit']); ?></p>
                         <p class="card-text"><strong>Jumlah Halaman:</strong> <?php echo htmlspecialchars($row['jumlah_halaman']); ?></p>
-                        <a href="peminjaman_buku.php?id=<?php echo htmlspecialchars($row['id_buku']); ?>" class="btn btn-success">simpan buku</a>
+                        <form action="process_peminjaman.php" method="POST" style="display:inline;">
+                        <input type="hidden" name="id_buku" value="<?php echo htmlspecialchars($row['id_buku']); ?>">
+                        <button type="submit" class="btn btn-success">simpan Buku</button>
+                       </form>
                       </div>
                     </div>
                   </div>
