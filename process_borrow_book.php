@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 // Database connection details
 $servername = "localhost";
 $username = "root"; // Replace with your database username
@@ -15,51 +13,52 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Sanitize and get POST data
-    $id_buku = $conn->real_escape_string($_POST['id_buku']);
-    $judul_buku = $conn->real_escape_string($_POST['judul_buku']);
-    $isbn = $conn->real_escape_string($_POST['isbn']);
-    $nama_penulis = $conn->real_escape_string($_POST['nama_penulis']);
-    $nama_penerbit = $conn->real_escape_string($_POST['nama_penerbit']);
-    $jumlah_halaman = (int)$_POST['jumlah_halaman']; // Cast to integer
-    $foto = $conn->real_escape_string($_POST['foto']); // Get photo from hidden field
-    $tanggal_pinjam = $conn->real_escape_string($_POST['tanggal_pinjam']);
-    $tanggal_pengembalian = $conn->real_escape_string($_POST['tanggal_pengembalian']);
-    $status_pengembalian = "Belum Dikembalikan"; // Default status
+// Get data from the form
+$id_buku = $_POST['id_buku'];
+$judul_buku = $_POST['judul_buku'];
+$isbn = $_POST['isbn'];
+$nama_penulis = $_POST['nama_penulis'];
+$nama_penerbit = $_POST['nama_penerbit'];
+$jumlah_halaman = $_POST['jumlah_halaman'];
+$foto = $_POST['foto'];
+$tanggal_pinjam = $_POST['tanggal_pinjam'];
+$tanggal_pengembalian = $_POST['tanggal_pengembalian'];
 
-    // Start a transaction to ensure both inserts succeed or fail together
-    $conn->begin_transaction();
+// Check if the book already exists in data_pinjam
+$check_sql = "SELECT COUNT(*) AS count FROM data_pinjam WHERE id_buku = ?";
+$stmt_check = $conn->prepare($check_sql);
+$stmt_check->bind_param("s", $id_buku);
+$stmt_check->execute();
+$result_check = $stmt_check->get_result();
+$row_check = $result_check->fetch_assoc();
+$book_exists = $row_check['count'] > 0;
+$stmt_check->close();
 
-    try {
-        // Insert into data_pinjam table
-        $stmt_pinjam = $conn->prepare("INSERT INTO data_pinjam (id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, foto, jumlah_halaman, tanggal_pinjam, tanggal_pengembalian) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt_pinjam->bind_param("ssssssiss", $id_buku, $judul_buku, $isbn, $nama_penulis, $nama_penerbit, $foto, $jumlah_halaman, $tanggal_pinjam, $tanggal_pengembalian);
-        $stmt_pinjam->execute();
-        $stmt_pinjam->close();
-
-        // Insert into data_pengembalian table
-        // Ensure your data_pengembalian table has these columns: id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status
-        $stmt_pengembalian = $conn->prepare("INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status) VALUES (?, ?, ?, ?, ?)");
-        $stmt_pengembalian->bind_param("sssss", $id_buku, $judul_buku, $tanggal_pinjam, $tanggal_pengembalian, $status_pengembalian);
-        $stmt_pengembalian->execute();
-        $stmt_pengembalian->close();
-
-        // If both inserts are successful, commit the transaction
-        $conn->commit();
-        header("Location: peminjaman_buku.php?status=success&message=Buku berhasil dipinjam dan dicatat untuk pengembalian!");
-        exit();
-
-    } catch (mysqli_sql_exception $exception) {
-        // If any error occurs, rollback the transaction
-        $conn->rollback();
-        header("Location: peminjaman_buku.php?status=error&message=Gagal meminjam buku: " . $exception->getMessage());
-        exit();
-    }
+if ($book_exists) {
+    // If book exists, update the borrow and return dates
+    $sql = "UPDATE data_pinjam SET tanggal_pinjam = ?, tanggal_pengembalian = ? WHERE id_buku = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sss", $tanggal_pinjam, $tanggal_pengembalian, $id_buku);
+    $message = "Tanggal peminjaman buku berhasil diperbarui.";
 } else {
-    header("Location: peminjaman_buku.php?status=error&message=Metode request tidak valid.");
-    exit();
+    // If book does not exist, insert a new record
+    $sql = "INSERT INTO data_pinjam (id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssssisss", $id_buku, $judul_buku, $isbn, $nama_penulis, $nama_penerbit, $jumlah_halaman, $foto, $tanggal_pinjam, $tanggal_pengembalian);
+    $message = "Buku berhasil dipinjam.";
 }
 
+if ($stmt->execute()) {
+    $status = 'success';
+} else {
+    $status = 'error';
+    $message = "Error: " . $stmt->error;
+}
+
+$stmt->close();
 $conn->close();
+
+// Redirect back to the peminjaman_buku.php page with status message
+header("Location: peminjaman_buku.php?status=$status&message=" . urlencode($message));
+exit();
 ?>
