@@ -151,7 +151,7 @@ $conn->close();
                 <h5 class="pt-4">Siswa<br /><small>user</small></h5>
                 <a href="lihat_anggota.php">lihat Anggota</a>
                 <a href="katalog_buku.php">Katalog Buku</a>
-                <a href="peminjaman_buku.php" class="active">Peminjaman Buku</a>
+                <a href="peminjaman_buku.php">Peminjaman Buku</a>
                 <a href="pengembalian_buku.php">Pengembalian Buku</a>
                 <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
                 <a href="logout.php">Logout</a>
@@ -341,7 +341,7 @@ $conn->close();
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menghapus data buku dengan ID: <strong id="deleteBookIdPlaceholder"></strong>?</p>
+                    <p>Apakah Anda yakin ingin menghapus data buku?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

@@ -54,14 +54,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
 // Menangani penghapusan data anggota
 if (isset($_GET['id'])) {
-    $id_siswa = $_GET['id'];
-    $delete_query = "DELETE FROM data_anggota WHERE id_siswa='$id_siswa'";
-    mysqli_query($koneksi, $delete_query);
-    header("Location: kelola_anggota.php"); // Redirect setelah penghapusan
-    exit();
+    $id_siswa_to_delete = $_GET['id']; // Renamed variable for clarity
+
+    // Start a transaction for atomicity
+    mysqli_begin_transaction($koneksi);
+
+    try {
+        // First, delete from the data_anggota table
+        $delete_anggota_query = "DELETE FROM data_anggota WHERE id_siswa='$id_siswa_to_delete'";
+        if (!mysqli_query($koneksi, $delete_anggota_query)) {
+            throw new Exception(mysqli_error($koneksi));
+        }
+
+        // Then, delete from the users table (assuming username matches nama or id_siswa matches password for simplicity as per your insert logic)
+        // A more robust solution would be to have a foreign key or a dedicated user ID in data_anggota
+        $delete_users_query = "DELETE FROM users WHERE password='$id_siswa_to_delete'"; // Assuming password is id_siswa
+        // Alternatively, if username is used as 'nama' from data_anggota, you'd need to fetch 'nama' first.
+        // For now, based on your insert, password matching id_siswa is the direct link.
+        
+        if (!mysqli_query($koneksi, $delete_users_query)) {
+            throw new Exception(mysqli_error($koneksi));
+        }
+
+        // If both queries are successful, commit the transaction
+        mysqli_commit($koneksi);
+        header("Location: kelola_anggota.php"); // Redirect after successful deletion
+        exit();
+    } catch (Exception $e) {
+        // If any query fails, rollback the transaction
+        mysqli_rollback($koneksi);
+        echo "Error deleting record: " . $e->getMessage();
+    }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -149,6 +174,8 @@ if (isset($_GET['id'])) {
           <tbody>
             <?php
             $no = 1;
+            // Re-fetch result after potential modifications
+            $result = mysqli_query($koneksi, $query);
             while ($row = mysqli_fetch_assoc($result)) {
               echo "<tr>";
               echo "<td>" . $no++ . "</td>";

@@ -24,7 +24,7 @@ $foto = $_POST['foto'];
 $tanggal_pinjam = $_POST['tanggal_pinjam'];
 $tanggal_pengembalian = $_POST['tanggal_pengembalian'];
 
-// Initialize status and message for the overall operation result
+// Initialize status and message
 $status = 'error';
 $message = 'Terjadi kesalahan tidak terduga.';
 
@@ -74,9 +74,6 @@ try {
     }
 
     // 2. Handle data_pengembalian table (Insert or Update)
-    // The column name `status` in `data_pengembalian` (as per your SQL) should match the query.
-    // Ensure `status` is indeed the column name in `data_pengembalian` and not `status_pengembalian`
-    // as suggested in the previous response. I'm using 'status' as it's in your `INSERT` statement below.
     $check_pengembalian_sql = "SELECT COUNT(*) AS count FROM data_pengembalian WHERE id_buku = ? AND status = 'Belum Dikembalikan'";
     $stmt_check_pengembalian = $conn->prepare($check_pengembalian_sql);
     if ($stmt_check_pengembalian === false) {
@@ -89,8 +86,7 @@ try {
     $book_in_pengembalian_exists = $row_check_pengembalian['count'] > 0;
     $stmt_check_pengembalian->close();
 
-    // This variable holds the specific status for data_pengembalian table
-    $status_for_pengembalian_table = 'Belum Dikembalikan';
+    $status_pengembalian = 'Belum Dikembalikan';
 
     if ($book_in_pengembalian_exists) {
         // If an active 'Belum Dikembalikan' record exists, update its dates
@@ -99,6 +95,7 @@ try {
         if ($stmt_pengembalian === false) {
             throw new Exception("Prepare failed on data_pengembalian UPDATE: " . $conn->error);
         }
+        // Line 79, now with proper error checking for prepare
         $stmt_pengembalian->bind_param("ssss", $judul_buku, $tanggal_pinjam, $tanggal_pengembalian, $id_buku);
         if (!$stmt_pengembalian->execute()) {
             throw new Exception("Error updating data_pengembalian: " . $stmt_pengembalian->error);
@@ -111,8 +108,7 @@ try {
         if ($stmt_pengembalian === false) {
             throw new Exception("Prepare failed on data_pengembalian INSERT: " . $conn->error);
         }
-        // CORRECTED LINE: Use $status_for_pengembalian_table here
-        $stmt_pengembalian->bind_param("sssss", $id_buku, $judul_buku, $tanggal_pinjam, $tanggal_pengembalian, $status_for_pengembalian_table);
+        $stmt_pengembalian->bind_param("sssss", $id_buku, $judul_buku, $tanggal_pinjam, $tanggal_pengembalian, $status);
         if (!$stmt_pengembalian->execute()) {
             throw new Exception("Error inserting into data_pengembalian: " . $stmt_pengembalian->error);
         }
@@ -121,12 +117,12 @@ try {
 
     // Commit the transaction if all queries were successful
     $conn->commit();
-    $status = 'success'; // This 'status' is for the redirection message
+    $status = 'success';
 
 } catch (Exception $e) {
     // Rollback the transaction if any query failed
     $conn->rollback();
-    $status = 'error'; // This 'status' is for the redirection message
+    $status = 'error';
     $message = $e->getMessage();
 }
 
