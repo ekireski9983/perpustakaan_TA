@@ -13,7 +13,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch book data
+// Fetch book data from data_pinjam
+// It's good practice to fetch all columns you might need, even if some are nullable
 $sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian FROM data_pinjam";
 $result = $conn->query($sql);
 
@@ -150,7 +151,7 @@ $conn->close();
                 <h5 class="pt-4">Siswa<br /><small>user</small></h5>
                 <a href="lihat_anggota.php">lihat Anggota</a>
                 <a href="katalog_buku.php">Katalog Buku</a>
-                <a href="peminjaman_buku.php">Peminjaman Buku</a>
+                <a href="peminjaman_buku.php" class="active">Peminjaman Buku</a>
                 <a href="pengembalian_buku.php">Pengembalian Buku</a>
                 <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
                 <a href="logout.php">Logout</a>
@@ -172,6 +173,9 @@ $conn->close();
                     <a href="pengembalian_buku.php">Pengembalian Buku</a>
                     <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
                     <a href="logout.php">Logout</a>
+                    <div class="image-box text-center mt-5">
+                        <img src="assets/Bootstrap_logo.png" alt="icon" />
+                    </div>
                 </div>
             </div>
 
@@ -198,20 +202,26 @@ $conn->close();
                                             <p class="card-text book-author"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($book['nama_penulis']); ?></p>
                                             <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($book['nama_penerbit']); ?></p>
                                             <p class="card-text"><strong>Jumlah Halaman:</strong> <?php echo htmlspecialchars($book['jumlah_halaman']); ?></p>
-                                            <p class="card-text"><strong>tanggal pinjam:</strong> <?php echo htmlspecialchars($book['tanggal_pinjam'] ?? '00/00/00'); ?></p>
-                                            <p class="card-text"><strong>tanggal pengembalian:</strong> <?php echo htmlspecialchars($book['tanggal_pengembalian'] ?? '00/00/00'); ?></p>
+                                            <p class="card-text"><strong>Tanggal Pinjam:</strong> <?php echo htmlspecialchars($book['tanggal_pinjam'] ?? ''); ?></p>
+                                            <p class="card-text"><strong>Tanggal Pengembalian:</strong> <?php echo htmlspecialchars($book['tanggal_pengembalian'] ?? ''); ?></p>
+                                            
                                             <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal"
-                                                    onclick="showBorrowModal('<?php echo htmlspecialchars($book['id_buku']); ?>', '<?php echo htmlspecialchars($book['judul_buku']); ?>', '<?php echo htmlspecialchars($book['isbn']); ?>', '<?php echo htmlspecialchars($book['nama_penulis']); ?>', '<?php echo htmlspecialchars($book['nama_penerbit']); ?>', <?php echo htmlspecialchars($book['jumlah_halaman']); ?>, '<?php echo htmlspecialchars($book['foto']); ?>')">Pinjam buku</button>
+                                                     onclick="showBorrowModal('<?php echo htmlspecialchars($book['id_buku']); ?>', '<?php echo htmlspecialchars($book['judul_buku']); ?>', '<?php echo htmlspecialchars($book['isbn']); ?>', '<?php echo htmlspecialchars($book['nama_penulis']); ?>', '<?php echo htmlspecialchars($book['nama_penerbit']); ?>', <?php echo htmlspecialchars($book['jumlah_halaman']); ?>, '<?php echo htmlspecialchars($book['foto']); ?>')">Pinjam buku</button>
+                                            
                                             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal"
-                                                    onclick='showEditModal(<?php echo json_encode($book); ?>)'>Edit</button>
+                                                     onclick='showEditModal(<?php echo json_encode($book); ?>)'>Edit</button>
+                                            
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
-                                                    onclick="setDeleteBookId('<?php echo htmlspecialchars($book['id_buku']); ?>')">Hapus</button>
+                                                     onclick="setDeleteBookId('<?php echo htmlspecialchars($book['id_buku']); ?>')">Hapus</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
+                        <div class="alert alert-info" role="alert">
+                            Tidak ada buku yang sedang dipinjam.
+                        </div>
                     <?php endif; ?>
                 </div>
             </main>
@@ -225,6 +235,7 @@ $conn->close();
                     <h5 class="modal-title" id="borrowBookModalLabel">Peminjaman Buku</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <form action="process_borrow_book.php" method="POST"> 
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="borrowBookId" class="form-label">ID Buku</label>
@@ -258,10 +269,11 @@ $conn->close();
                             <label for="borrowReturnDate" class="form-label">Tanggal Pengembalian</label>
                             <input type="date" class="form-control" id="borrowReturnDate" name="tanggal_pengembalian" required>
                         </div>
+                        <input type="hidden" id="borrowFoto" name="foto"> 
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-success">Pinjam buku</button>
-                        <button type="reset" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                     </div>
                 </form>
             </div>
@@ -275,7 +287,8 @@ $conn->close();
                     <h5 class="modal-title" id="editBookModalLabel">Edit Peminjaman Buku</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                     <div class="modal-body">
+                <form action="process_edit_peminjaman.php" method="POST">
+                    <div class="modal-body">
                         <input type="hidden" id="edit_original_book_id" name="original_id_buku">
                         <div class="mb-3">
                             <label for="editBookId" class="form-label">ID Buku</label>
@@ -309,10 +322,11 @@ $conn->close();
                             <label for="editTanggalPengembalian" class="form-label">Tanggal Pengembalian</label>
                             <input type="date" class="form-control" id="editTanggalPengembalian" name="tanggal_pengembalian" required>
                         </div>
+                        <input type="hidden" id="editFoto" name="foto"> 
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">edit</button>
-                        <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">reset</button>
+                        <button type="submit" class="btn btn-primary">Edit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     </div>
                 </form>
             </div>
@@ -380,18 +394,22 @@ $conn->close();
             document.getElementById('borrowNamaPenulis').value = nama_penulis;
             document.getElementById('borrowNamaPenerbit').value = nama_penerbit;
             document.getElementById('borrowJumlahHalaman').value = jumlah_halaman;
+            document.getElementById('borrowFoto').value = foto; // Set hidden foto field
 
             const today = new Date();
-            document.getElementById('borrowDate').valueAsDate = today;
+            // Format date to YYYY-MM-DD for input type="date"
+            const todayFormatted = today.toISOString().split('T')[0];
+            document.getElementById('borrowDate').value = todayFormatted;
 
             const returnDate = new Date(today);
             returnDate.setDate(today.getDate() + 7); // Default return date: 7 days from today
-            document.getElementById('borrowReturnDate').valueAsDate = returnDate;
+            const returnDateFormatted = returnDate.toISOString().split('T')[0];
+            document.getElementById('borrowReturnDate').value = returnDateFormatted;
         }
 
         // Function to show the Edit Borrow Book Modal and pre-fill its fields
         function showEditModal(bookData) {
-            // Set the value for the hidden input field
+            // Set the value for the hidden input field to identify the record being edited
             document.getElementById('edit_original_book_id').value = bookData.id_buku;
 
             document.getElementById('editBookId').value = bookData.id_buku;
@@ -400,14 +418,12 @@ $conn->close();
             document.getElementById('editPenulis').value = bookData.nama_penulis;
             document.getElementById('editPenerbit').value = bookData.nama_penerbit;
             document.getElementById('editHalaman').value = bookData.jumlah_halaman;
+            document.getElementById('editFoto').value = bookData.foto; // Set hidden foto field
 
             // Set dates for editing, ensure they are in YYYY-MM-DD format
-            if (bookData.tanggal_pinjam) {
-                document.getElementById('editTanggalPinjam').value = bookData.tanggal_pinjam;
-            }
-            if (bookData.tanggal_pengembalian) {
-                document.getElementById('editTanggalPengembalian').value = bookData.tanggal_pengembalian;
-            }
+            // If the date is '0000-00-00' or null, set it to empty string so the date picker doesn't show an invalid date.
+            document.getElementById('editTanggalPinjam').value = (bookData.tanggal_pinjam === '0000-00-00' || !bookData.tanggal_pinjam) ? '' : bookData.tanggal_pinjam;
+            document.getElementById('editTanggalPengembalian').value = (bookData.tanggal_pengembalian === '0000-00-00' || !bookData.tanggal_pengembalian) ? '' : bookData.tanggal_pengembalian;
         }
 
         // Variable to store the ID of the book to be deleted
@@ -423,9 +439,37 @@ $conn->close();
         document.getElementById('confirmDeleteButton').addEventListener('click', function() {
             if (bookIdToDelete) {
                 // Redirect to a PHP script to handle deletion
-                window.location.href = `process_delete_book.php?id=${bookIdToDelete}`;
+                window.location.href = `process_delete_peminjaman.php?id=${bookIdToDelete}`;
             }
         });
+
+        // Display status messages from URL parameters
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            const message = urlParams.get('message');
+
+            if (status && message) {
+                let alertClass = '';
+                if (status === 'success') {
+                    alertClass = 'alert-success';
+                } else if (status === 'error') {
+                    alertClass = 'alert-danger';
+                }
+
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert ${alertClass} alert-dismissible fade show mt-3`;
+                alertDiv.setAttribute('role', 'alert');
+                alertDiv.innerHTML = `
+                    ${decodeURIComponent(message)}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                document.querySelector('.main-content').prepend(alertDiv);
+
+                // Optional: remove the URL parameters after displaying the message
+                history.replaceState({}, document.title, window.location.pathname);
+            }
+        };
     </script>
 </body>
 </html>
