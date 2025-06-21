@@ -15,7 +15,11 @@ if ($conn->connect_error) {
 
 // Get data from the form
 $original_id_buku = $_POST['original_id_buku']; // This is crucial for identifying the record
-$id_buku = $_POST['id_buku']; // This will be the same as original_id_buku if ID is not editable
+// Note: If 'id_buku' itself can be changed through the edit form,
+// you would need to retrieve it as $_POST['id_buku'] and update data_pinjam's id_buku field as well,
+// using original_id_buku in the WHERE clause.
+// For this script, we assume id_buku is the primary key and doesn't change,
+// so original_id_buku is consistently used for lookup.
 $judul_buku = $_POST['judul_buku'];
 $isbn = $_POST['isbn'];
 $nama_penulis = $_POST['nama_penulis'];
@@ -25,30 +29,98 @@ $foto = $_POST['foto'];
 $tanggal_pinjam = $_POST['tanggal_pinjam'];
 $tanggal_pengembalian = $_POST['tanggal_pengembalian'];
 
-// Update the existing record in data_pinjam
-$sql = "UPDATE data_pinjam SET
-            judul_buku = ?,
-            isbn = ?,
-            nama_penulis = ?,
-            nama_penerbit = ?,
-            jumlah_halaman = ?,
-            foto = ?,
-            tanggal_pinjam = ?,
-            tanggal_pengembalian = ?
-        WHERE id_buku = ?"; // Use original_id_buku to ensure correct record is updated
+// Initialize status and message for the overall operation result
+$status = 'error';
+$message = 'Terjadi kesalahan tidak terduga.';
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssissss", $judul_buku, $isbn, $nama_penulis, $nama_penerbit, $jumlah_halaman, $foto, $tanggal_pinjam, $tanggal_pengembalian, $original_id_buku);
+// Start a transaction for atomicity
+$conn->begin_transaction();
 
-if ($stmt->execute()) {
-    $status = 'success';
+try {
+    // 1. Update the existing record in data_pinjam
+    $sql_pinjam_update = "UPDATE data_pinjam SET
+                            judul_buku = ?,
+                            isbn = ?,
+                            nama_penulis = ?,
+                            nama_penerbit = ?,
+                            jumlah_halaman = ?,
+                            foto = ?,
+                            tanggal_pinjam = ?,
+                            tanggal_pengembalian = ?
+                          WHERE id_buku = ?"; // Use original_id_buku to ensure correct record is updated
+
+    $stmt_pinjam_update = $conn->prepare($sql_pinjam_update);
+    if ($stmt_pinjam_update === false) {
+        throw new Exception("Prepare failed on data_pinjam UPDATE: " . $conn->error);
+    }
+    $stmt_pinjam_update->bind_param("ssssissss", $judul_buku, $isbn, $nama_penulis, $nama_penerbit, $jumlah_halaman, $foto, $tanggal_pinjam, $tanggal_pengembalian, $original_id_buku);
+
+    if (!$stmt_pinjam_update->execute()) {
+        throw new Exception("Error updating data_pinjam: " . $stmt_pinjam_update->error);
+    }
+    $stmt_pinjam_update->close();
     $message = "Data peminjaman buku berhasil diperbarui.";
-} else {
-    $status = 'error';
-    $message = "Error: " . $stmt->error;
+
+    // 2. Handle data_pengembalian table (Update or Insert)
+    // We need to update the corresponding "Belum Dikembalikan" entry in data_pengembalian.
+    // If somehow it doesn't exist (e.g., historical data missing), then create a new one.
+
+    $check_pengembalian_sql = "SELECT COUNT(*) AS count FROM data_pengembalian WHERE id_buku = ? AND status = 'Belum Dikembalikan'";
+    $stmt_check_pengembalian = $conn->prepare($check_pengembalian_sql);
+    if ($stmt_check_pengembalian === false) {
+        throw new Exception("Prepare failed on data_pengembalian check: " . $conn->error);
+    }
+    $stmt_check_pengembalian->bind_param("s", $original_id_buku); // Check using the original_id_buku
+    $stmt_check_pengembalian->execute();
+    $result_check_pengembalian = $stmt_check_pengembalian->get_result();
+    $row_check_pengembalian = $result_check_pengembalian->fetch_assoc();
+    $book_in_pengembalian_active_exists = $row_check_pengembalian['count'] > 0;
+    $stmt_check_pengembalian->close();
+
+    $status_for_pengembalian_table = 'Belum Dikembalikan'; // For any new or updated entry in pengembalian
+
+    if ($book_in_pengembalian_active_exists) {
+        // If an active 'Belum Dikembalikan' record exists, update its dates and judul_buku
+        $sql_pengembalian_update = "UPDATE data_pengembalian SET
+                                      judul_buku = ?,
+                                      tanggal_pinjam = ?,
+                                      tanggal_pengembalian = ?
+                                    WHERE id_buku = ? AND status = 'Belum Dikembalikan'";
+        $stmt_pengembalian_update = $conn->prepare($sql_pengembalian_update);
+        if ($stmt_pengembalian_update === false) {
+            throw new Exception("Prepare failed on data_pengembalian UPDATE: " . $conn->error);
+        }
+        $stmt_pengembalian_update->bind_param("ssss", $judul_buku, $tanggal_pinjam, $tanggal_pengembalian, $original_id_buku);
+        if (!$stmt_pengembalian_update->execute()) {
+            throw new Exception("Error updating data_pengembalian: " . $stmt_pengembalian_update->error);
+        }
+        $stmt_pengembalian_update->close();
+    } else {
+        // If no active 'Belum Dikembalikan' record exists for this book, insert a new one.
+        // This ensures data_pengembalian reflects the current borrow state in data_pinjam.
+        $sql_pengembalian_insert = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status) VALUES (?, ?, ?, ?, ?)";
+        $stmt_pengembalian_insert = $conn->prepare($sql_pengembalian_insert);
+        if ($stmt_pengembalian_insert === false) {
+            throw new Exception("Prepare failed on data_pengembalian INSERT: " . $conn->error);
+        }
+        $stmt_pengembalian_insert->bind_param("sssss", $original_id_buku, $judul_buku, $tanggal_pinjam, $tanggal_pengembalian, $status_for_pengembalian_table);
+        if (!$stmt_pengembalian_insert->execute()) {
+            throw new Exception("Error inserting into data_pengembalian: " . $stmt_pengembalian_insert->error);
+        }
+        $stmt_pengembalian_insert->close();
+    }
+
+    // Commit the transaction if all queries were successful
+    $conn->commit();
+    $status = 'success'; // This 'status' is for the redirection message
+
+} catch (Exception $e) {
+    // Rollback the transaction if any query failed
+    $conn->rollback();
+    $status = 'error'; // This 'status' is for the redirection message
+    $message = $e->getMessage();
 }
 
-$stmt->close();
 $conn->close();
 
 // Redirect back to the peminjaman_buku.php page with status message
