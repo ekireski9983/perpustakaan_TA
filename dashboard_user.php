@@ -80,7 +80,7 @@
         <a href="denda_keterlambatan.php">denda keterlambatan</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
-          <img src="assets/Bootstrap_logo.png" alt="icon" />
+          <img src="assets/logo_sekolah.png" alt="icon" />
         </div>
       </nav>
 

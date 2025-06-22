@@ -152,7 +152,7 @@ if (isset($_GET['id'])) {
         <a href="kelola_denda.php">Kelola Denda</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
-          <img src="assets/Bootstrap_logo.png" alt="icon" />
+          <img src="assets/logo_sekolah.png" alt="icon" />
         </div>
       </nav>
       
@@ -169,7 +169,7 @@ if (isset($_GET['id'])) {
           <a href="kelola_denda.php">kelola denda</a>
           <a href="logout.php">Logout</a>
           <div class="image-box text-center mt-5">
-            <img src="assets/Bootstrap_logo.png" alt="icon" />
+            <img src="assets/logo_sekolah.png" alt="icon" />
           </div>
         </div>
       </div>

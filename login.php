@@ -45,7 +45,7 @@ if (isset($_SESSION['username'])) {
 <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card login-container shadow-lg p-4 login-card">
         <div class="text-center mb-4">
-            <img src="assets/Bootstrap_logo.png" alt="Logo">
+            <img src="assets/logo_sekolah.png" alt="Logo">
         </div>
         <h4 class="text-center login-title mb-4">Login</h4>
 
