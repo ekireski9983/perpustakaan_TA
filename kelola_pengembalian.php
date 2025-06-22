@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $new_status = $_POST['new_status'];
 
     // Gunakan prepared statement untuk UPDATE
-    $update_query = "UPDATE data_pengembalian SET status = ? WHERE id_buku = ?";
+    $update_query = "UPDATE data_pengembalian SET status_pengembalian = ? WHERE id_buku = ?";
     $stmt = mysqli_prepare($koneksi, $update_query);
     if ($stmt === false) {
         echo json_encode(['success' => false, 'message' => "Prepare failed: " . mysqli_error($koneksi)]);
@@ -158,10 +158,10 @@ $result = mysqli_query($koneksi, $query);
                                 echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['tanggal_pinjam']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['tanggal_pengembalian']) . "</td>";
-                                echo '<td class="status-cell">' . htmlspecialchars($row['status']) . '</td>'; // Tambahkan class untuk akses mudah
+                                echo '<td class="status-cell">' . htmlspecialchars($row['status_pengembalian']) . '</td>'; // Tambahkan class untuk akses mudah
                                 echo '<td>
                                         <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#ubahStatusPengembalianModal" 
-                                                data-id="' . htmlspecialchars($row['id_buku']) . '" data-status="' . htmlspecialchars($row['status']) . '">
+                                                data-id="' . htmlspecialchars($row['id_buku']) . '" data-status="' . htmlspecialchars($row['status_pengembalian']) . '">
                                             Ubah 
                                         </button>
                                     </td>';
@@ -209,7 +209,7 @@ $result = mysqli_query($koneksi, $query);
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus data pengembalian untuk buku ID: <strong id="hapusIdPengembalianDisplay"></strong>?</p>
+                <p>Apakah Anda yakin ingin menghapus data ini?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
