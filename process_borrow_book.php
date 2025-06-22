@@ -74,7 +74,7 @@ try {
     }
 
     // 2. Handle data_pengembalian table (Insert or Update)
-    $check_pengembalian_sql = "SELECT COUNT(*) AS count FROM data_pengembalian WHERE id_buku = ? AND status = 'Belum Dikembalikan'";
+    $check_pengembalian_sql = "SELECT COUNT(*) AS count FROM data_pengembalian WHERE id_buku = ? AND status_pengembalian = 'belum dikembalikan'";
     $stmt_check_pengembalian = $conn->prepare($check_pengembalian_sql);
     if ($stmt_check_pengembalian === false) {
         throw new Exception("Prepare failed on data_pengembalian check: " . $conn->error);
@@ -86,11 +86,11 @@ try {
     $book_in_pengembalian_exists = $row_check_pengembalian['count'] > 0;
     $stmt_check_pengembalian->close();
 
-    $status_pengembalian = 'Belum Dikembalikan';
+    $status_pengembalian = 'belum dikembalikan';
 
     if ($book_in_pengembalian_exists) {
         // If an active 'Belum Dikembalikan' record exists, update its dates
-        $sql_pengembalian = "UPDATE data_pengembalian SET judul_buku = ?, tanggal_pinjam = ?, tanggal_pengembalian = ? WHERE id_buku = ? AND status = 'Belum Dikembalikan'";
+        $sql_pengembalian = "UPDATE data_pengembalian SET judul_buku = ?, tanggal_pinjam = ?, tanggal_pengembalian = ? WHERE id_buku = ? AND status_pengembalian = 'belum dikembalikan'";
         $stmt_pengembalian = $conn->prepare($sql_pengembalian);
         if ($stmt_pengembalian === false) {
             throw new Exception("Prepare failed on data_pengembalian UPDATE: " . $conn->error);
@@ -103,12 +103,12 @@ try {
         $stmt_pengembalian->close();
     } else {
         // Otherwise, insert a new record for this borrowing event
-        $sql_pengembalian = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status) VALUES (?, ?, ?, ?, ?)";
+        $sql_pengembalian = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status_pengembalian) VALUES (?, ?, ?, ?, ?)";
         $stmt_pengembalian = $conn->prepare($sql_pengembalian);
         if ($stmt_pengembalian === false) {
             throw new Exception("Prepare failed on data_pengembalian INSERT: " . $conn->error);
         }
-        $stmt_pengembalian->bind_param("sssss", $id_buku, $judul_buku, $tanggal_pinjam, $tanggal_pengembalian, $status);
+        $stmt_pengembalian->bind_param("sssss", $id_buku, $judul_buku, $tanggal_pinjam, $tanggal_pengembalian, $status_pengembalian);
         if (!$stmt_pengembalian->execute()) {
             throw new Exception("Error inserting into data_pengembalian: " . $stmt_pengembalian->error);
         }
