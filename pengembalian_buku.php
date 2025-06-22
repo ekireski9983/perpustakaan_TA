@@ -145,7 +145,7 @@ if (!$result) {
         <a href="lihat_anggota.php">lihat anggota</a>
         <a href="katalog_buku.php">katalog buku</a>
         <a href="peminjaman_buku.php">Peminjaman buku</a>
-        <a href="pengembalian_buku.php" class="active">Pengembalian buku</a>
+        <a href="pengembalian_buku.php">Pengembalian buku</a>
         <a href="denda_keterlambatan.php">denda keterlambatan</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
