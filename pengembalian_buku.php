@@ -7,39 +7,49 @@ if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-// Ambil data dari tabel data_pengembalian
-$query = "SELECT id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian FROM data_pengembalian";
-$result = mysqli_query($koneksi, $query);
-
-// Cek apakah query berhasil dieksekusi
-if (!$result) {
-    die("Query gagal: " . mysqli_error($koneksi));
-}
-
-// Handle Update (Ubah) operation - Placeholder for actual update logic
-// In a real application, this would involve updating the database and potentially moving the book back to available status.
+// Handle Update (Ubah) operation - Confirm Book Return
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'update_return') {
     $id_buku_to_update = $_POST['id_buku'];
-    // You might want to update a status in data_pengembalian or move the record
-    // to a history table, and update the book's availability status in data_buku.
-    // Example: UPDATE data_pengembalian SET status = 'returned' WHERE id_buku = '$id_buku_to_update';
-    // Example: UPDATE data_buku SET status_tersedia = 1 WHERE id_buku = '$id_buku_to_update';
 
-    // For demonstration, just show a success message
-    // echo "<script>alert('Buku dengan ID " . htmlspecialchars($id_buku_to_update) . " berhasil dikonfirmasi pengembaliannya!');</script>";
-    // Optionally, refresh the page to reflect changes if the database was updated
-    // header("Location: pengembalian_buku.php");
-    // exit();
+    // Update the status_pengembalian in data_pengembalian table
+    $update_query = "UPDATE data_pengembalian SET status_pengembalian = 'Sudah Dikembalikan' WHERE id_buku = ?";
+    $stmt = mysqli_prepare($koneksi, $update_query);
+    mysqli_stmt_bind_param($stmt, "s", $id_buku_to_update); // 's' for string type
+
+    if (mysqli_stmt_execute($stmt)) {
+        // Optionally, update the book's availability status in data_buku table
+        // Assuming 'status_tersedia' is 0 for borrowed and 1 for available
+        $update_buku_status_query = "UPDATE data_buku SET status_tersedia = 1 WHERE id_buku = ?";
+        $stmt_buku = mysqli_prepare($koneksi, $update_buku_status_query);
+        mysqli_stmt_bind_param($stmt_buku, "s", $id_buku_to_update);
+
+        if (mysqli_stmt_execute($stmt_buku)) {
+            echo "<script>alert('Buku dengan ID " . htmlspecialchars($id_buku_to_update) . " berhasil dikonfirmasi pengembaliannya dan status buku diperbarui!');</script>";
+        } else {
+            echo "<script>alert('Buku dengan ID " . htmlspecialchars($id_buku_to_update) . " berhasil dikonfirmasi pengembaliannya, tetapi gagal memperbarui status buku: " . mysqli_error($koneksi) . "');</script>";
+        }
+        mysqli_stmt_close($stmt_buku);
+    } else {
+        echo "<script>alert('Gagal mengkonfirmasi pengembalian buku: " . mysqli_error($koneksi) . "');</script>";
+    }
+    mysqli_stmt_close($stmt);
+
+    // Redirect back to the page to reflect changes
+    header("Location: pengembalian_buku.php");
+    exit();
 }
-
 
 // Handle Delete operation
 if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id_buku'])) {
     $id_buku_to_delete = $_GET['id_buku'];
-    
+
+    // Sanitize the input to prevent SQL injection
+    $id_buku_to_delete = mysqli_real_escape_string($koneksi, $id_buku_to_delete);
+
     // Perform the deletion
     $delete_query = "DELETE FROM data_pengembalian WHERE id_buku = '$id_buku_to_delete'";
     if (mysqli_query($koneksi, $delete_query)) {
+        echo "<script>alert('Data pengembalian buku dengan ID " . htmlspecialchars($id_buku_to_delete) . " berhasil dihapus!');</script>";
         // Redirect back to the page to refresh the table
         header("Location: pengembalian_buku.php");
         exit();
@@ -48,6 +58,15 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id_buk
     }
 }
 
+// Ambil data dari tabel data_pengembalian
+// Add 'status_pengembalian' to the SELECT query
+$query = "SELECT id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status_pengembalian FROM data_pengembalian";
+$result = mysqli_query($koneksi, $query);
+
+// Cek apakah query berhasil dieksekusi
+if (!$result) {
+    die("Query gagal: " . mysqli_error($koneksi));
+}
 ?>
 
 <!DOCTYPE html>
@@ -144,8 +163,8 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id_buk
                 <th>Judul Buku</th>
                 <th>Tanggal Pinjam</th>
                 <th>Tanggal Pengembalian</th>
-                <th>Action</th>
-              </tr>
+                <th>Status Pengembalian</th>
+                <th>Ubah</th> <th>Hapus</th> </tr>
             </thead>
             <tbody>
               <?php
@@ -156,16 +175,28 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id_buk
                       echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
                       echo "<td>" . htmlspecialchars($row['tanggal_pinjam']) . "</td>";
                       echo "<td>" . htmlspecialchars($row['tanggal_pengembalian']) . "</td>";
-                      echo '<td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalUbahPengembalian" 
-                                        data-idbuku="' . htmlspecialchars($row['id_buku']) . '" 
-                                        data-judulbuku="' . htmlspecialchars($row['judul_buku']) . '">Ubah</button>
-                                <button class="btn btn-danger btn-sm" onclick="confirmDelete(\'' . htmlspecialchars($row['id_buku']) . '\')">Hapus</button>
-                            </td>';
+                      echo "<td>" . htmlspecialchars($row['status_pengembalian']) . "</td>"; // Display status
+
+                      // Ubah button column or "Sudah Dikembalikan" message
+                      echo '<td>';
+                      if ($row['status_pengembalian'] != 'Sudah Dikembalikan') {
+                          echo '<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalUbahPengembalian"
+                                        data-idbuku="' . htmlspecialchars($row['id_buku']) . '"
+                                        data-judulbuku="' . htmlspecialchars($row['judul_buku']) . '">Ubah</button>';
+                      } else {
+                          echo '<span class="text-success fw-bold">Buku Sudah Dikembalikan</span>'; // Display message here
+                      }
+                      echo '</td>';
+
+                      // Hapus button column
+                      echo '<td>';
+                      echo '<button class="btn btn-danger btn-sm" onclick="confirmDelete(\'' . htmlspecialchars($row['id_buku']) . '\')">Hapus</button>';
+                      echo '</td>';
+
                       echo "</tr>";
                   }
               } else {
-                  echo "<tr><td colspan='5' class='text-center'>Tidak ada data pengembalian buku.</td></tr>";
+                  echo "<tr><td colspan='7' class='text-center'>Tidak ada data pengembalian buku.</td></tr>";
               }
               ?>
             </tbody>
@@ -183,7 +214,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id_buk
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          Anda yakin ingin mengembalikan buku?
+          Anda yakin ingin mengkonfirmasi pengembalian buku **<span id="modalBukuJudul"></span>** (ID: <span id="modalBukuId"></span>)?
         </div>
         <div class="modal-footer justify-content-between">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
@@ -202,7 +233,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id_buk
     // Script untuk mengisi data buku ke dalam modal saat tombol "Ubah" diklik
     var modalUbahPengembalian = document.getElementById('modalUbahPengembalian');
     modalUbahPengembalian.addEventListener('show.bs.modal', function (event) {
-      var button = event.relatedTarget; 
+      var button = event.relatedTarget;
 
       var idBuku = button.getAttribute('data-idbuku');
       var judulBuku = button.getAttribute('data-judulbuku');
