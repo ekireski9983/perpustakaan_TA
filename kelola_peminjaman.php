@@ -149,7 +149,7 @@ if (isset($_GET['id'])) {
         <a href="kelola_katalog.php">Kelola Katalog Buku</a>
         <a href="kelola_peminjaman.php">Kelola Peminjaman Buku</a>
         <a href="kelola_pengembalian.php">Kelola Pengembalian Buku</a>
-        <a href="kelola_denda.php">Kelola Denda</a>
+        <a href="denda_kelola.php">Kelola Denda</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/logo_sekolah.png" alt="icon" />
@@ -166,7 +166,7 @@ if (isset($_GET['id'])) {
           <a href="kelola_katalog.php">kelola katalog buku</a>
           <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
           <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
-          <a href="kelola_denda.php">kelola denda</a>
+          <a href="denda_kelola.php">kelola denda</a>
           <a href="logout.php">Logout</a>
           <div class="image-box text-center mt-5">
             <img src="assets/logo_sekolah.png" alt="icon" />
