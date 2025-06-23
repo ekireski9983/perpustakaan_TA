@@ -164,7 +164,8 @@ if (!$result) {
                 <th>Tanggal Pinjam</th>
                 <th>Tanggal Pengembalian</th>
                 <th>Status Pengembalian</th>
-                <th>Ubah</th> <th>Hapus</th> </tr>
+                <th>Ubah</th>
+               </tr>
             </thead>
             <tbody>
               <?php
@@ -189,9 +190,6 @@ if (!$result) {
                       echo '</td>';
 
                       // Hapus button column
-                      echo '<td>';
-                      echo '<button class="btn btn-danger btn-sm" onclick="confirmDelete(\'' . htmlspecialchars($row['id_buku']) . '\')">Hapus</button>';
-                      echo '</td>';
 
                       echo "</tr>";
                   }
