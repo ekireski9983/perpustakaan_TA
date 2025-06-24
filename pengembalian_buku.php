@@ -11,37 +11,10 @@ if (!$koneksi) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'update_return') {
     $id_buku_to_update = $_POST['id_buku'];
 
-    // Get borrow and return dates from data_pengembalian for the given book
-    $get_dates_query = "SELECT tanggal_pinjam, tanggal_pengembalian FROM data_pengembalian WHERE id_buku = ?";
-    $stmt_dates = mysqli_prepare($koneksi, $get_dates_query);
-    mysqli_stmt_bind_param($stmt_dates, "s", $id_buku_to_update);
-    mysqli_stmt_execute($stmt_dates);
-    $result_dates = mysqli_stmt_get_result($stmt_dates);
-    $row_dates = mysqli_fetch_assoc($result_dates);
-    mysqli_stmt_close($stmt_dates);
-
-    $tanggal_pinjam = $row_dates['tanggal_pinjam'];
-    $tanggal_seharusnya_kembali = $row_dates['tanggal_pengembalian']; // This is the expected return date
-
-    // Calculate days overdue
-    $today = new DateTime();
-    $expected_return_date = new DateTime($tanggal_seharusnya_kembali);
-
-    $keterlambatan_hari = 0;
-    $denda_per_hari = 1000; // Example fine per day, adjust as needed
-    $nominal_denda = 0;
-    $status_pembayaran_denda = 'Belum Dibayar'; // Default status for fines
-
-    if ($today > $expected_return_date) {
-        $interval = $today->diff($expected_return_date);
-        $keterlambatan_hari = $interval->days;
-        $nominal_denda = $keterlambatan_hari * $denda_per_hari;
-    }
-
     // Update the status_pengembalian in data_pengembalian table
     $update_query = "UPDATE data_pengembalian SET status_pengembalian = 'Sudah Dikembalikan' WHERE id_buku = ?";
     $stmt = mysqli_prepare($koneksi, $update_query);
-    mysqli_stmt_bind_param($stmt, "s", $id_buku_to_update);
+    mysqli_stmt_bind_param($stmt, "s", $id_buku_to_update); // 's' for string type
 
     if (mysqli_stmt_execute($stmt)) {
         // Optionally, update the book's availability status in data_buku table
@@ -51,34 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         mysqli_stmt_bind_param($stmt_buku, "s", $id_buku_to_update);
 
         if (mysqli_stmt_execute($stmt_buku)) {
-            // If there's a fine, insert into data_keterlambatan
-            if ($nominal_denda > 0) {
-                // Fetch judul_buku from data_buku or data_pengembalian
-                $get_judul_query = "SELECT judul_buku FROM data_buku WHERE id_buku = ?";
-                $stmt_judul = mysqli_prepare($koneksi, $get_judul_query);
-                mysqli_stmt_bind_param($stmt_judul, "s", $id_buku_to_update);
-                mysqli_stmt_execute($stmt_judul);
-                $result_judul = mysqli_stmt_get_result($stmt_judul);
-                $row_judul = mysqli_fetch_assoc($result_judul);
-                $judul_buku_for_denda = $row_judul['judul_buku'] ?? 'Judul Tidak Diketahui'; // Fallback
-                mysqli_stmt_close($stmt_judul);
-
-                $insert_denda_query = "INSERT INTO data_keterlambatan (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian_seharusnya, tanggal_dikembalikan, jumlah_hari_terlambat, nominal_denda, status_pembayaran) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmt_denda = mysqli_prepare($koneksi, $insert_denda_query);
-                // 's' for string (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian_seharusnya, tanggal_dikembalikan, status_pembayaran)
-                // 'i' for integer (jumlah_hari_terlambat, nominal_denda)
-                $tanggal_dikembalikan = $today->format('Y-m-d');
-                mysqli_stmt_bind_param($stmt_denda, "sssssiis", $id_buku_to_update, $judul_buku_for_denda, $tanggal_pinjam, $tanggal_seharusnya_kembali, $tanggal_dikembalikan, $keterlambatan_hari, $nominal_denda, $status_pembayaran_denda);
-
-                if (mysqli_stmt_execute($stmt_denda)) {
-                    echo "<script>alert('Buku dengan ID " . htmlspecialchars($id_buku_to_update) . " berhasil dikonfirmasi pengembaliannya dan status buku diperbarui. Denda sebesar Rp " . number_format($nominal_denda, 0, ',', '.') . " telah dicatat!');</script>";
-                } else {
-                    echo "<script>alert('Buku dengan ID " . htmlspecialchars($id_buku_to_update) . " berhasil dikonfirmasi pengembaliannya, tetapi gagal mencatat denda: " . mysqli_error($koneksi) . "');</script>";
-                }
-                mysqli_stmt_close($stmt_denda);
-            } else {
-                echo "<script>alert('Buku dengan ID " . htmlspecialchars($id_buku_to_update) . " berhasil dikonfirmasi pengembaliannya dan status buku diperbarui!');</script>";
-            }
+            echo "<script>alert('Buku dengan ID " . htmlspecialchars($id_buku_to_update) . " berhasil dikonfirmasi pengembaliannya dan status buku diperbarui!');</script>";
         } else {
             echo "<script>alert('Buku dengan ID " . htmlspecialchars($id_buku_to_update) . " berhasil dikonfirmasi pengembaliannya, tetapi gagal memperbarui status buku: " . mysqli_error($koneksi) . "');</script>";
         }
@@ -126,181 +72,185 @@ if (!$result) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard Siswa</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-        body {
-            background-color: #f1f5f9;
-            margin: 0;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Siswa</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f1f5f9;
+      margin: 0;
+    }
 
-        .sidebar {
-            background-color: #2f3e46;
-            color: white;
-        }
+    .sidebar {
+      background-color: #2f3e46;
+      color: white;
+    }
 
-        .sidebar h5 {
-            margin-left: 20px;
-            margin-bottom: 30px;
-        }
+    .sidebar h5 {
+      margin-left: 20px;
+      margin-bottom: 30px;
+    }
 
-        .sidebar a {
-            display: block;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-        }
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+    }
 
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: #00b4d8;
-            border-radius: 5px;
-        }
+    .sidebar a:hover,
+    .sidebar a.active {
+      background-color: #00b4d8;
+      border-radius: 5px;
+    }
 
-        .sidebar .logout {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-        }
+    .sidebar .logout {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+    }
 
-        .image-box img {
-            width: 80px;
-            opacity: 0.7;
-        }
+    .image-box img {
+      width: 80px;
+      opacity: 0.7;
+    }
 
-        .main-content {
-            padding: 40px;
-        }
+    .main-content {
+      padding: 40px;
+    }
 
-        @media (max-width: 768px) {
-            .sidebar .logout {
-                position: static;
-                margin-top: 30px;
-            }
-        }
-    </style>
+    @media (max-width: 768px) {
+      .sidebar .logout {
+        position: static;
+        margin-top: 30px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row d-md-none bg-dark text-white p-2">
-            <div class="col">
-                <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-                    ☰ Menu
-                </button>
-                <span class="ms-3">Dashboard siswa</span>
-            </div>
-        </div>
-
-        <div class="row">
-            <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
-                <h5 class="pt-4">siswa<br /><small>user</small></h5>
-                <a href="lihat_anggota.php">lihat anggota</a>
-                <a href="katalog_buku.php">katalog buku</a>
-                <a href="peminjaman_buku.php">Peminjaman buku</a>
-                <a href="pengembalian_buku.php">Pengembalian buku</a>
-                <a href="denda_keterlambatan.php">denda keterlambatan</a>
-                <a href="logout.php">Logout</a>
-                <div class="image-box text-center mt-5">
-                    <img src="assets/logo_sekolah.png" alt="icon" />
-                </div>
-            </nav>
-
-            <main class="col-md-9 col-12 main-content">
-                <h4 class="mt-4">Pengembalian Buku</h4>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID Buku</th>
-                                <th>Judul Buku</th>
-                                <th>Tanggal Pinjam</th>
-                                <th>Tanggal Pengembalian Seharusnya</th>
-                                <th>Status Pengembalian</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            if (mysqli_num_rows($result) > 0) {
-                                while ($row = mysqli_fetch_assoc($result)) {
-                                    echo "<tr>";
-                                    echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['tanggal_pinjam']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['tanggal_pengembalian']) . "</td>";
-                                    echo "<td>" . htmlspecialchars($row['status_pengembalian']) . "</td>"; // Display status
-
-                                    echo '<td>';
-                                    if ($row['status_pengembalian'] != 'Sudah Dikembalikan') {
-                                        echo '<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalUbahPengembalian"
-                                                 data-idbuku="' . htmlspecialchars($row['id_buku']) . '"
-                                                 data-judulbuku="' . htmlspecialchars($row['judul_buku']) . '">Kembalikan Buku</button>';
-                                    } else {
-                                        echo '<span class="text-success fw-bold">Buku Sudah Dikembalikan</span>'; // Display message here
-                                    }
-                                    echo '</td>';
-                                    echo "</tr>";
-                                }
-                            } else {
-                                echo "<tr><td colspan='6' class='text-center'>Tidak ada data pengembalian buku.</td></tr>";
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                </div>
-            </main>
-        </div>
+  <div class="container-fluid">
+    <div class="row d-md-none bg-dark text-white p-2">
+      <div class="col">
+        <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+          ☰ Menu
+        </button>
+        <span class="ms-3">Dashboard siswa</span>
+      </div>
     </div>
 
-    <div class="modal fade" id="modalUbahPengembalian" tabindex="-1" aria-labelledby="modalUbahPengembalianLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalUbahPengembalianLabel">Konfirmasi Pengembalian Buku</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Anda yakin ingin mengkonfirmasi pengembalian buku **<span id="modalBukuJudul"></span>** (ID: <span id="modalBukuId"></span>)?
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
-                    <form method="POST" action="">
-                        <input type="hidden" name="action" value="update_return">
-                        <input type="hidden" id="confirmReturnIdBuku" name="id_buku">
-                        <button type="submit" class="btn btn-primary">Ya</button>
-                    </form>
-                </div>
-            </div>
+    <div class="row">
+      <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
+        <h5 class="pt-4">siswa<br /><small>user</small></h5>
+        <a href="lihat_anggota.php">lihat anggota</a>
+        <a href="katalog_buku.php">katalog buku</a>
+        <a href="peminjaman_buku.php">Peminjaman buku</a>
+        <a href="pengembalian_buku.php">Pengembalian buku</a>
+        <a href="denda_keterlambatan.php">denda keterlambatan</a>
+        <a href="logout.php">Logout</a>
+        <div class="image-box text-center mt-5">
+          <img src="assets/logo_sekolah.png" alt="icon" />
         </div>
+      </nav>
+
+      <main class="col-md-9 col-12 main-content">
+        <h4 class="mt-4">Pengembalian Buku</h4>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>ID Buku</th>
+                <th>Judul Buku</th>
+                <th>Tanggal Pinjam</th>
+                <th>Tanggal Pengembalian</th>
+                <th>Status Pengembalian</th>
+                <th>action</th>
+               </tr>
+            </thead>
+            <tbody>
+              <?php
+              if (mysqli_num_rows($result) > 0) {
+                  while ($row = mysqli_fetch_assoc($result)) {
+                      echo "<tr>";
+                      echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['tanggal_pinjam']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['tanggal_pengembalian']) . "</td>";
+                      echo "<td>" . htmlspecialchars($row['status_pengembalian']) . "</td>"; // Display status
+
+                      // Ubah button column or "Sudah Dikembalikan" message
+                      echo '<td>';
+                      if ($row['status_pengembalian'] != 'Sudah Dikembalikan') {
+                          echo '<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalUbahPengembalian"
+                                        data-idbuku="' . htmlspecialchars($row['id_buku']) . '"
+                                        data-judulbuku="' . htmlspecialchars($row['judul_buku']) . '">kembalikan</button>';
+                      } else {
+                          echo '<span class="text-success fw-bold">Buku Sudah Dikembalikan</span>'; // Display message here
+                      }
+                      echo '</td>';
+
+                      // Hapus button column
+
+                      echo "</tr>";
+                  }
+              } else {
+                  echo "<tr><td colspan='7' class='text-center'>Tidak ada data pengembalian buku.</td></tr>";
+              }
+              ?>
+            </tbody>
+          </table>
+        </div>
+      </main>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Script untuk mengisi data buku ke dalam modal saat tombol "Ubah" diklik
-        var modalUbahPengembalian = document.getElementById('modalUbahPengembalian');
-        modalUbahPengembalian.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
+  <div class="modal fade" id="modalUbahPengembalian" tabindex="-1" aria-labelledby="modalUbahPengembalianLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalUbahPengembalianLabel">Konfirmasi Pengembalian Buku</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Anda yakin ingin mengkonfirmasi pengembalian buku **<span id="modalBukuJudul"></span>** (ID: <span id="modalBukuId"></span>)?
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+          <form method="POST" action="">
+            <input type="hidden" name="action" value="update_return">
+            <input type="hidden" id="confirmReturnIdBuku" name="id_buku">
+            <button type="submit" class="btn btn-primary">Ya</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            var idBuku = button.getAttribute('data-idbuku');
-            var judulBuku = button.getAttribute('data-judulbuku');
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Script untuk mengisi data buku ke dalam modal saat tombol "Ubah" diklik
+    var modalUbahPengembalian = document.getElementById('modalUbahPengembalian');
+    modalUbahPengembalian.addEventListener('show.bs.modal', function (event) {
+      var button = event.relatedTarget;
 
-            var modalBukuId = modalUbahPengembalian.querySelector('#modalBukuId');
-            var modalBukuJudul = modalUbahPengembalian.querySelector('#modalBukuJudul');
-            var confirmReturnIdBuku = modalUbahPengembalian.querySelector('#confirmReturnIdBuku'); // Hidden input for form submission
+      var idBuku = button.getAttribute('data-idbuku');
+      var judulBuku = button.getAttribute('data-judulbuku');
 
-            modalBukuId.textContent = idBuku;
-            modalBukuJudul.textContent = judulBuku;
-            confirmReturnIdBuku.value = idBuku; // Set the value for the hidden input
-        });
+      var modalBukuId = modalUbahPengembalian.querySelector('#modalBukuId');
+      var modalBukuJudul = modalUbahPengembalian.querySelector('#modalBukuJudul');
+      var confirmReturnIdBuku = modalUbahPengembalian.querySelector('#confirmReturnIdBuku'); // Hidden input for form submission
 
-        // JavaScript function to handle delete confirmation
-        function confirmDelete(id_buku) {
-            if (confirm("Apakah Anda yakin ingin menghapus data pengembalian buku dengan ID: " + id_buku + "?")) {
-                window.location.href = 'pengembalian_buku.php?action=delete&id_buku=' + id_buku;
-            }
+      modalBukuId.textContent = idBuku;
+      modalBukuJudul.textContent = judulBuku;
+      confirmReturnIdBuku.value = idBuku; // Set the value for the hidden input
+    });
+
+    // JavaScript function to handle delete confirmation
+    function confirmDelete(id_buku) {
+        if (confirm("Apakah Anda yakin ingin menghapus data pengembalian buku dengan ID: " + id_buku + "?")) {
+            window.location.href = 'pengembalian_buku.php?action=delete&id_buku=' + id_buku;
         }
-    </script>
+    }
+  </script>
 </body>
 </html>

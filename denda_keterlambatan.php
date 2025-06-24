@@ -74,6 +74,7 @@ $result = mysqli_query($koneksi, $query);
 
     <div class="row">
         <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
+            <h5 class="pt-4">siswa<br /><small>user</small></h5>
             <a href="lihat_anggota.php">lihat anggota</a>
                 <a href="katalog_buku.php">katalog buku</a>
                 <a href="peminjaman_buku.php">Peminjaman buku</a>
