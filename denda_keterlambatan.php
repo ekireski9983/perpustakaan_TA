@@ -68,7 +68,7 @@ $result = mysqli_query($koneksi, $query);
     <div class="row d-md-none bg-dark text-white p-2">
         <div class="col">
             <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">☰ Menu</button>
-            <span class="ms-3">Kelola Pengembalian Buku</span>
+            <span class="ms-3">denda keterlambatan Buku</span>
         </div>
     </div>
 
