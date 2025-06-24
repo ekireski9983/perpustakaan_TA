@@ -183,7 +183,7 @@ if (!$result) {
                       if ($row['status_pengembalian'] != 'Sudah Dikembalikan') {
                           echo '<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalUbahPengembalian"
                                         data-idbuku="' . htmlspecialchars($row['id_buku']) . '"
-                                        data-judulbuku="' . htmlspecialchars($row['judul_buku']) . '">kembalikan</button>';
+                                        data-judulbuku="' . htmlspecialchars($row['judul_buku']) . '">ubah</button>';
                       } else {
                           echo '<span class="text-success fw-bold">Buku Sudah Dikembalikan</span>'; // Display message here
                       }
