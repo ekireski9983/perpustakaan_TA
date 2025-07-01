@@ -111,6 +111,7 @@ $result = mysqli_query($koneksi, $query);
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th>Nama siswa</th>
                             <th>Id Buku</th>
                             <th>Judul Buku</th>
                             <th>Tanggal Pinjam</th>
@@ -128,6 +129,7 @@ $result = mysqli_query($koneksi, $query);
                                 // Tambahkan data-row-id untuk identifikasi baris yang unik
                                 echo '<tr data-id-buku="' . htmlspecialchars($row['id_buku']) . '">';
                                 echo "<td>" . $no++ . "</td>";
+                                echo "<td>" . htmlspecialchars($row['nama_siswa']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['tanggal_pinjam']) . "</td>";
