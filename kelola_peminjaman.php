@@ -45,14 +45,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
             // Insert query into data_pinjam table
             // Ensure column names match your data_pinjam table structure
-            $insert_pinjam_query = "INSERT INTO data_pinjam (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian) 
-                                 VALUES ('$id_buku', '$isbn', '$judul_buku', '$nama_penulis', '$nama_penerbit', '$jumlah_halaman', '$foto_destination', '$tanggal_pinjam', '$tanggal_pengembalian')";
+            $insert_pinjam_query = "INSERT INTO data_pinjam (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian)
+                                    VALUES ('$id_buku', '$isbn', '$judul_buku', '$nama_penulis', '$nama_penerbit', '$jumlah_halaman', '$foto_destination', '$tanggal_pinjam', '$tanggal_pengembalian')";
 
             if (mysqli_query($koneksi, $insert_pinjam_query)) {
                 // Insert query into data_pengembalian table
-                // Ensure column names match your data_pengembalian table structure
-                $insert_pengembalian_query = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian)
-                                          VALUES ('$id_buku', '$judul_buku', '$tanggal_pinjam', '$tanggal_pengembalian')";
+                // Include 'status' column and set it to 'belum dikembalikan'
+                $insert_pengembalian_query = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status_pengembalian)
+                                              VALUES ('$id_buku', '$judul_buku', '$tanggal_pinjam', '$tanggal_pengembalian', 'belum dikembalikan')";
 
                 if (mysqli_query($koneksi, $insert_pengembalian_query)) {
                     mysqli_commit($koneksi); // Commit the transaction if both inserts are successful
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 // Menangani penghapusan data peminjaman
 if (isset($_GET['id'])) {
     $id_buku = mysqli_real_escape_string($koneksi, $_GET['id']);
-    
+
     // Start a transaction for atomicity
     mysqli_begin_transaction($koneksi);
 
@@ -155,14 +155,14 @@ if (isset($_GET['id'])) {
           <img src="assets/logo_sekolah.png" alt="icon" />
         </div>
       </nav>
-      
+
       <div class="offcanvas offcanvas-start sidebar text-white" tabindex="-1" id="sidebarMenu">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title">Pustakawan</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
-          <a href="kelola_anggota.php">kelola anggota</a> 
+          <a href="kelola_anggota.php">kelola anggota</a>
           <a href="kelola_katalog.php">kelola katalog buku</a>
           <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
           <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
@@ -193,7 +193,7 @@ if (isset($_GET['id'])) {
               <th>Foto buku</th>
               <th>Tanggal Pinjam</th>
               <th>Tanggal Pengembalian</th>
-              <th>Action</th> 
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -302,7 +302,7 @@ if (isset($_GET['id'])) {
 
 <script>
   // Script untuk mengisi data pada modal hapus
-  const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusPeminjamanModal"]'); 
+  const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusPeminjamanModal"]');
   deleteButtons.forEach(button => {
     button.addEventListener('click', () => {
       const id = button.getAttribute('data-id');
