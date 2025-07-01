@@ -201,7 +201,8 @@ if (isset($_GET['id'])) {
                             <th>Jurusan</th>
                             <th>Kelas</th>
                             <th>Semester</th>
-                            <th colspan="2">Aksi</th>
+                            <th>action</th>
+                            <th>action</th>
                         </tr>
                     </thead>
                     <tbody>
