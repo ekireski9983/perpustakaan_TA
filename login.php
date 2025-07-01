@@ -61,9 +61,9 @@ if (isset($_SESSION['username'])) {
             </div>
 
             <div class="mb-4 w-50">
-                <label for="role" class="form-label">Pilih Sesi</label>
+                <label for="role" class="form-label">Pilih level</label>
                 <select class="form-select" name="role" id="role" required>
-                    <option value="" selected disabled>-- Pilih Sesi --</option>
+                    <option value="" selected disabled>Pilih level</option>
                     <option value="admin">Admin</option>
                     <option value="user">User </option>
                 </select>
