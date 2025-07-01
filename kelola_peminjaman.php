@@ -194,6 +194,7 @@ if (isset($_GET['id'])) {
               <th>Tanggal Pinjam</th>
               <th>Tanggal Pengembalian</th>
               <th>Action</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
