@@ -96,7 +96,7 @@
     $nama_user = $_SESSION['username'] ?? ''; // Ambil nama dari session
 
     // Ambil data hanya untuk nama user yang sedang login
-       $query = "SELECT * FROM data_anggota WHERE nama = '$nama_user'";
+       $query = "SELECT * FROM data_anggota WHERE nama_siswa = '$nama_user'";
        $result = mysqli_query($koneksi, $query);
        ?>
 <div class="col-md-9 main-content">
@@ -106,7 +106,7 @@
         <ul>
           <?php while ($row = mysqli_fetch_assoc($result)): ?>
             <li>
-              Nama Siswa: <?= htmlspecialchars($row['nama']) ?><br>
+              Nama Siswa: <?= htmlspecialchars($row['nama_siswa']) ?><br>
               Kelas: <?= htmlspecialchars($row['kelas']) ?><br>
               Jurusan: <?= htmlspecialchars($row['jurusan']) ?><br>
               Semester: <?= htmlspecialchars($row['semester']) ?>
