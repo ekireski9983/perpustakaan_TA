@@ -98,6 +98,7 @@ $result = mysqli_query($koneksi, $query);
     <div class="row">
         <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
             <h5 class="pt-4">Pustakawan<br /><small>admin</small></h5>
+            <a href="kelola_pustakawan.php">Kelola Pustakawan</a>
             <a href="kelola_anggota.php">Kelola Anggota</a>
             <a href="kelola_katalog.php">Kelola Katalog Buku</a>
             <a href="kelola_peminjaman.php">Kelola Peminjaman Buku</a>
@@ -115,6 +116,7 @@ $result = mysqli_query($koneksi, $query);
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
             </div>
             <div class="offcanvas-body">
+                <a href="kelola_pustakawan.php">Kelola Pustakawan</a>
                 <a href="kelola_anggota.php">kelola anggota</a> 
                 <a href="kelola_katalog.php">kelola katalog buku</a>
                 <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
