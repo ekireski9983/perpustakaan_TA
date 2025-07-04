@@ -164,7 +164,7 @@ $result = mysqli_query($koneksi, $query);
                                 echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['tanggal_pinjam']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['tanggal_pengembalian']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['tanggal_kembali']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['nominal']) . "</td>"; // Added nominal
                                 echo '<td class="status-pembayaran-cell">' . htmlspecialchars($row['status_pembayaran']) . '</td>'; // Updated status cell
                                 echo '<td>

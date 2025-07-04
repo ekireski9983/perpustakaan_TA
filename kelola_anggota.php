@@ -156,7 +156,7 @@ if (isset($_GET['id'])) {
     <div class="row">
         <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
             <h5 class="pt-4">Pustakawan<br /><small>admin</small></h5>
-            <a href="kelola_pustakawan.php">Kelola pustakawan</a>
+            <a href="kelola_pustakawan.php">Kelola Pustakawan</a>
             <a href="kelola_anggota.php">Kelola Anggota</a>
             <a href="kelola_katalog.php">Kelola Katalog Buku</a>
             <a href="kelola_list_buku.php">Kelola list buku</a>

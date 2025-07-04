@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             // Insert query untuk tabel users (jika pustakawan perlu akun login)
             // Asumsi: username = id_pustakawan, password = nama_pustakawan (atau hash password), role = 'pustakawan'
             $username = $nama_pustakawan; // ID Pustakawan sebagai username
-            $password = password_hash($id_pustakawan, PASSWORD_DEFAULT); // Hash password untuk keamanan
+            $password = $id_pustakawan; // Hash password untuk keamanan
             $role = 'admin'; // Role untuk pustakawan
 
             $insert_user_query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";

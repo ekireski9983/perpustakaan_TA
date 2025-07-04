@@ -176,6 +176,7 @@
                         <form action="process_peminjaman.php" method="POST" style="display:inline;">
                         <input type="hidden" name="id_buku" value="<?php echo htmlspecialchars($row['id_buku']); ?>">
                         <button type="submit" class="btn btn-success">simpan Buku</button>
+                        <button type="submit" class="btn btn-danger">informasi Buku</button>
                        </form>
                       </div>
                     </div>
