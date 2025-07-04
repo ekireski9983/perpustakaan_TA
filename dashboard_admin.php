@@ -73,8 +73,10 @@
       <!-- Sidebar for md and up -->
       <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
         <h5 class="pt-4">Pustakawan<br /><small>admin</small></h5>
+        <a href="kelola_pustakawan.php">Kelola Pustakawan</a>
         <a href="kelola_anggota.php">kelola anggota</a>
         <a href="kelola_katalog.php">kelola katalog buku</a>
+        <a href="kelola_list_buku.php">Kelola list buku</a>
         <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
         <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
         <a href="kelola_denda.php">kelola denda</a>
