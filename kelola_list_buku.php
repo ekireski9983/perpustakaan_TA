@@ -126,7 +126,7 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
                 <a href="kelola_pustakawan.php">Kelola Pustakawan</a>
                 <a href="kelola_anggota.php">Kelola Anggota</a>
                 <a href="kelola_katalog.php">Kelola Katalog Buku</a>
-                <a href="kelola_list_buku.php" class="active">Kelola list buku</a>
+                <a href="kelola_list_buku.php">Kelola list buku</a>
                 <a href="kelola_peminjaman.php">Kelola Peminjaman Buku</a>
                 <a href="kelola_pengembalian.php">Kelola Pengembalian Buku</a>
                 <a href="denda_kelola.php">Kelola Denda</a>
