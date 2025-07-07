@@ -1,4 +1,8 @@
 <?php
+// Enable error reporting for development (remove or disable in production)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Koneksi ke database
 $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
 
@@ -12,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $id_buku_to_update = $_POST['id_buku_status'];
     $new_status = $_POST['new_status'];
 
-    // Gunakan prepared statement untuk UPDATE tabel data_denda
-    $update_query = "UPDATE data_denda SET status_pembayaran = ? WHERE id_buku = ?";
+    // Gunakan prepared statement untuk UPDATE tabel denda_keterlambatan
+    $update_query = "UPDATE denda_keterlambatan SET status_pembayaran = ? WHERE id_buku = ?";
     $stmt = mysqli_prepare($koneksi, $update_query);
     if ($stmt === false) {
         echo json_encode(['success' => false, 'message' => "Prepare failed: " . mysqli_error($koneksi)]);
@@ -36,8 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 if (isset($_GET['action']) && $_GET['action'] == 'delete_denda' && isset($_GET['id'])) {
     $id_buku_to_delete = $_GET['id'];
 
-    // Gunakan prepared statement untuk DELETE dari tabel data_denda
-    $delete_query = "DELETE FROM data_denda WHERE id_buku = ?";
+    // Gunakan prepared statement untuk DELETE dari tabel denda_keterlambatan
+    $delete_query = "DELETE FROM denda_keterlambatan WHERE id_buku = ?";
     $stmt = mysqli_prepare($koneksi, $delete_query);
     if ($stmt === false) {
         echo json_encode(['success' => false, 'message' => "Prepare failed: " . mysqli_error($koneksi)]);
@@ -56,9 +60,15 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete_denda' && isset($_GET['
     }
 }
 
-// Ambil data dari tabel data_denda
-$query = "SELECT * FROM data_denda"; // Mengambil data dari tabel data_denda
+// Ambil data dari tabel denda_keterlambatan
+// Pastikan tabel ini memiliki kolom: id_buku, nama_siswa, judul_buku, tanggal_pinjam, tanggal_pengembalian, nominal, status_pembayaran
+$query = "SELECT * FROM denda_keterlambatan";
 $result = mysqli_query($koneksi, $query);
+
+// Check if the query was successful
+if ($result === false) {
+    die("Error retrieving data: " . mysqli_error($koneksi));
+}
 ?>
 
 <!DOCTYPE html>
@@ -104,8 +114,7 @@ $result = mysqli_query($koneksi, $query);
             <a href="kelola_list_buku.php">Kelola list buku</a>
             <a href="kelola_peminjaman.php">Kelola Peminjaman Buku</a>
             <a href="kelola_pengembalian.php">Kelola Pengembalian Buku</a>
-            <a href="denda_kelola.php">Kelola Denda</a>
-            <a href="logout.php">Logout</a>
+            <a href="denda_kelola.php" class="active">Kelola Denda</a> <a href="logout.php">Logout</a>
             <div class="image-box text-center mt-5">
                 <img src="assets/logo_sekolah.png" alt="icon" />
             </div>
@@ -123,8 +132,7 @@ $result = mysqli_query($koneksi, $query);
                 <a href="kelola_list_buku.php">Kelola list buku</a>
                 <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
                 <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
-                <a href="denda_kelola.php">kelola denda</a>
-                <a href="logout.php">Logout</a>
+                <a href="denda_kelola.php" class="active">kelola denda</a> <a href="logout.php">Logout</a>
                 <div class="image-box text-center mt-5">
                     <img src="assets/logo_sekolah.png" alt="icon" />
                 </div>
@@ -148,36 +156,33 @@ $result = mysqli_query($koneksi, $query);
                             <th>Tanggal Pengembalian</th>
                             <th>Nominal</th>
                             <th>Status Pembayaran</th>
-                            <th>Action</th>
-                            <th>Action</th>
-                        </tr>
+                            <th colspan="2">Action</th> </tr>
                     </thead>
                     <tbody>
                         <?php
                         $no = 1;
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
-                                // Tambahkan data-row-id untuk identifikasi baris yang unik
                                 echo '<tr data-id-buku="' . htmlspecialchars($row['id_buku']) . '">';
                                 echo "<td>" . $no++ . "</td>";
-                                echo "<td>" . htmlspecialchars($row['nama_siswa']) . "</td>"; // Added nama_siswa
+                                echo "<td>" . htmlspecialchars($row['nama_siswa']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['tanggal_pinjam']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['tanggal_kembali']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['nominal']) . "</td>"; // Added nominal
-                                echo '<td class="status-pembayaran-cell">' . htmlspecialchars($row['status_pembayaran']) . '</td>'; // Updated status cell
+                                echo "<td>" . htmlspecialchars($row['tanggal_pengembalian']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['nominal']) . "</td>";
+                                echo '<td class="status-pembayaran-cell">' . htmlspecialchars($row['status_pembayaran']) . '</td>';
                                 echo '<td>
-                                        <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#ubahStatusPembayaranModal" 
-                                                data-id="' . htmlspecialchars($row['id_buku']) . '" data-status="' . htmlspecialchars($row['status_pembayaran']) . '">
-                                            Ubah 
-                                        </button>
-                                    </td>';
+                                            <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#ubahStatusPembayaranModal" 
+                                                    data-id="' . htmlspecialchars($row['id_buku']) . '" data-status="' . htmlspecialchars($row['status_pembayaran']) . '">
+                                                Ubah 
+                                            </button>
+                                        </td>';
                                 echo '<td>
-                                        <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusDendaModal" data-id="' . htmlspecialchars($row['id_buku']) . '">
-                                            Delete
-                                        </button>
-                                    </td>';
+                                            <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusDendaModal" data-id="' . htmlspecialchars($row['id_buku']) . '">
+                                                Delete
+                                            </button>
+                                        </td>';
                                 echo "</tr>";
                             }
                         } else {
@@ -241,7 +246,7 @@ $result = mysqli_query($koneksi, $query);
     document.querySelectorAll('[data-bs-target="#ubahStatusPembayaranModal"]').forEach(button => {
         button.addEventListener('click', function() {
             currentBookIdToUpdate = this.getAttribute('data-id');
-            const currentStatus = this.getAttribute('data-status'); // Not used directly in modal, but good to keep
+            // const currentStatus = this.getAttribute('data-status'); // Not used directly in modal, but good to keep
             currentTableRow = this.closest('tr'); // Dapatkan referensi ke baris <tr>
 
             if (modalBookIdDisplay) { // Ensure element exists before trying to set textContent
@@ -257,7 +262,7 @@ $result = mysqli_query($koneksi, $query);
                 const newStatus = this.getAttribute('data-status-value');
 
                 // Kirim permintaan fetch ke PHP
-                fetch('kelola_denda.php', { // Changed to kelola_denda.php
+                fetch('denda_kelola.php', { // Changed to denda_kelola.php as per the filename
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -269,7 +274,7 @@ $result = mysqli_query($koneksi, $query);
                     if (data.success) {
                         // Perbarui status di tabel secara langsung tanpa reload
                         if (currentTableRow) {
-                            const statusCell = currentTableRow.querySelector('.status-pembayaran-cell'); // Updated class
+                            const statusCell = currentTableRow.querySelector('.status-pembayaran-cell');
                             if (statusCell) {
                                 statusCell.textContent = data.new_status; // Perbarui teks status
                                 // Optional: perbarui warna latar belakang sel status jika diinginkan
@@ -305,7 +310,7 @@ $result = mysqli_query($koneksi, $query);
     document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         if (idBukuToDelete) {
             // Kirim permintaan fetch ke PHP untuk menghapus
-            fetch(`kelola_denda.php?action=delete_denda&id=${encodeURIComponent(idBukuToDelete)}`) // Changed to kelola_denda.php
+            fetch(`denda_kelola.php?action=delete_denda&id=${encodeURIComponent(idBukuToDelete)}`) // Changed to denda_kelola.php
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -331,39 +336,45 @@ $result = mysqli_query($koneksi, $query);
 
     // Fungsi untuk memperbarui nomor urut (No) setelah penghapusan
     function updateRowNumbers() {
-        const tableRows = document.querySelectorAll('#dendaTable tbody tr'); // Updated table ID
+        const tableRows = document.querySelectorAll('#dendaTable tbody tr');
+        let visibleRowIndex = 0; // Initialize a counter for visible rows
         tableRows.forEach((row, index) => {
-            const noCell = row.querySelector('td:first-child');
-            if (noCell) {
-                noCell.textContent = index + 1;
+            // Only update the number if the row is currently visible
+            if (row.style.display !== 'none') {
+                const noCell = row.querySelector('td:first-child');
+                if (noCell) {
+                    noCell.textContent = visibleRowIndex + 1;
+                    visibleRowIndex++;
+                }
             }
         });
     }
+
 
     // Fungsi untuk memfilter baris tabel berdasarkan input pencarian
     function filterTable() {
         const input = document.getElementById('searchInput');
         const filter = input.value.toLowerCase();
-        const table = document.getElementById('dendaTable'); // Updated table ID
+        const table = document.getElementById('dendaTable');
         const tr = table.getElementsByTagName('tr');
 
         for (let i = 1; i < tr.length; i++) { // Mulai dari 1 untuk melewati baris header
-            const td = tr[i].getElementsByTagName('td');
+            const td_id_buku = tr[i].getElementsByTagName('td')[2]; // Id Buku is at index 2
+            const td_judul_buku = tr[i].getElementsByTagName('td')[3]; // Judul Buku is at index 3
+            const td_nama_siswa = tr[i].getElementsByTagName('td')[1]; // Nama Siswa is at index 1
+
             let found = false;
 
-            // Iterasi melalui setiap kolom yang relevan untuk pencarian
-            // Kolom yang relevan: Nama Siswa (index 1), Id Buku (index 2), Judul Buku (index 3)
-            for (let j = 1; j <= 3; j++) { // Adjusted loop for relevant search columns
-                if (td[j]) {
-                    const txtValue = td[j].textContent || td[j].innerText;
-                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                        found = true;
-                        break; 
-                    }
-                }
+            if (td_id_buku && td_id_buku.textContent.toLowerCase().indexOf(filter) > -1) {
+                found = true;
+            } else if (td_judul_buku && td_judul_buku.textContent.toLowerCase().indexOf(filter) > -1) {
+                found = true;
+            } else if (td_nama_siswa && td_nama_siswa.textContent.toLowerCase().indexOf(filter) > -1) {
+                found = true;
             }
             tr[i].style.display = found ? "" : "none";
         }
+        updateRowNumbers(); // Update row numbers after filtering
     }
 </script>
 </body>

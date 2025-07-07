@@ -79,7 +79,7 @@
         <a href="kelola_list_buku.php">Kelola list buku</a>
         <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
         <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
-        <a href="kelola_denda.php">kelola denda</a>
+        <a href="denda_kelola.php">kelola denda</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/logo_sekolah.png" alt="icon" />
