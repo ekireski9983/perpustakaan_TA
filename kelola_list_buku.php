@@ -158,7 +158,7 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
 
             <main class="col-md-9 col-12 main-content">
                 <h4>Kelola List Buku</h4>
-                <p>Berikut adalah daftar buku yang tersedia di perpustakaan.</p>
+                <p>Berikut adalah daftar buku yang sudah ditambahkan di perpustakaan.</p>
 
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped" id="bookTable">
