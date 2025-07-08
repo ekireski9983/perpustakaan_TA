@@ -103,7 +103,7 @@
         <a href="katalog_buku.php">Katalog Buku</a>
         <a href="peminjaman_buku.php">Peminjaman Buku</a>
         <a href="pengembalian_buku.php">Pengembalian Buku</a>
-        <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
+        <a href="histori_pengembalian.php">histori pengembalian</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/logo_sekolah.png" alt="icon" />
@@ -121,7 +121,7 @@
           <a href="katalog_buku.php">Katalog Buku</a>
           <a href="peminjaman_buku.php">Peminjaman Buku</a>
           <a href="pengembalian_buku.php">Pengembalian Buku</a>
-          <a href="denda_keterlambatan.php">Denda Keterlambatan</a>
+          <a href="histori_pengembalian.php">histori pengembalian</a>
           <a href="logout.php">Logout</a>
         </div>
       </div>

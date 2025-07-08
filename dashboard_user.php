@@ -77,7 +77,7 @@
         <a href="katalog_buku.php">katalog buku</a>
         <a href="peminjaman_buku.php">Peminjaman buku</a>
         <a href="pengembalian_buku.php">Pengembalian buku</a>
-        <a href="denda_keterlambatan.php">denda keterlambatan</a>
+        <a href="histori_pengembalian.php">histori pengembalian</a>
         <a href="logout.php">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/logo_sekolah.png" alt="icon" />
