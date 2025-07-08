@@ -210,7 +210,7 @@ if (!$result) {
                                 echo '<td>
                                             <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#ubahStatusPengembalianModal" 
                                                 data-id="' . htmlspecialchars($row['id_buku']) . '" data-status="' . htmlspecialchars($row['status_pengembalian']) . '">
-                                                Ubah Status
+                                                Ubah
                                             </button>
                                         </td>';
                                 echo '<td>
