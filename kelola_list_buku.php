@@ -129,7 +129,7 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
                 <a href="kelola_list_buku.php">Kelola list buku</a>
                 <a href="kelola_peminjaman.php">Kelola Peminjaman Buku</a>
                 <a href="kelola_pengembalian.php">Kelola Pengembalian Buku</a>
-                <a href="denda_kelola.php">Kelola Denda</a>
+                <a href="kelola_histori.php">Kelola histori pengembalian</a>
                 <a href="logout.php">Logout</a>
                 <div class="image-box text-center mt-5">
                     <img src="assets/logo_sekolah.png" alt="icon" />
@@ -145,10 +145,10 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
                     <a href="kelola_pustakawan.php">Kelola Pustakawan</a>
                     <a href="kelola_anggota.php">Kelola Anggota</a>
                     <a href="kelola_katalog.php">Kelola Katalog Buku</a>
-                    <a href="kelola_list_buku.php" class="active">Kelola list buku</a>
+                    <a href="kelola_list_buku.php">Kelola list buku</a>
                     <a href="kelola_peminjaman.php">Kelola Peminjaman Buku</a>
                     <a href="kelola_pengembalian.php">Kelola Pengembalian Buku</a>
-                    <a href="denda_kelola.php">Kelola Denda</a>
+                    <a href="kelola_histori.php">Kelola histori pengembalian</a>
                     <a href="logout.php">Logout</a>
                     <div class="image-box text-center mt-5">
                         <img src="assets/logo_sekolah.png" alt="icon" />
