@@ -97,12 +97,12 @@ $result = mysqli_query($koneksi, $query);
 
     <div class="row">
         <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
-            <h5 class="pt-4">Pustakawan<br /><small>admin</small></h5>
-            <a href="kelola_anggota.php">Kelola Anggota</a>
-            <a href="kelola_katalog.php">Kelola Katalog Buku</a>
-            <a href="kelola_peminjaman.php">Kelola Peminjaman Buku</a>
-            <a href="kelola_pengembalian.php">Kelola Pengembalian Buku</a>
-            <a href="denda_kelola.php">Kelola Denda</a>
+            <h5 class="pt-4">siswa<br /><small>user</small></h5>
+            <a href="lihat_anggota.php">lihat anggota</a>
+            <a href="katalog_buku.php">katalog buku</a>
+            <a href="peminjaman_buku.php">Peminjaman buku</a>
+            <a href="pengembalian_buku.php">Pengembalian buku</a>
+            <a href="denda_keterlambatan.php">denda keterlambatan</a>
             <a href="logout.php">Logout</a>
             <div class="image-box text-center mt-5">
                 <img src="assets/logo_sekolah.png" alt="icon" />
@@ -111,16 +111,16 @@ $result = mysqli_query($koneksi, $query);
         
         <div class="offcanvas offcanvas-start sidebar text-white" tabindex="-1" id="sidebarMenu">
             <div class="offcanvas-header">
-                <h5 class="offcanvas-title">Pustakawan</h5>
+                <h5 class="offcanvas-title">user</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
             </div>
             <div class="offcanvas-body">
-                <a href="kelola_anggota.php">kelola anggota</a> 
-                <a href="kelola_katalog.php">kelola katalog buku</a>
-                <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
-                <a href="kelola_pengembalian.php">kelola Pengembalian buku</a>
-                <a href="denda_kelola.php">kelola denda</a>
-                <a href="logout.php">Logout</a>
+            <a href="lihat_anggota.php">lihat anggota</a>
+            <a href="katalog_buku.php">katalog buku</a>
+            <a href="peminjaman_buku.php">Peminjaman buku</a>
+            <a href="pengembalian_buku.php">Pengembalian buku</a>
+            <a href="denda_keterlambatan.php">denda keterlambatan</a>
+            <a href="logout.php">Logout</a>
                 <div class="image-box text-center mt-5">
                     <img src="assets/logo_sekolah.png" alt="icon" />
                 </div>
@@ -128,7 +128,7 @@ $result = mysqli_query($koneksi, $query);
         </div>
 
         <main class="col-md-9 col-12 main-content">
-            <h4>Kelola Pengembalian Buku</h4>
+            <h4>Pengembalian Buku</h4>
             <div class="d-flex flex-wrap gap-2 align-items-center mb-3 mt-3">
                 <input type="text" id="searchInput" class="form-control form-control-md me-2" placeholder="ketik id buku atau judul buku" style="max-width: 300px;" oninput="filterTable()" />
             </div>
