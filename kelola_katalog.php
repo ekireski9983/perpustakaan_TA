@@ -111,13 +111,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
 // Menangani pembaruan data buku
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
-    $id_buku = $_POST['editId'];
+    // Tangkap ID lama (sebelum diubah) dari hidden input atau sesi
+    $old_id_buku = $_POST['editId'];
+    // Tangkap ID baru (setelah diubah) dari input form
+    $new_id_buku = $_POST['newId']; 
+    
     $isbn = $_POST['editIsbn'];
     $judul_buku = $_POST['editJudulbuku'];
     $nama_penulis = $_POST['editNamaPenulis'];
     $nama_penerbit = $_POST['editNamaPenerbit'];
     $jumlah_halaman = $_POST['editJumlahHalaman'];
-    
+    $foto = $_POST['editfoto']; // Ini sepertinya tidak digunakan karena foto dihandle via $_FILES
 
     $foto_destination = null; // Inisialisasi path foto baru
     $current_foto_path = null; // Path foto lama
@@ -126,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $get_old_foto_query = "SELECT foto FROM data_buku WHERE id_buku = ?";
     $stmt_old_foto = mysqli_prepare($koneksi, $get_old_foto_query);
     if ($stmt_old_foto) {
-        mysqli_stmt_bind_param($stmt_old_foto, "s", $id_buku);
+        mysqli_stmt_bind_param($stmt_old_foto, "s", $old_id_buku);
         mysqli_stmt_execute($stmt_old_foto);
         $res_old_foto = mysqli_stmt_get_result($stmt_old_foto);
         if ($row_old_foto = mysqli_fetch_assoc($res_old_foto)) {
@@ -162,10 +166,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
     try {
         // 1. Update tabel data_buku
-        $update_buku_query = "UPDATE data_buku SET isbn=?, judul_buku=?, nama_penulis=?, nama_penerbit=?, jumlah_halaman=?, foto=? WHERE id_buku=?";
+        // Pastikan Anda memperbarui ID_Buku di sini juga jika berubah
+        $update_buku_query = "UPDATE data_buku SET id_buku=?, isbn=?, judul_buku=?, nama_penulis=?, nama_penerbit=?, jumlah_halaman=?, foto=? WHERE id_buku=?";
         $stmt_buku = mysqli_prepare($koneksi, $update_buku_query);
         if ($stmt_buku) {
-            mysqli_stmt_bind_param($stmt_buku, "sssssis", $isbn, $judul_buku, $nama_penulis, $nama_penerbit, $jumlah_halaman, $foto_destination, $id_buku);
+            mysqli_stmt_bind_param($stmt_buku, "sssssiss", $new_id_buku, $isbn, $judul_buku, $nama_penulis, $nama_penerbit, $jumlah_halaman, $foto_destination, $old_id_buku);
             if (!mysqli_stmt_execute($stmt_buku)) {
                 throw new Exception("Error updating data_buku: " . mysqli_stmt_error($stmt_buku));
             }
@@ -175,10 +180,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
 
         // 2. Update tabel data_list_buku
-        $update_list_buku_query = "UPDATE data_list_buku SET isbn=?, judul_buku=?, nama_penulis=?, nama_penerbit=? WHERE id_buku=?";
+        // Perbarui juga ID_Buku di tabel kedua
+        $update_list_buku_query = "UPDATE data_list_buku SET id_buku=?, isbn=?, judul_buku=?, nama_penulis=?, nama_penerbit=? WHERE id_buku=?";
         $stmt_list_buku = mysqli_prepare($koneksi, $update_list_buku_query);
         if ($stmt_list_buku) {
-            mysqli_stmt_bind_param($stmt_list_buku, "sssss", $isbn, $judul_buku, $nama_penulis, $nama_penerbit, $id_buku);
+            mysqli_stmt_bind_param($stmt_list_buku, "ssssss", $new_id_buku, $isbn, $judul_buku, $nama_penulis, $nama_penerbit, $old_id_buku);
             if (!mysqli_stmt_execute($stmt_list_buku)) {
                 throw new Exception("Error updating data_list_buku: " . mysqli_stmt_error($stmt_list_buku));
             }
@@ -196,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         echo "Error saat memperbarui buku: " . $e->getMessage();
         // Pertimbangkan untuk menghapus foto baru jika update gagal
         if ($foto_destination && $foto_destination !== $current_foto_path && file_exists($foto_destination)) {
-             unlink($foto_destination);
+              unlink($foto_destination);
         }
     }
 }
@@ -338,29 +344,29 @@ if (isset($_GET['id'])) {
             $result = mysqli_query($koneksi, $query_select_buku);
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
-                  echo "<tr>";
-                  echo "<td>" . $no++ . "</td>";
-                  echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
-                  echo "<td>" . htmlspecialchars($row['isbn']) . "</td>";
-                  echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
-                  echo "<td>" . htmlspecialchars($row['nama_penulis']) . "</td>";
-                  echo "<td>" . htmlspecialchars($row['nama_penerbit']) . "</td>";
-                  echo "<td>" . htmlspecialchars($row['jumlah_halaman']) . "</td>";
-                  echo "<td><img src='" . htmlspecialchars($row['foto']) . "' alt='Foto Buku' style='width: 50px; height: auto;'></td>";
-                  echo '<td>
-                                <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#editKatalogModal"
-                                    data-id="' . htmlspecialchars($row['id_buku']) . '"
-                                    data-isbn="' . htmlspecialchars($row['isbn']) . '"
-                                    data-judul_buku="' . htmlspecialchars($row['judul_buku']) . '"
-                                    data-nama_penulis="' . htmlspecialchars($row['nama_penulis']) . '"
-                                    data-nama_penerbit="' . htmlspecialchars($row['nama_penerbit']) . '"
-                                    data-jumlah_halaman="' . htmlspecialchars($row['jumlah_halaman']) . '"
-                                    data-foto="' . htmlspecialchars($row['foto']) . '">Edit</button>
-                              </td>';
-                  echo '<td>
-                                <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusKatalogModal" data-id="' . htmlspecialchars($row['id_buku']) . '">Hapus</button>
-                              </td>';
-                  echo "</tr>";
+                    echo "<tr>";
+                    echo "<td>" . $no++ . "</td>";
+                    echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['isbn']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['nama_penulis']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['nama_penerbit']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['jumlah_halaman']) . "</td>";
+                    echo "<td><img src='" . htmlspecialchars($row['foto']) . "' alt='Foto Buku' style='width: 50px; height: auto;'></td>";
+                    echo '<td>
+                                 <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#editKatalogModal"
+                                     data-id="' . htmlspecialchars($row['id_buku']) . '"
+                                     data-isbn="' . htmlspecialchars($row['isbn']) . '"
+                                     data-judul_buku="' . htmlspecialchars($row['judul_buku']) . '"
+                                     data-nama_penulis="' . htmlspecialchars($row['nama_penulis']) . '"
+                                     data-nama_penerbit="' . htmlspecialchars($row['nama_penerbit']) . '"
+                                     data-jumlah_halaman="' . htmlspecialchars($row['jumlah_halaman']) . '"
+                                     data-foto="' . htmlspecialchars($row['foto']) . '">Edit</button>
+                               </td>';
+                    echo '<td>
+                                 <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusKatalogModal" data-id="' . htmlspecialchars($row['id_buku']) . '">Hapus</button>
+                               </td>';
+                    echo "</tr>";
                 }
             } else {
                 echo "<tr><td colspan='10' class='text-center'>Tidak ada data buku.</td></tr>";
@@ -429,10 +435,10 @@ if (isset($_GET['id'])) {
       <div class="modal-body">
         <form id="formEditKatalog" method="POST" action="" enctype="multipart/form-data">
           <input type="hidden" name="action" value="edit">
-          <input type="hidden" id="editId" name="editId">
+          <input type="hidden" id="editId" name="editId"> 
           <div class="mb-3">
-            <label for="displayId" class="form-label">ID Buku</label>
-            <input type="text" class="form-control" id="displayId" readonly>
+            <label for="newId" class="form-label">ID Buku</label>
+            <input type="text" class="form-control" id="newId" name="newId" required> 
           </div>
           <div class="mb-3">
             <label for="editIsbn" class="form-label">ISBN</label>
@@ -455,7 +461,7 @@ if (isset($_GET['id'])) {
             <input type="number" class="form-control" id="editJumlahHalaman" name="editJumlahHalaman" required>
           </div>
           <div class="mb-3">
-            <label for="editFoto" class="form-label">Foto (Biarkan kosong jika tidak ingin mengubah)</label>
+            <label for="editFoto" class="form-label">Foto</label>
             <input type="file" class="form-control" id="editFoto" name="editFoto" accept="image/*">
           </div>
           <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
@@ -501,8 +507,11 @@ if (isset($_GET['id'])) {
       const nama_penerbit = button.getAttribute('data-nama_penerbit');
       const jumlah_halaman = button.getAttribute('data-jumlah_halaman');
 
-      document.getElementById('editId').value = id; // Hidden field for ID
-      document.getElementById('displayId').value = id; // Display field for ID (readonly)
+      // Set the ORIGINAL ID in the hidden field (editId)
+      document.getElementById('editId').value = id; 
+      // Set the CURRENT ID in the editable field (newId)
+      document.getElementById('newId').value = id; 
+      
       document.getElementById('editIsbn').value = isbn;
       document.getElementById('editJudulbuku').value = judul_buku;
       document.getElementById('editNamaPenulis').value = nama_penulis;
