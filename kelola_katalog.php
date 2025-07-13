@@ -325,7 +325,7 @@ if (isset($_GET['id'])) {
               <th>Nama Penulis</th>
               <th>Nama Penerbit</th>
               <th>Jumlah Halaman</th>
-              <th>Foto Buku</th>
+              <th>Foto</th>
               <th>action</th>
               <th>action</th>
             </tr>

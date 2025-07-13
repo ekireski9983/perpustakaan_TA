@@ -79,6 +79,7 @@ if (!$result) {
            <a href="kelola_katalog.php">kelola katalog buku</a>
            <a href="kelola_list_buku.php">Kelola list buku</a>
            <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
+            <a href="kelola_pengembalian.php">kelola pengembalian buku</a>
            <a href="kelola_histori.php">kelola histori pengembalian</a>
            <a href="logout.php">Logout</a>
             <div class="image-box text-center mt-5">
@@ -97,6 +98,7 @@ if (!$result) {
             <a href="kelola_katalog.php">kelola katalog buku</a>
             <a href="kelola_list_buku.php">Kelola list buku</a>
             <a href="kelola_peminjaman.php">kelola Peminjaman buku</a>
+            <a href="kelola_pengembalian.php">kelola pengembalian buku</a>
             <a href="kelola_histori.php">kelola histori pengembalian</a>
             <a href="logout.php">Logout</a>
                 <div class="image-box text-center mt-5">

@@ -239,7 +239,7 @@ if (!$result) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Ubah status untuk buku ID: <strong id="modalBookIdDisplay"></strong></p>
+                <p>status pengembalian</p>
                 <div class="d-flex justify-content-between mt-3">
                     <button type="button" class="btn btn-update-status-belum" data-status-value="Belum Dikembalikan">Belum Dikembalikan</button>
                     <button type="button" class="btn btn-update-status-sudah" data-status-value="Sudah Dikembalikan">Sudah Dikembalikan</button>
