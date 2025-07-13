@@ -117,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $nama_penulis = $_POST['editNamaPenulis'];
     $nama_penerbit = $_POST['editNamaPenerbit'];
     $jumlah_halaman = $_POST['editJumlahHalaman'];
+    
 
     $foto_destination = null; // Inisialisasi path foto baru
     $current_foto_path = null; // Path foto lama
