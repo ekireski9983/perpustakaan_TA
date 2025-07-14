@@ -78,7 +78,7 @@
         <a href="peminjaman_buku.php">Peminjaman buku</a>
         <a href="pengembalian_buku.php">Pengembalian buku</a>
         <a href="histori_pengembalian.php">histori pengembalian</a>
-        <a href="logout.php">Logout</a>
+        <a href="logout.php" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
         <div class="image-box text-center mt-5">
           <img src="assets/logo_sekolah.png" alt="icon" />
         </div>
@@ -92,7 +92,23 @@
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Apakah Anda yakin ingin logout?
+      </div>
+      <div class="modal-footer d-flex justify-content-center gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+        <a href="logout.php" class="btn btn-danger">Ya</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
