@@ -13,7 +13,7 @@ $result = mysqli_query($koneksi, $query);
 
 // Menangani penyimpanan data peminjaman baru
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'tambah') {
-    // Escape all input values to prevent SQL injection (BASIC SECURITY, USE PREPARED STATEMENTS FOR PRODUCTION)
+    // Sanitize and validate input
     $id_buku = mysqli_real_escape_string($koneksi, $_POST['id']);
     $isbn = mysqli_real_escape_string($koneksi, $_POST['isbn']);
     $judul_buku = mysqli_real_escape_string($koneksi, $_POST['judul_buku']);
@@ -22,6 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $jumlah_halaman = mysqli_real_escape_string($koneksi, $_POST['jumlah_halaman']);
     $tanggal_pinjam = mysqli_real_escape_string($koneksi, $_POST['tanggal_pinjam']);
     $tanggal_pengembalian = mysqli_real_escape_string($koneksi, $_POST['tanggal_pengembalian']);
+
+    // Get current date for 'tanggal_ditambahkan'
+    $tanggal_ditambahkan = date('Y-m-d'); // Current date in YYYY-MM-DD format
 
     // Menangani upload foto
     $foto = $_FILES['foto'];
@@ -44,20 +47,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             mysqli_begin_transaction($koneksi);
 
             // Insert query into data_pinjam table
-            // Ensure column names match your data_pinjam table structure
             $insert_pinjam_query = "INSERT INTO data_pinjam (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian)
                                     VALUES ('$id_buku', '$isbn', '$judul_buku', '$nama_penulis', '$nama_penerbit', '$jumlah_halaman', '$foto_destination', '$tanggal_pinjam', '$tanggal_pengembalian')";
 
             if (mysqli_query($koneksi, $insert_pinjam_query)) {
                 // Insert query into data_pengembalian table
-                // Include 'status' column and set it to 'belum dikembalikan'
                 $insert_pengembalian_query = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status_pengembalian)
                                               VALUES ('$id_buku', '$judul_buku', '$tanggal_pinjam', '$tanggal_pengembalian', 'belum dikembalikan')";
 
                 if (mysqli_query($koneksi, $insert_pengembalian_query)) {
-                    mysqli_commit($koneksi); // Commit the transaction if both inserts are successful
-                    header("Location: kelola_peminjaman.php"); // Redirect after saving
-                    exit();
+                    // Insert query into data_list_buku table
+                    // Make sure column names match your data_list_buku table structure
+                    $insert_list_buku_query = "INSERT INTO data_list_buku (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, tanggal_ditambahkan)
+                                               VALUES ('$id_buku', '$isbn', '$judul_buku', '$nama_penulis', '$nama_penerbit', '$tanggal_ditambahkan')";
+
+                    if (mysqli_query($koneksi, $insert_list_buku_query)) {
+                        mysqli_commit($koneksi); // Commit the transaction if all inserts are successful
+                        header("Location: kelola_peminjaman.php"); // Redirect after saving
+                        exit();
+                    } else {
+                        mysqli_rollback($koneksi); // Rollback if data_list_buku insert fails
+                        echo "Error inserting into data_list_buku: " . mysqli_error($koneksi);
+                    }
                 } else {
                     mysqli_rollback($koneksi); // Rollback if pengembalian insert fails
                     echo "Error inserting into data_pengembalian: " . mysqli_error($koneksi);
@@ -95,14 +106,21 @@ if (isset($_GET['id'])) {
     // Delete from data_pengembalian first to avoid foreign key constraints if they exist
     $delete_pengembalian_query = "DELETE FROM data_pengembalian WHERE id_buku='$id_buku'";
     if (mysqli_query($koneksi, $delete_pengembalian_query)) {
-        $delete_pinjam_query = "DELETE FROM data_pinjam WHERE id_buku='$id_buku'";
-        if (mysqli_query($koneksi, $delete_pinjam_query)) {
-            mysqli_commit($koneksi); // Commit if both deletes are successful
-            header("Location: kelola_peminjaman.php"); // Redirect after deletion
-            exit();
+        // Delete from data_list_buku
+        $delete_list_buku_query = "DELETE FROM data_list_buku WHERE id_buku='$id_buku'";
+        if (mysqli_query($koneksi, $delete_list_buku_query)) {
+            $delete_pinjam_query = "DELETE FROM data_pinjam WHERE id_buku='$id_buku'";
+            if (mysqli_query($koneksi, $delete_pinjam_query)) {
+                mysqli_commit($koneksi); // Commit if all deletes are successful
+                header("Location: kelola_peminjaman.php"); // Redirect after deletion
+                exit();
+            } else {
+                mysqli_rollback($koneksi); // Rollback if pinjam delete fails
+                echo "Error deleting from data_pinjam: " . mysqli_error($koneksi);
+            }
         } else {
-            mysqli_rollback($koneksi); // Rollback if pinjam delete fails
-            echo "Error deleting from data_pinjam: " . mysqli_error($koneksi);
+            mysqli_rollback($koneksi); // Rollback if data_list_buku delete fails
+            echo "Error deleting from data_list_buku: " . mysqli_error($koneksi);
         }
     } else {
         mysqli_rollback($koneksi); // Rollback if pengembalian delete fails

@@ -341,21 +341,21 @@ if (isset($_GET['id'])) {
 </div>
 
 <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Apakah Anda yakin ingin logout?
-      </div>
-      <div class="modal-footer d-flex flex-row-reverse">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">tidak</button>
-        <a href="logout.php" class="btn btn-danger me-2">Ya</a>
-      </div>
-    </div>
-  </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Apakah Anda yakin ingin logout?
+      </div>
+      <div class="modal-footer d-flex justify-content-center gap-2">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+        <a href="logout.php" class="btn btn-danger">Ya</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 

@@ -214,11 +214,6 @@ if (!$result) {
                                                 Ubah
                                             </button>
                                         </td>';
-                                echo '<td>
-                                            <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusPengembalianModal" data-id="' . htmlspecialchars($row['id_buku']) . '">
-                                                Hapus
-                                            </button>
-                                        </td>';
                                 echo "</tr>";
                             }
                         } else {
