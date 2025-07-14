@@ -10,19 +10,27 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    // It's better to log the error and display a generic message to the user
+    error_log("Connection failed: " . $conn->connect_error);
+    die("Terjadi kesalahan koneksi ke database. Silakan coba lagi nanti.");
 }
 
 // Fetch book data from data_pinjam
-// It's good practice to fetch all columns you might need, even if some are nullable
+// Using prepared statements for safer database interactions, even for SELECT
 $sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian FROM data_pinjam";
 $result = $conn->query($sql);
 
 $books = [];
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $books[] = $row;
+if ($result) { // Check if query was successful
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $books[] = $row;
+        }
     }
+    $result->free(); // Free the result set
+} else {
+    error_log("Error fetching data: " . $conn->error);
+    // Optionally, set an error message to display to the user
 }
 $conn->close();
 ?>
@@ -35,15 +43,25 @@ $conn->close();
     <title>Dashboard Siswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
+        /* --- General Body Styles --- */
         body {
             background-color: #f1f5f9;
             margin: 0;
+            display: flex;
+            min-height: 100vh; /* Ensures body takes full viewport height */
+            flex-direction: column;
         }
 
+        /* --- Sidebar Styles --- */
         .sidebar {
             background-color: #2f3e46;
             color: white;
-            padding-top: 20px; /* Added padding to align content better */
+            padding-top: 20px;
+            position: sticky;
+            top: 0;
+            align-self: flex-start;
+            height: 100vh; /* This makes the sidebar take full viewport height */
+            overflow-y: auto; /* Keep this if you want the sidebar to scroll independently if its content overflows */
         }
 
         .sidebar h5 {
@@ -56,7 +74,7 @@ $conn->close();
             color: white;
             padding: 10px 20px;
             text-decoration: none;
-            transition: background-color 0.3s ease; /* Smooth transition for hover */
+            transition: background-color 0.3s ease;
         }
 
         .sidebar a:hover,
@@ -69,7 +87,7 @@ $conn->close();
             position: absolute;
             bottom: 20px;
             width: 100%;
-            padding-left: 20px; /* Align logout button with other links */
+            padding-left: 20px;
         }
 
         .image-box img {
@@ -77,46 +95,59 @@ $conn->close();
             opacity: 0.7;
         }
 
-        .main-content {
-            padding: 40px;
+        /* --- Main Content Area Styles --- */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
         }
 
-        /* --- Image and Card Styling Improvements --- */
+        .main-content {
+            padding: 40px;
+            flex-grow: 1;
+        }
+
+        /* --- Book Card Styles --- */
         .book-card {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Added subtle shadow for depth */
-            border-radius: 8px; /* Slightly more rounded corners */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
 
         .book-card .col-md-4 {
-            display: flex; /* Use flexbox for vertical centering */
-            align-items: center; /* Center image vertically */
-            justify-content: center; /* Center image horizontally */
-            padding: 15px; /* Add some padding around the image */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
         }
 
         .book-card img {
-            width: 100%; /* Make image take full width of its column */
-            max-width: 180px; /* Set a maximum width for the image */
-            height: auto; /* Maintain aspect ratio */
-            object-fit: contain; /* Ensure the whole image is visible within its bounds */
-            border-radius: var(--bs-border-radius); /* Use Bootstrap's default border-radius */
+            width: 100%;
+            max-width: 180px;
+            height: auto;
+            object-fit: contain;
+            border-radius: var(--bs-border-radius);
         }
 
-        /* Optional: Adjust card-body padding if needed */
         .book-card .card-body {
-            padding: 20px; /* Consistent padding inside card body */
+            padding: 20px;
         }
 
+        /* --- Responsive Adjustments --- */
         @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
             .sidebar {
-                padding-top: 0; /* Remove top padding for offcanvas on small screens */
+                padding-top: 0;
+                position: static;
+                height: auto;
+                overflow-y: visible;
             }
             .sidebar h5 {
-                margin-left: 0; /* Reset margin for offcanvas title */
-                text-align: center; /* Center title in offcanvas */
+                margin-left: 0;
+                text-align: center;
             }
             .sidebar a {
-                padding: 10px 15px; /* Adjust padding for offcanvas links */
+                padding: 10px 15px;
                 text-align: center;
             }
             .sidebar .logout {
@@ -126,18 +157,25 @@ $conn->close();
                 text-align: center;
             }
             .book-card .col-md-4 {
-                padding-bottom: 0; /* Less padding on small screens if image is above text */
+                padding-bottom: 0;
             }
             .book-card img {
-                max-width: 100%; /* Allow image to fill its column on smaller screens */
-                max-height: 250px; /* Adjust max height for smaller screens if necessary */
+                max-width: 100%;
+                max-height: 250px;
+            }
+            .main-wrapper {
+                flex-direction: column;
+            }
+            .main-content {
+                max-height: unset;
+                overflow-y: visible;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row d-md-none bg-dark text-white p-2">
+    <div class="container-fluid p-0">
+        <div class="row d-md-none bg-dark text-white p-2 sticky-top">
             <div class="col d-flex align-items-center">
                 <button class="btn btn-outline-light me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
                     <span class="navbar-toggler-icon"></span> Menu
@@ -146,15 +184,15 @@ $conn->close();
             </div>
         </div>
 
-        <div class="row">
-            <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
+        <div class="main-wrapper">
+            <nav class="col-md-3 d-none d-md-block sidebar">
                 <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-                <a href="lihat_anggota.php">lihat Anggota</a>
+                <a href="lihat_anggota.php">Lihat Anggota</a>
                 <a href="katalog_buku.php">Katalog Buku</a>
                 <a href="peminjaman_buku.php">Peminjaman Buku</a>
                 <a href="pengembalian_buku.php">Pengembalian Buku</a>
-                <a href="histori_pengembalian.php">histori pengembalian</a>
-                <a href="logout.php" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
+                <a href="histori_pengembalian.php">Histori Pengembalian</a>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
                 <div class="image-box text-center mt-5">
                     <img src="assets/logo_sekolah.png" alt="icon" />
                 </div>
@@ -162,17 +200,17 @@ $conn->close();
 
             <div class="offcanvas offcanvas-start sidebar" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
                 <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="sidebarMenuLabel">Siswa</h5>
+                    <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
                     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
                     <h5 class="pt-4">Siswa<br /><small>user</small></h5>
-                    <a href="lihat_anggota.php">lihat Anggota</a>
+                    <a href="lihat_anggota.php">Lihat Anggota</a>
                     <a href="katalog_buku.php">Katalog Buku</a>
                     <a href="peminjaman_buku.php">Peminjaman Buku</a>
                     <a href="pengembalian_buku.php">Pengembalian Buku</a>
-                    <a href="histori_pengembalian.php">histori pengembalian</a>
-                    <a href="logout.php" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
+                    <a href="histori_pengembalian.php">Histori Pengembalian</a>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</a>
                     <div class="image-box text-center mt-5">
                         <img src="assets/logo_sekolah.png" alt="icon" />
                     </div>
@@ -192,7 +230,7 @@ $conn->close();
                             <div class="card mb-4 book-card">
                                 <div class="row g-0">
                                     <div class="col-md-4">
-                                        <img src="<?php echo htmlspecialchars($book['foto']); ?>" class="img-fluid rounded-start" alt="Book Cover">
+                                        <img src="<?php echo !empty($book['foto']) ? htmlspecialchars($book['foto']) : 'assets/default_book.png'; ?>" class="img-fluid rounded-start" alt="Book Cover">
                                     </div>
                                     <div class="col-md-8">
                                         <div class="card-body">
@@ -202,17 +240,25 @@ $conn->close();
                                             <p class="card-text book-author"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($book['nama_penulis']); ?></p>
                                             <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($book['nama_penerbit']); ?></p>
                                             <p class="card-text"><strong>Jumlah Halaman:</strong> <?php echo htmlspecialchars($book['jumlah_halaman']); ?></p>
-                                            <p class="card-text"><strong>Tanggal Pinjam:</strong> <?php echo htmlspecialchars($book['tanggal_pinjam'] ?? ''); ?></p>
-                                            <p class="card-text"><strong>Tanggal Pengembalian:</strong> <?php echo htmlspecialchars($book['tanggal_pengembalian'] ?? ''); ?></p>
-                                            
+                                            <p class="card-text"><strong>Tanggal Pinjam:</strong> <?php echo htmlspecialchars($book['tanggal_pinjam'] ?? 'N/A'); ?></p>
+                                            <p class="card-text"><strong>Tanggal Pengembalian:</strong> <?php echo htmlspecialchars($book['tanggal_pengembalian'] ?? 'N/A'); ?></p>
+
                                             <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal"
-                                                     onclick="showBorrowModal('<?php echo htmlspecialchars($book['id_buku']); ?>', '<?php echo htmlspecialchars($book['judul_buku']); ?>', '<?php echo htmlspecialchars($book['isbn']); ?>', '<?php echo htmlspecialchars($book['nama_penulis']); ?>', '<?php echo htmlspecialchars($book['nama_penerbit']); ?>', <?php echo htmlspecialchars($book['jumlah_halaman']); ?>, '<?php echo htmlspecialchars($book['foto']); ?>')">Pinjam buku</button>
-                                            
+                                                    onclick="showBorrowModal(
+                                                        '<?php echo htmlspecialchars($book['id_buku']); ?>',
+                                                        '<?php echo htmlspecialchars($book['judul_buku']); ?>',
+                                                        '<?php echo htmlspecialchars($book['isbn']); ?>',
+                                                        '<?php echo htmlspecialchars($book['nama_penulis']); ?>',
+                                                        '<?php echo htmlspecialchars($book['nama_penerbit']); ?>',
+                                                        <?php echo htmlspecialchars($book['jumlah_halaman']); ?>,
+                                                        '<?php echo htmlspecialchars($book['foto']); ?>'
+                                                    )">Pinjam buku</button>
+
                                             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal"
-                                                     onclick='showEditModal(<?php echo json_encode($book); ?>)'>Edit</button>
-                                            
+                                                    onclick='showEditModal(<?php echo json_encode($book); ?>)'>Edit</button>
+
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
-                                                     onclick="setDeleteBookId('<?php echo htmlspecialchars($book['id_buku']); ?>')">Hapus</button>
+                                                    onclick="setDeleteBookId('<?php echo htmlspecialchars($book['id_buku']); ?>')">Hapus</button>
                                         </div>
                                     </div>
                                 </div>
@@ -235,7 +281,7 @@ $conn->close();
                     <h5 class="modal-title" id="borrowBookModalLabel">Peminjaman Buku</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="process_borrow_book.php" method="POST"> 
+                <form action="process_borrow_book.php" method="POST">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="borrowBookId" class="form-label">ID Buku</label>
@@ -269,7 +315,7 @@ $conn->close();
                             <label for="borrowReturnDate" class="form-label">Tanggal Pengembalian</label>
                             <input type="date" class="form-control" id="borrowReturnDate" name="tanggal_pengembalian" required>
                         </div>
-                        <input type="hidden" id="borrowFoto" name="foto"> 
+                        <input type="hidden" id="borrowFoto" name="foto">
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-success">Pinjam buku</button>
@@ -322,7 +368,7 @@ $conn->close();
                             <label for="editTanggalPengembalian" class="form-label">Tanggal Pengembalian</label>
                             <input type="date" class="form-control" id="editTanggalPengembalian" name="tanggal_pengembalian" required>
                         </div>
-                        <input type="hidden" id="editFoto" name="foto"> 
+                        <input type="hidden" id="editFoto" name="foto">
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Edit</button>
@@ -341,37 +387,41 @@ $conn->close();
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menghapus data buku?</p>
+                    <p>Apakah Anda yakin ingin menghapus data ini?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <button type="button" class="btn btn-danger" id="confirmDeleteButton">Hapus</button>
                 </div>
+                <input type="hidden" id="deleteBookIdPlaceholder" value="">
             </div>
         </div>
     </div>
 
-<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Apakah Anda yakin ingin logout?
-      </div>
-      <div class="modal-footer d-flex justify-content-center gap-2">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
-        <a href="logout.php" class="btn btn-danger">Ya</a>
-      </div>
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin logout?
+                </div>
+                <div class="modal-footer d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+                    <a href="logout.php" class="btn btn-danger">Ya</a>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // JavaScript for filtering cards (client-side)
+        /**
+         * Filters book cards based on search input.
+         * Searches by book title, author, or ID.
+         */
         function filterCards() {
             let input, filter, cards, card, bookTitle, bookAuthor, bookId, i;
             input = document.getElementById("searchInput");
@@ -386,14 +436,20 @@ $conn->close();
 
                 let match = false;
 
+                // Check title
                 if (bookTitle && (bookTitle.textContent || bookTitle.innerText).toUpperCase().indexOf(filter) > -1) {
                     match = true;
                 }
+                // Check author
                 if (!match && bookAuthor && (bookAuthor.textContent || bookAuthor.innerText).toUpperCase().indexOf(filter) > -1) {
                     match = true;
                 }
-                if (!match && bookId && (bookId.textContent || bookId.innerText).toUpperCase().indexOf(filter) > -1) {
-                    match = true;
+                // Check ID. We need to extract the ID part from the "ID Buku: XXX" string.
+                if (!match && bookId) {
+                    const idText = (bookId.textContent || bookId.innerText).trim(); // No need to remove "ID Buku:" since it's just the ID now
+                    if (idText.toUpperCase().indexOf(filter) > -1) {
+                        match = true;
+                    }
                 }
 
                 if (match) {
@@ -404,7 +460,16 @@ $conn->close();
             }
         }
 
-        // Function to show the Borrow Book Modal and set the book details
+        /**
+         * Populates the "Borrow Book" modal with book details and sets default dates.
+         * @param {string} id_buku - The ID of the book.
+         * @param {string} judul_buku - The title of the book.
+         * @param {string} isbn - The ISBN of the book.
+         * @param {string} nama_penulis - The author's name.
+         * @param {string} nama_penerbit - The publisher's name.
+         * @param {number} jumlah_halaman - The number of pages.
+         * @param {string} foto - The path to the book's cover image.
+         */
         function showBorrowModal(id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto) {
             document.getElementById('borrowBookId').value = id_buku;
             document.getElementById('borrowJudulBuku').value = judul_buku;
@@ -415,7 +480,6 @@ $conn->close();
             document.getElementById('borrowFoto').value = foto; // Set hidden foto field
 
             const today = new Date();
-            // Format date to YYYY-MM-DD for input type="date"
             const todayFormatted = today.toISOString().split('T')[0];
             document.getElementById('borrowDate').value = todayFormatted;
 
@@ -425,43 +489,45 @@ $conn->close();
             document.getElementById('borrowReturnDate').value = returnDateFormatted;
         }
 
-        // Function to show the Edit Borrow Book Modal and pre-fill its fields
+        /**
+         * Populates the "Edit Borrow Book" modal with existing book details.
+         * @param {object} bookData - An object containing all book details.
+         */
         function showEditModal(bookData) {
-            // Set the value for the hidden input field to identify the record being edited
             document.getElementById('edit_original_book_id').value = bookData.id_buku;
-
             document.getElementById('editBookId').value = bookData.id_buku;
             document.getElementById('editJudul').value = bookData.judul_buku;
             document.getElementById('editISBN').value = bookData.isbn;
             document.getElementById('editPenulis').value = bookData.nama_penulis;
             document.getElementById('editPenerbit').value = bookData.nama_penerbit;
             document.getElementById('editHalaman').value = bookData.jumlah_halaman;
-            document.getElementById('editFoto').value = bookData.foto; // Set hidden foto field
+            document.getElementById('editFoto').value = bookData.foto;
 
-            // Set dates for editing, ensure they are in YYYY-MM-DD format
-            // If the date is '0000-00-00' or null, set it to empty string so the date picker doesn't show an invalid date.
-            document.getElementById('editTanggalPinjam').value = (bookData.tanggal_pinjam === '0000-00-00' || !bookData.tanggal_pinjam) ? '' : bookData.tanggal_pinjam;
-            document.getElementById('editTanggalPengembalian').value = (bookData.tanggal_pengembalian === '0000-00-00' || !bookData.tanggal_pengembalian) ? '' : bookData.tanggal_pengembalian;
+            // Handle potential '0000-00-00' or null dates gracefully
+            document.getElementById('editTanggalPinjam').value = (bookData.tanggal_pinjam && bookData.tanggal_pinjam !== '0000-00-00') ? bookData.tanggal_pinjam : '';
+            document.getElementById('editTanggalPengembalian').value = (bookData.tanggal_pengembalian && bookData.tanggal_pengembalian !== '0000-00-00') ? bookData.tanggal_pengembalian : '';
         }
 
         // Variable to store the ID of the book to be deleted
         let bookIdToDelete = null;
 
-        // Function to set the book ID in the delete confirmation modal
+        /**
+         * Sets the book ID for the delete confirmation modal.
+         * @param {string} bookId - The ID of the book to be deleted.
+         */
         function setDeleteBookId(bookId) {
             bookIdToDelete = bookId;
-            document.getElementById('deleteBookIdPlaceholder').textContent = bookId;
+            document.getElementById('deleteBookIdPlaceholder').value = bookId;
         }
 
         // Event listener for the "Hapus" button inside the delete confirmation modal
         document.getElementById('confirmDeleteButton').addEventListener('click', function() {
             if (bookIdToDelete) {
-                // Redirect to a PHP script to handle deletion
-                window.location.href = `process_delete_peminjaman.php?id=${bookIdToDelete}`;
+                window.location.href = `process_delete_peminjaman.php?id=${encodeURIComponent(bookIdToDelete)}`;
             }
         });
 
-        // Display status messages from URL parameters
+        // Display status messages from URL parameters on page load
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status');

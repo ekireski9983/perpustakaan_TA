@@ -68,7 +68,7 @@ if (!$result) {
     <div class="row d-md-none bg-dark text-white p-2">
         <div class="col">
             <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">☰ Menu</button>
-            <span class="ms-3">Histori Pengembalian Buku</span> </div>
+            <span class="ms-3">Kelola Histori Pengembalian Buku</span> </div>
     </div>
 
     <div class="row">
@@ -108,7 +108,7 @@ if (!$result) {
         </div>
 
         <main class="col-md-9 col-12 main-content">
-            <h4>Histori Pengembalian</h4> <div class="table-responsive">
+            <h4>kelola Histori Pengembalian</h4> <div class="table-responsive">
                 <table class="table table-bordered table-striped" id="historiTable"> <thead>
                         <tr>
                             <th>No</th>
@@ -116,6 +116,7 @@ if (!$result) {
                             <th>Judul Buku</th>
                             <th>Tanggal Pinjam</th>
                             <th>Tanggal Pengembalian</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
