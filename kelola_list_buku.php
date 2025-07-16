@@ -16,7 +16,8 @@ if (isset($_GET['delete_id'])) {
     $stmt = mysqli_prepare($koneksi, $delete_query);
 
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "s", $id_buku_to_delete); // "s" for string, adjust if id_buku is numeric
+        // "s" for string, adjust if id_buku is numeric (e.g., "i" for integer)
+        mysqli_stmt_bind_param($stmt, "s", $id_buku_to_delete);
         if (mysqli_stmt_execute($stmt)) {
             // Redirect kembali ke halaman ini setelah penghapusan berhasil
             header("Location: kelola_list_buku.php");
@@ -34,8 +35,7 @@ if (isset($_GET['delete_id'])) {
 $query_select_buku = "SELECT id_buku, judul_buku, nama_penulis, nama_penerbit, isbn, tanggal_ditambahkan FROM data_list_buku";
 $result_buku = mysqli_query($koneksi, $query_select_buku);
 
-// Tutup koneksi database di akhir script
-// (Akan dipindahkan ke setelah HTML agar koneksi tetap terbuka selama proses rendering)
+// Tutup koneksi database di akhir script (moved to after HTML for proper resource management)
 ?>
 
 <!DOCTYPE html>
@@ -158,8 +158,6 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
 
             <main class="col-md-9 col-12 main-content">
                 <h4>Kelola List Buku</h4>
-                <p>Berikut adalah daftar buku yang sudah ditambahkan di perpustakaan.</p>
-
                 <div class="table-responsive">
                     <table class="table table-bordered table-striped" id="bookTable">
                         <thead>
@@ -171,7 +169,8 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
                                 <th>Nama Penerbit</th>
                                 <th>ISBN</th>
                                 <th>Tanggal Ditambahkan</th>
-                                <th>Aksi</th> </tr>
+                                <th>Aksi</th>
+                            </tr>
                         </thead>
                         <tbody>
                             <?php
@@ -210,7 +209,7 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Apakah Anda yakin ingin Hapus</p>
+                    Apakah Anda yakin ingin hapus buku<strong id="bookIdDisplay"></strong>?
                 </div>
                 <div class="modal-footer d-flex justify-content-center gap-2">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
@@ -220,23 +219,23 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
         </div>
     </div>
 
-<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Apakah Anda yakin ingin logout?
-      </div>
-      <div class="modal-footer d-flex justify-content-center gap-2">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
-        <a href="logout.php" class="btn btn-danger">Ya</a>
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Apakah Anda yakin ingin logout?
+          </div>
+          <div class="modal-footer d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+            <a href="logout.php" class="btn btn-danger">Ya</a>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -249,10 +248,10 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
             const bookId = button.getAttribute('data-id');
 
             // Update the modal's content.
-            const modalBodyInput = hapusBukuModal.querySelector('#bukuIdToDelete');
+            const bookIdDisplayElement = hapusBukuModal.querySelector('#bookIdDisplay'); // Corrected ID
             const confirmDeleteButton = hapusBukuModal.querySelector('#confirmDeleteButton');
 
-            modalBodyInput.textContent = bookId; // Display the book ID in the modal
+            bookIdDisplayElement.textContent = bookId; // Display the book ID in the modal
             confirmDeleteButton.href = 'kelola_list_buku.php?delete_id=' + bookId; // Set the href for deletion
         });
     </script>
