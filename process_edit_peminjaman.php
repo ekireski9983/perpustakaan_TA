@@ -1,14 +1,14 @@
 <?php
 
 $servername = "localhost";
-$username = "root"; /
+$username = "root"; 
 $password = "";    
 $dbname = "perpustakaan";
 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -32,7 +32,7 @@ $message = 'Terjadi kesalahan tidak terduga.';
 $conn->begin_transaction();
 
 try {
-
+    
     $sql_pinjam_update = "UPDATE data_pinjam SET
                             judul_buku = ?,
                             isbn = ?,
@@ -43,6 +43,7 @@ try {
                             tanggal_pinjam = ?,
                             tanggal_pengembalian = ?
                           WHERE id_buku = ?"; 
+
     $stmt_pinjam_update = $conn->prepare($sql_pinjam_update);
     if ($stmt_pinjam_update === false) {
         throw new Exception("Prepare failed on data_pinjam UPDATE: " . $conn->error);
@@ -72,7 +73,7 @@ try {
     $status_for_pengembalian_table = 'belum dikembalikan';
 
     if ($book_in_pengembalian_active_exists) {
-        // Update the existing 'belum dikembalikan' record in data_pengembalian
+    
         $sql_pengembalian_update = "UPDATE data_pengembalian SET
                                             judul_buku = ?,
                                             tanggal_pinjam = ?,
@@ -88,7 +89,7 @@ try {
         }
         $stmt_pengembalian_update->close();
     } else {
-      
+        
         $sql_pengembalian_insert = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status_pengembalian) VALUES (?, ?, ?, ?, ?)";
         $stmt_pengembalian_insert = $conn->prepare($sql_pengembalian_insert);
         if ($stmt_pengembalian_insert === false) {
@@ -101,12 +102,12 @@ try {
         $stmt_pengembalian_insert->close();
     }
 
-  
+    
     $conn->commit();
     $status = 'success'; 
 
 } catch (Exception $e) {
-
+    
     $conn->rollback();
     $status = 'error'; 
     $message = $e->getMessage();

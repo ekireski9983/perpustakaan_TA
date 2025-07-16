@@ -1,19 +1,19 @@
 <?php
-// Koneksi ke database
+
 $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
 
-// Cek koneksi
+
 if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-// Ambil data dari tabel data_pinjam
+
 $query = "SELECT * FROM data_pinjam";
 $result = mysqli_query($koneksi, $query);
 
-// Menangani penyimpanan data peminjaman baru
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'tambah') {
-    // Sanitize and validate input
+
     $id_buku = mysqli_real_escape_string($koneksi, $_POST['id']);
     $isbn = mysqli_real_escape_string($koneksi, $_POST['isbn']);
     $judul_buku = mysqli_real_escape_string($koneksi, $_POST['judul_buku']);
@@ -23,22 +23,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $tanggal_pinjam = mysqli_real_escape_string($koneksi, $_POST['tanggal_pinjam']);
     $tanggal_pengembalian = mysqli_real_escape_string($koneksi, $_POST['tanggal_pengembalian']);
 
-    // Get current date for 'tanggal_ditambahkan'
-    $tanggal_ditambahkan = date('Y-m-d'); // Current date in YYYY-MM-DD format
+    
+    $tanggal_ditambahkan = date('Y-m-d'); 
 
-    // Menangani upload foto
+    
     $foto = $_FILES['foto'];
     $foto_name = $foto['name'];
     $foto_tmp = $foto['tmp_name'];
     $foto_size = $foto['size'];
     $foto_error = $foto['error'];
 
-    // Validasi format gambar
+    
     $allowed_extensions = ['jpg', 'jpeg', 'png'];
     $foto_ext = strtolower(pathinfo($foto_name, PATHINFO_EXTENSION));
 
     if (in_array($foto_ext, $allowed_extensions) && $foto_error === 0) {
-        // Tentukan direktori untuk menyimpan gambar
+        
         $foto_destination = 'upload/' . uniqid('', true) . '.' . $foto_ext;
 
         // Pindahkan file ke direktori
@@ -85,45 +85,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
 }
 
-// Menangani penghapusan data peminjaman
+
 if (isset($_GET['id'])) {
     $id_buku = mysqli_real_escape_string($koneksi, $_GET['id']);
 
-    // Start a transaction for atomicity
+    
     mysqli_begin_transaction($koneksi);
 
-    // Optional: Get the photo path before deleting the record to delete the file as well
+    
     $get_photo_query = "SELECT foto FROM data_pinjam WHERE id_buku='$id_buku'";
     $photo_result = mysqli_query($koneksi, $get_photo_query);
     if ($photo_result && mysqli_num_rows($photo_result) > 0) {
         $row = mysqli_fetch_assoc($photo_result);
         $photo_path = $row['foto'];
         if (file_exists($photo_path)) {
-            unlink($photo_path); // Delete the actual photo file
+            unlink($photo_path); 
         }
     }
 
-    // Delete from data_pengembalian first to avoid foreign key constraints if they exist
+    
     $delete_pengembalian_query = "DELETE FROM data_pengembalian WHERE id_buku='$id_buku'";
     if (mysqli_query($koneksi, $delete_pengembalian_query)) {
-        // Delete from data_list_buku
+        
         $delete_list_buku_query = "DELETE FROM data_list_buku WHERE id_buku='$id_buku'";
         if (mysqli_query($koneksi, $delete_list_buku_query)) {
             $delete_pinjam_query = "DELETE FROM data_pinjam WHERE id_buku='$id_buku'";
             if (mysqli_query($koneksi, $delete_pinjam_query)) {
-                mysqli_commit($koneksi); // Commit if all deletes are successful
-                header("Location: kelola_peminjaman.php"); // Redirect after deletion
+                mysqli_commit($koneksi); 
+                header("Location: kelola_peminjaman.php"); 
                 exit();
             } else {
-                mysqli_rollback($koneksi); // Rollback if pinjam delete fails
+                mysqli_rollback($koneksi); 
                 echo "Error deleting from data_pinjam: " . mysqli_error($koneksi);
             }
         } else {
-            mysqli_rollback($koneksi); // Rollback if data_list_buku delete fails
+            mysqli_rollback($koneksi); 
             echo "Error deleting from data_list_buku: " . mysqli_error($koneksi);
         }
     } else {
-        mysqli_rollback($koneksi); // Rollback if pengembalian delete fails
+        mysqli_rollback($koneksi); 
         echo "Error deleting from data_pengembalian: " . mysqli_error($koneksi);
     }
 }
@@ -341,7 +341,7 @@ if (isset($_GET['id'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // Script untuk mengisi data pada modal hapus
+  
   const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusPeminjamanModal"]');
   deleteButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -350,22 +350,22 @@ if (isset($_GET['id'])) {
     });
   });
 
-  // Function to filter table rows based on search input
+  
   function filterTable() {
     const input = document.getElementById('searchInput');
     const filter = input.value.toLowerCase();
-    const table = document.getElementById('PeminjamanTable'); // Corrected ID
+    const table = document.getElementById('PeminjamanTable'); 
     const tr = table.getElementsByTagName('tr');
 
-    for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+    for (let i = 1; i < tr.length; i++) { 
       const td = tr[i].getElementsByTagName('td');
       let found = false;
 
-      // Search across relevant columns (e.g., Judul Buku, Nama Penulis, Nama Penerbit)
-      // Adjust column indices as needed based on your table structure
-      const judulBukuCol = td[3]; // Assuming Judul Buku is the 4th column (index 3)
-      const namaPenulisCol = td[4]; // Assuming Nama Penulis is the 5th column (index 4)
-      const namaPenerbitCol = td[5]; // Assuming Nama Penerbit is the 6th column (index 5)
+      
+      
+      const judulBukuCol = td[3]; 
+      const namaPenulisCol = td[4]; 
+      const namaPenerbitCol = td[5]; 
 
       if (judulBukuCol && judulBukuCol.textContent.toLowerCase().indexOf(filter) > -1) {
         found = true;
@@ -375,7 +375,7 @@ if (isset($_GET['id'])) {
         found = true;
       }
 
-      tr[i].style.display = found ? "" : "none"; // Show or hide the row
+      tr[i].style.display = found ? "" : "none"; 
     }
   }
 </script>

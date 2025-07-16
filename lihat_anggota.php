@@ -59,7 +59,7 @@
 </head>
 <body>
   <div class="container-fluid">
-    <!-- Navbar toggle for mobile -->
+    
     <div class="row d-md-none bg-dark text-white p-2">
       <div class="col">
         <button class="btn btn-outline-light" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
@@ -70,7 +70,7 @@
     </div>
 
     <div class="row">
-      <!-- Sidebar for md and up -->
+      
       <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
         <h5 class="pt-4">siswa<br /><small>user</small></h5>
         <a href="lihat_anggota.php">lihat anggota</a>
@@ -84,18 +84,18 @@
         </div>
       </nav>
       
-      <!-- Isi konten -->
+      
      <?php
-     session_start(); // Tambahkan ini
+     session_start(); 
 
     $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
     if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
     }
 
-    $nama_user = $_SESSION['username'] ?? ''; // Ambil nama dari session
+    $nama_user = $_SESSION['username'] ?? ''; 
 
-    // Ambil data hanya untuk nama user yang sedang login
+    
        $query = "SELECT * FROM data_anggota WHERE nama_siswa = '$nama_user'";
        $result = mysqli_query($koneksi, $query);
        ?>
@@ -139,7 +139,6 @@
 </div>
   
 
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
 </body>
 </html>

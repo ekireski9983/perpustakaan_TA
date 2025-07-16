@@ -1,25 +1,25 @@
 <?php
-// Koneksi ke database
+
 $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
 
-// Cek koneksi
+
 if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-// Menangani penghapusan data buku
+
 if (isset($_GET['delete_id'])) {
     $id_buku_to_delete = $_GET['delete_id'];
 
-    // Query untuk menghapus data dari tabel data_list_buku
+    
     $delete_query = "DELETE FROM data_list_buku WHERE id_buku = ?";
     $stmt = mysqli_prepare($koneksi, $delete_query);
 
     if ($stmt) {
-        // "s" for string, adjust if id_buku is numeric (e.g., "i" for integer)
+        
         mysqli_stmt_bind_param($stmt, "s", $id_buku_to_delete);
         if (mysqli_stmt_execute($stmt)) {
-            // Redirect kembali ke halaman ini setelah penghapusan berhasil
+            
             header("Location: kelola_list_buku.php");
             exit();
         } else {
@@ -31,11 +31,11 @@ if (isset($_GET['delete_id'])) {
     }
 }
 
-// Ambil data dari tabel data_list_buku untuk ditampilkan
+
 $query_select_buku = "SELECT id_buku, judul_buku, nama_penulis, nama_penerbit, isbn, tanggal_ditambahkan FROM data_list_buku";
 $result_buku = mysqli_query($koneksi, $query_select_buku);
 
-// Tutup koneksi database di akhir script (moved to after HTML for proper resource management)
+
 ?>
 
 <!DOCTYPE html>
@@ -239,25 +239,25 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Script untuk mengisi ID Buku pada modal hapus
+        
         const hapusBukuModal = document.getElementById('hapusBukuModal');
         hapusBukuModal.addEventListener('show.bs.modal', event => {
-            // Button that triggered the modal
+            
             const button = event.relatedTarget;
-            // Extract info from data-bs-* attributes
+            
             const bookId = button.getAttribute('data-id');
 
-            // Update the modal's content.
-            const bookIdDisplayElement = hapusBukuModal.querySelector('#bookIdDisplay'); // Corrected ID
+            
+            const bookIdDisplayElement = hapusBukuModal.querySelector('#bookIdDisplay'); 
             const confirmDeleteButton = hapusBukuModal.querySelector('#confirmDeleteButton');
 
-            bookIdDisplayElement.textContent = bookId; // Display the book ID in the modal
-            confirmDeleteButton.href = 'kelola_list_buku.php?delete_id=' + bookId; // Set the href for deletion
+            bookIdDisplayElement.textContent = bookId; 
+            confirmDeleteButton.href = 'kelola_list_buku.php?delete_id=' + bookId; 
         });
     </script>
 </body>
 </html>
 <?php
-// Tutup koneksi database setelah semua data ditampilkan
+
 mysqli_close($koneksi);
 ?>

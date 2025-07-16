@@ -7,12 +7,12 @@ if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-// Ambil data dari tabel data_anggota
-// Initial fetch, though it will be re-fetched after modifications
+
+
 $query_select_anggota = "SELECT * FROM data_anggota";
 $result = mysqli_query($koneksi, $query_select_anggota);
 
-// Menangani penyimpanan data anggota baru
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'tambah') {
     $id_siswa = $_POST['id'];
     $nama_siswa = $_POST['nama'];
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $kelas = $_POST['kelas'];
     $semester = $_POST['semester'];
 
-    // Insert query untuk data anggota using prepared statements
+    
     $insert_anggota_query = "INSERT INTO data_anggota (id_siswa, nama_siswa, jurusan, kelas, semester) VALUES (?, ?, ?, ?, ?)";
     $stmt_anggota = mysqli_prepare($koneksi, $insert_anggota_query);
     if ($stmt_anggota) {
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             if ($stmt_user) {
                 mysqli_stmt_bind_param($stmt_user, "sss", $username, $password, $role);
                 if (mysqli_stmt_execute($stmt_user)) {
-                    header("Location: kelola_anggota.php"); // Redirect setelah penyimpanan
+                    header("Location: kelola_anggota.php"); 
                     exit();
                 } else {
                     echo "Error inserting user: " . mysqli_stmt_error($stmt_user);
@@ -54,28 +54,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
 }
 
-// Menangani pembaruan data anggota
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
-    // Get the ORIGINAL ID and Name of the student from hidden inputs.
-    // These are crucial for finding the correct records in both tables.
+    
+    
     $original_id_siswa = $_POST['originalId'];
     $original_nama_siswa = $_POST['originalNama'];
 
-    // Get the NEW data from the form
+    
     $new_id_siswa = $_POST['editId'];
     $new_nama_siswa = $_POST['editNama'];
     $jurusan = $_POST['editJurusan'];
     $kelas = $_POST['editKelas'];
     $semester = $_POST['editSemester'];
 
-    // Start a database transaction for atomicity.
-    // If any part of the update fails, everything will be rolled back.
+    
+    
     mysqli_begin_transaction($koneksi);
 
     try {
-        // 1. Update the data_anggota table
-        // We're updating id_siswa, nama_siswa, jurusan, kelas, and semester
-        // The WHERE clause uses the original_id_siswa to target the correct record.
+       
         $update_anggota_query = "UPDATE data_anggota SET id_siswa=?, nama_siswa=?, jurusan=?, kelas=?, semester=? WHERE id_siswa=?";
         $stmt_anggota = mysqli_prepare($koneksi, $update_anggota_query);
 
@@ -89,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             $jurusan,
             $kelas,
             $semester,
-            $original_id_siswa // Use the original ID to find the record
+            $original_id_siswa 
         );
 
         if (!mysqli_stmt_execute($stmt_anggota)) {
@@ -97,10 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
         mysqli_stmt_close($stmt_anggota);
 
-        // 2. Update the users table
-        // The username in the users table corresponds to nama_siswa.
-        // The password in the users table corresponds to id_siswa.
-        // We need to use the original_nama_siswa to find the user's record.
+
         $update_user_query = "UPDATE users SET username=?, password=? WHERE username=?";
         $stmt_user = mysqli_prepare($koneksi, $update_user_query);
 
@@ -109,9 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
 
         mysqli_stmt_bind_param($stmt_user, "sss",
-            $new_nama_siswa,       // New username
-            $new_id_siswa,         // New password (id_siswa, as per your request)
-            $original_nama_siswa   // Use the original username to find the user's record
+            $new_nama_siswa,       
+            $new_id_siswa,         
+            $original_nama_siswa   
         );
 
         if (!mysqli_stmt_execute($stmt_user)) {
@@ -119,13 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
         mysqli_stmt_close($stmt_user);
 
-        // If both updates were successful, commit the transaction
+        
         mysqli_commit($koneksi);
-        header("Location: kelola_anggota.php"); // Redirect after successful update
+        header("Location: kelola_anggota.php"); 
         exit();
 
     } catch (Exception $e) {
-        // If any error occurred, roll back the transaction
+        
         mysqli_rollback($koneksi);
         echo "Error updating record: " . $e->getMessage();
     }
@@ -135,11 +130,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 if (isset($_GET['id'])) {
     $id_siswa_to_delete = $_GET['id'];
 
-    // Start a transaction for atomicity
+    
     mysqli_begin_transaction($koneksi);
 
     try {
-        // First, delete from the data_anggota table
+        
         $delete_anggota_query = "DELETE FROM data_anggota WHERE id_siswa=?";
         $stmt_anggota = mysqli_prepare($koneksi, $delete_anggota_query);
         if (!$stmt_anggota) {
@@ -151,8 +146,8 @@ if (isset($_GET['id'])) {
         }
         mysqli_stmt_close($stmt_anggota);
 
-        // Then, delete from the users table
-        $delete_users_query = "DELETE FROM users WHERE password=?"; // Assuming password is id_siswa
+        
+        $delete_users_query = "DELETE FROM users WHERE password=?"; 
         $stmt_user = mysqli_prepare($koneksi, $delete_users_query);
         if (!$stmt_user) {
             throw new Exception("Error preparing delete user statement: " . mysqli_error($koneksi));
@@ -163,12 +158,12 @@ if (isset($_GET['id'])) {
         }
         mysqli_stmt_close($stmt_user);
 
-        // If both queries are successful, commit the transaction
+        
         mysqli_commit($koneksi);
-        header("Location: kelola_anggota.php"); // Redirect after successful deletion
+        header("Location: kelola_anggota.php"); 
         exit();
     } catch (Exception $e) {
-        // If any query fails, rollback the transaction
+        
         mysqli_rollback($koneksi);
         echo "Error deleting record: " . $e->getMessage();
     }
@@ -426,12 +421,12 @@ if (isset($_GET['id'])) {
             const kelas = button.getAttribute('data-kelas');
             const semester = button.getAttribute('data-semester');
 
-            // Set the original values into the hidden input fields
+            
             document.getElementById('originalId').value = id;
             document.getElementById('originalNama').value = nama;
 
-            // Set the current values into the editable form fields
-            document.getElementById('editId').value = id; // This is now editable
+
+            document.getElementById('editId').value = id; 
             document.getElementById('editNama').value = nama;
             document.getElementById('editJurusan').value = jurusan;
             document.getElementById('editKelas').value = kelas;
@@ -439,7 +434,7 @@ if (isset($_GET['id'])) {
         });
     });
 
-    // Script untuk mengisi data pada modal hapus
+    
     const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusAnggotaModal"]');
     deleteButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -448,14 +443,14 @@ if (isset($_GET['id'])) {
         });
     });
 
-    // Function to filter table rows based on search input
+    
     function filterTable() {
         const input = document.getElementById('searchInput');
         const filter = input.value.toLowerCase();
         const table = document.getElementById('anggotaTable');
         const tr = table.getElementsByTagName('tr');
 
-        for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+        for (let i = 1; i < tr.length; i++) { 
             const td = tr[i].getElementsByTagName('td');
             let found = false;
 
@@ -469,7 +464,7 @@ if (isset($_GET['id'])) {
                 }
             }
 
-            tr[i].style.display = found ? "" : "none"; // Show or hide the row
+            tr[i].style.display = found ? "" : "none"; 
         }
     }
 </script>

@@ -84,7 +84,7 @@
         </div>
       </nav>
 
-      <!-- Main Content -->
+      
       <main class="col-md-9 col-12 main-content">
         <h4>Selamat datang di halaman user</h4>
         <p>Silakan pilih menu di sebelah kiri untuk melakukan peminjaman dan pengembalian buku perpustakaan.</p>

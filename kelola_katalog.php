@@ -1,13 +1,13 @@
 <?php
-// Koneksi ke database
+
 $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
 
-// Cek koneksi
+
 if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-// Fungsi untuk mengupload foto
+
 function uploadFoto($file_data, $target_dir = 'upload/') {
     $foto_name = $file_data['name'];
     $foto_tmp = $file_data['tmp_name'];
@@ -23,9 +23,9 @@ function uploadFoto($file_data, $target_dir = 'upload/') {
         return ['success' => false, 'message' => "Terjadi kesalahan saat upload file. Error code: " . $foto_error];
     }
 
-    // Pastikan direktori 'upload/' ada dan dapat ditulis
+    
     if (!is_dir($target_dir)) {
-        mkdir($target_dir, 0777, true); // Buat direktori jika belum ada
+        mkdir($target_dir, 0777, true); 
     }
 
     $foto_destination = $target_dir . uniqid('buku_', true) . '.' . $foto_ext;
@@ -38,11 +38,11 @@ function uploadFoto($file_data, $target_dir = 'upload/') {
 }
 
 
-// Ambil data dari tabel data_buku untuk ditampilkan
+
 $query_select_buku = "SELECT * FROM data_buku";
 $result = mysqli_query($koneksi, $query_select_buku);
 
-// Menangani penyimpanan data buku baru
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'tambah') {
     $id_buku = $_POST['id'];
     $isbn = $_POST['isbn'];
@@ -51,17 +51,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $nama_penerbit = $_POST['nama_penerbit'];
     $jumlah_halaman = $_POST['jumlah_halaman'];
 
-    // Menangani upload foto
+    
     $upload_result = uploadFoto($_FILES['foto']);
 
     if ($upload_result['success']) {
         $foto_destination = $upload_result['path'];
 
-        // Mulai transaksi untuk memastikan kedua INSERT berhasil atau tidak sama sekali
+        
         mysqli_begin_transaction($koneksi);
 
         try {
-            // 1. Insert ke tabel data_buku
+            
             $insert_buku_query = "INSERT INTO data_buku (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto) VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt_buku = mysqli_prepare($koneksi, $insert_buku_query);
 
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                 throw new Exception("Error preparing data_buku statement: " . mysqli_error($koneksi));
             }
 
-            // 2. Insert ke tabel data_list_buku (dengan tanggal_ditambahkan otomatis)
+            
             $insert_list_buku_query = "INSERT INTO data_list_buku (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, tanggal_ditambahkan) VALUES (?, ?, ?, ?, ?, NOW())";
             $stmt_list_buku = mysqli_prepare($koneksi, $insert_list_buku_query);
 
@@ -89,15 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
                 throw new Exception("Error preparing data_list_buku statement: " . mysqli_error($koneksi));
             }
 
-            // Jika semua berhasil, commit transaksi
+            
             mysqli_commit($koneksi);
-            header("Location: kelola_katalog.php"); // Redirect setelah penyimpanan
+            header("Location: kelola_katalog.php"); 
             exit();
 
         } catch (Exception $e) {
-            // Jika ada kesalahan, rollback transaksi
+            
             mysqli_rollback($koneksi);
-            // Hapus file foto yang mungkin sudah terupload jika transaksi gagal
+            
             if (file_exists($foto_destination)) {
                 unlink($foto_destination);
             }
@@ -109,11 +109,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
 }
 
-// Menangani pembaruan data buku
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
-    // Tangkap ID lama (sebelum diubah) dari hidden input atau sesi
+    
     $old_id_buku = $_POST['editId'];
-    // Tangkap ID baru (setelah diubah) dari input form
+    
     $new_id_buku = $_POST['newId']; 
     
     $isbn = $_POST['editIsbn'];
@@ -121,12 +121,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $nama_penulis = $_POST['editNamaPenulis'];
     $nama_penerbit = $_POST['editNamaPenerbit'];
     $jumlah_halaman = $_POST['editJumlahHalaman'];
-    $foto = $_POST['editfoto']; // Ini sepertinya tidak digunakan karena foto dihandle via $_FILES
+    $foto = $_POST['editfoto']; 
 
-    $foto_destination = null; // Inisialisasi path foto baru
-    $current_foto_path = null; // Path foto lama
+    $foto_destination = null; 
+    $current_foto_path = null; 
 
-    // Dapatkan path foto lama sebelum update untuk kemungkinan penghapusan
+    
     $get_old_foto_query = "SELECT foto FROM data_buku WHERE id_buku = ?";
     $stmt_old_foto = mysqli_prepare($koneksi, $get_old_foto_query);
     if ($stmt_old_foto) {
@@ -143,12 +143,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
 
 
-    // Menangani upload foto baru jika ada
+    
     if (isset($_FILES['editFoto']) && $_FILES['editFoto']['error'] === 0) {
         $upload_result = uploadFoto($_FILES['editFoto']);
         if ($upload_result['success']) {
             $foto_destination = $upload_result['path'];
-            // Hapus foto lama jika ada foto baru berhasil diunggah
+            
             if ($current_foto_path && file_exists($current_foto_path)) {
                 unlink($current_foto_path);
             }
@@ -157,16 +157,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             exit();
         }
     } else {
-        // Jika tidak ada foto baru diupload, gunakan foto yang sudah ada
+        
         $foto_destination = $current_foto_path;
     }
 
-    // Mulai transaksi untuk memastikan kedua UPDATE berhasil atau tidak sama sekali
+    
     mysqli_begin_transaction($koneksi);
 
     try {
-        // 1. Update tabel data_buku
-        // Pastikan Anda memperbarui ID_Buku di sini juga jika berubah
+        
         $update_buku_query = "UPDATE data_buku SET id_buku=?, isbn=?, judul_buku=?, nama_penulis=?, nama_penerbit=?, jumlah_halaman=?, foto=? WHERE id_buku=?";
         $stmt_buku = mysqli_prepare($koneksi, $update_buku_query);
         if ($stmt_buku) {
@@ -179,8 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             throw new Exception("Error preparing data_buku update statement: " . mysqli_error($koneksi));
         }
 
-        // 2. Update tabel data_list_buku
-        // Perbarui juga ID_Buku di tabel kedua
+        
         $update_list_buku_query = "UPDATE data_list_buku SET id_buku=?, isbn=?, judul_buku=?, nama_penulis=?, nama_penerbit=? WHERE id_buku=?";
         $stmt_list_buku = mysqli_prepare($koneksi, $update_list_buku_query);
         if ($stmt_list_buku) {
@@ -200,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     } catch (Exception $e) {
         mysqli_rollback($koneksi);
         echo "Error saat memperbarui buku: " . $e->getMessage();
-        // Pertimbangkan untuk menghapus foto baru jika update gagal
+        
         if ($foto_destination && $foto_destination !== $current_foto_path && file_exists($foto_destination)) {
               unlink($foto_destination);
         }
@@ -208,14 +206,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 }
 
 
-// Menangani penghapusan data buku
+
 if (isset($_GET['id'])) {
     $id_buku_to_delete = $_GET['id'];
 
     mysqli_begin_transaction($koneksi);
 
     try {
-        // 1. Ambil path foto dari data_buku untuk dihapus dari server
+        
         $get_photo_query = "SELECT foto FROM data_buku WHERE id_buku=?";
         $stmt_photo = mysqli_prepare($koneksi, $get_photo_query);
         if (!$stmt_photo) {
@@ -230,7 +228,7 @@ if (isset($_GET['id'])) {
         }
         mysqli_stmt_close($stmt_photo);
 
-        // 2. Hapus dari tabel data_buku
+        
         $delete_buku_query = "DELETE FROM data_buku WHERE id_buku=?";
         $stmt_buku = mysqli_prepare($koneksi, $delete_buku_query);
         if (!$stmt_buku) {
@@ -242,7 +240,7 @@ if (isset($_GET['id'])) {
         }
         mysqli_stmt_close($stmt_buku);
 
-        // 3. Hapus dari tabel data_list_buku
+        
         $delete_list_buku_query = "DELETE FROM data_list_buku WHERE id_buku=?";
         $stmt_list_buku = mysqli_prepare($koneksi, $delete_list_buku_query);
         if (!$stmt_list_buku) {
@@ -254,10 +252,10 @@ if (isset($_GET['id'])) {
         }
         mysqli_stmt_close($stmt_list_buku);
 
-        // Jika kedua query berhasil, commit transaksi dan hapus file foto
+        
         mysqli_commit($koneksi);
         if ($photo_path && file_exists($photo_path)) {
-            unlink($photo_path); // Hapus file foto dari server
+            unlink($photo_path); 
         }
         header("Location: kelola_katalog.php");
         exit();
@@ -514,7 +512,7 @@ if (isset($_GET['id'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // Script untuk mengisi data pada modal edit
+  
   const editButtons = document.querySelectorAll('[data-bs-target="#editKatalogModal"]');
   editButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -525,9 +523,9 @@ if (isset($_GET['id'])) {
       const nama_penerbit = button.getAttribute('data-nama_penerbit');
       const jumlah_halaman = button.getAttribute('data-jumlah_halaman');
 
-      // Set the ORIGINAL ID in the hidden field (editId)
+      
       document.getElementById('editId').value = id; 
-      // Set the CURRENT ID in the editable field (newId)
+      
       document.getElementById('newId').value = id; 
       
       document.getElementById('editIsbn').value = isbn;
@@ -538,7 +536,7 @@ if (isset($_GET['id'])) {
     });
   });
 
-  // Script untuk mengisi data pada modal hapus
+  
   const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusKatalogModal"]');
   deleteButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -547,24 +545,23 @@ if (isset($_GET['id'])) {
     });
   });
 
-  // Function to filter table rows based on search input
+  
   function filterTable() {
     const input = document.getElementById('searchInput');
     const filter = input.value.toLowerCase();
     const table = document.getElementById('KatalogTable');
     const tr = table.getElementsByTagName('tr');
 
-    for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+    for (let i = 1; i < tr.length; i++) { 
       const td = tr[i].getElementsByTagName('td');
       let found = false;
 
-      // Search across relevant columns (e.g., Judul Buku, Nama Penulis, Nama Penerbit, ID Buku, ISBN)
-      // Adjust column indices as needed based on your table structure
-      const idBukuCol = td[1]; // ID Buku
-      const isbnCol = td[2]; // ISBN
-      const judulBukuCol = td[3]; // Judul Buku
-      const namaPenulisCol = td[4]; // Nama Penulis
-      const namaPenerbitCol = td[5]; // Nama Penerbit
+      
+      const idBukuCol = td[1]; 
+      const isbnCol = td[2]; 
+      const judulBukuCol = td[3]; 
+      const namaPenulisCol = td[4]; 
+      const namaPenerbitCol = td[5]; 
 
       if (idBukuCol && idBukuCol.textContent.toLowerCase().indexOf(filter) > -1) {
         found = true;
@@ -578,7 +575,7 @@ if (isset($_GET['id'])) {
         found = true;
       }
 
-      tr[i].style.display = found ? "" : "none"; // Show or hide the row
+      tr[i].style.display = found ? "" : "none"; 
     }
   }
 </script>

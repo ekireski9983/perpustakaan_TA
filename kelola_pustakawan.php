@@ -1,27 +1,27 @@
 <?php
-// Koneksi ke database
+
 $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
 
-// Cek koneksi
+
 if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-// Ambil data dari tabel data_pustakawan
+
 $query_select_pustakawan = "SELECT * FROM data_pustakawan";
 $result = mysqli_query($koneksi, $query_select_pustakawan);
 
-// Menangani penyimpanan data pustakawan baru
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'tambah') {
     $id_pustakawan = $_POST['id'];
     $nama_pustakawan = $_POST['nama'];
     $jabatan = $_POST['jabatan'];
 
-    // Start a transaction for atomicity
+    
     mysqli_begin_transaction($koneksi);
 
     try {
-        // Insert query untuk data_pustakawan using prepared statements
+        
         $insert_pustakawan_query = "INSERT INTO data_pustakawan (id_pustakawan, nama_pustakawan, jabatan) VALUES (?, ?, ?)";
         $stmt_pustakawan = mysqli_prepare($koneksi, $insert_pustakawan_query);
         if (!$stmt_pustakawan) {
@@ -33,11 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
         mysqli_stmt_close($stmt_pustakawan);
 
-        // Insert query untuk tabel users
-        // Use id_pustakawan as username and nama_pustakawan as password
+        
         $username = $nama_pustakawan; 
-        $password = $id_pustakawan; // WARNING: Storing passwords directly is highly insecure. Hash them!
-        $role = 'admin'; // Pustakawan typically has 'admin' role
+        $password = $id_pustakawan; 
+        $role = 'admin'; 
 
         $insert_user_query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
         $stmt_user = mysqli_prepare($koneksi, $insert_user_query);
@@ -51,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         mysqli_stmt_close($stmt_user);
 
         mysqli_commit($koneksi);
-        header("Location: kelola_pustakawan.php"); // Redirect after successful saving
+        header("Location: kelola_pustakawan.php"); 
         exit();
     } catch (Exception $e) {
         mysqli_rollback($koneksi);
@@ -59,22 +58,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
 }
 
-// Menangani pembaruan data pustakawan
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
-    // Get the ORIGINAL ID and Name of the pustakawan from hidden inputs.
+    
     $original_id_pustakawan = $_POST['originalId'];
     $original_nama_pustakawan = $_POST['originalNama'];
 
-    // Get the NEW data from the form
+    
     $new_id_pustakawan = $_POST['editId'];
     $new_nama_pustakawan = $_POST['editNama'];
     $new_jabatan = $_POST['editJabatan'];
 
-    // Start a database transaction for atomicity.
+    
     mysqli_begin_transaction($koneksi);
 
     try {
-        // 1. Update the data_pustakawan table
+        
         $update_pustakawan_query = "UPDATE data_pustakawan SET id_pustakawan=?, nama_pustakawan=?, jabatan=? WHERE id_pustakawan=?";
         $stmt_pustakawan = mysqli_prepare($koneksi, $update_pustakawan_query);
 
@@ -86,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             $new_id_pustakawan,
             $new_nama_pustakawan,
             $new_jabatan,
-            $original_id_pustakawan // Use the original ID to find the record
+            $original_id_pustakawan 
         );
 
         if (!mysqli_stmt_execute($stmt_pustakawan)) {
@@ -94,13 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
         mysqli_stmt_close($stmt_pustakawan);
 
-        // 2. Update the users table
-        // The username in the users table corresponds to id_pustakawan.
-        // The password in the users table corresponds to nama_pustakawan.
-        // We need to use the original_id_pustakawan to find the user's record.
-        // If username (id_pustakawan) is unique in users table, then WHERE username=? is sufficient.
-        // If password (nama_pustakawan) is also used for uniqueness, include it.
-        // For simplicity, I'm assuming username (id_pustakawan) is unique.
+        
         $update_user_query = "UPDATE users SET username=?, password=? WHERE password=?";
         $stmt_user = mysqli_prepare($koneksi, $update_user_query);
 
@@ -109,9 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
 
         mysqli_stmt_bind_param($stmt_user, "sss",
-            $new_nama_pustakawan,    // New username (id_pustakawan)
-            $new_id_pustakawan,  // New password (nama_pustakawan)
-            $original_id_pustakawan // Use the original username (id_pustakawan) to find the user's record
+            $new_nama_pustakawan,    
+            $new_id_pustakawan,  
+            $original_id_pustakawan 
         );
 
         if (!mysqli_stmt_execute($stmt_user)) {
@@ -119,29 +112,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
         mysqli_stmt_close($stmt_user);
 
-        // If both updates were successful, commit the transaction
+        
         mysqli_commit($koneksi);
-        header("Location: kelola_pustakawan.php"); // Redirect after successful update
+        header("Location: kelola_pustakawan.php"); 
         exit();
 
     } catch (Exception $e) {
-        // If any error occurred, roll back the transaction
+        
         mysqli_rollback($koneksi);
         echo "Error updating record: " . $e->getMessage();
     }
 }
 
-// Menangani penghapusan data pustakawan
+
 if (isset($_GET['id'])) {
     $id_pustakawan_to_delete = $_GET['id'];
 
-    // Start a transaction for atomicity
+    
     mysqli_begin_transaction($koneksi);
 
     try {
-        // --- Fetch nama_pustakawan before deletion (for user deletion) ---
-        // We need nama_pustakawan if it's used as the password in the users table
-        // This query must run BEFORE data_pustakawan is deleted.
+        
         $get_nama_query = "SELECT nama_pustakawan FROM data_pustakawan WHERE id_pustakawan = ?";
         $stmt_get_nama = mysqli_prepare($koneksi, $get_nama_query);
         if (!$stmt_get_nama) {
@@ -158,14 +149,11 @@ if (isset($_GET['id'])) {
         $nama_pustakawan_for_user_deletion = $row_nama_pustakawan['nama_pustakawan'] ?? null;
         
         if (is_null($nama_pustakawan_for_user_deletion)) {
-            // Optional: If you want to strictly enforce user existence for deletion, you can throw an error here.
-            // For now, it will proceed to delete from data_pustakawan even if user record not found by name.
-            // Consider if 'username' (id_pustakawan) is sufficient to delete the user.
-             // throw new Exception("Pustakawan with ID " . $id_pustakawan_to_delete . " not found in data_pustakawan or associated user record is problematic.");
+
         }
 
 
-        // First, delete from the data_pustakawan table
+        
         $delete_pustakawan_query = "DELETE FROM data_pustakawan WHERE id_pustakawan=?";
         $stmt_pustakawan = mysqli_prepare($koneksi, $delete_pustakawan_query);
         if (!$stmt_pustakawan) {
@@ -177,10 +165,7 @@ if (isset($_GET['id'])) {
         }
         mysqli_stmt_close($stmt_pustakawan);
 
-        // Then, delete from the users table
-        // Assuming 'username' in 'users' table stores id_pustakawan
-        // And 'password' in 'users' table stores nama_pustakawan (insecure)
-        // You can choose to delete based on username only if it's unique:
+       
         $delete_users_query = "DELETE FROM users WHERE username=?"; 
         $stmt_user = mysqli_prepare($koneksi, $delete_users_query);
         if (!$stmt_user) {
@@ -192,12 +177,12 @@ if (isset($_GET['id'])) {
         }
         mysqli_stmt_close($stmt_user);
 
-        // If both queries are successful, commit the transaction
+    
         mysqli_commit($koneksi);
-        header("Location: kelola_pustakawan.php"); // Redirect after successful deletion
+        header("Location: kelola_pustakawan.php"); 
         exit();
     } catch (Exception $e) {
-        // If any query fails, rollback the transaction
+        
         mysqli_rollback($koneksi);
         echo "Error deleting record: " . $e->getMessage();
     }
@@ -425,7 +410,7 @@ if (isset($_GET['id'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Script untuk mengisi data pada modal edit
+    
     const editButtons = document.querySelectorAll('[data-bs-target="#editPustakawanModal"]');
     editButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -433,18 +418,18 @@ if (isset($_GET['id'])) {
             const nama = button.getAttribute('data-nama');
             const jabatan = button.getAttribute('data-jabatan');
 
-            // Set the original values into the hidden input fields
+        
             document.getElementById('originalId').value = id;
-            document.getElementById('originalNama').value = nama; // Keep original name for user table update
+            document.getElementById('originalNama').value = nama; 
 
-            // Set the current values into the editable form fields
+            
             document.getElementById('editId').value = id;
             document.getElementById('editNama').value = nama;
             document.getElementById('editJabatan').value = jabatan;
         });
     });
 
-    // Script untuk mengisi data pada modal hapus
+    
     const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusPustakawanModal"]');
     deleteButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -453,25 +438,25 @@ if (isset($_GET['id'])) {
         });
     });
 
-    // Function to filter table rows based on search input
+    
     function filterTable() {
         const input = document.getElementById('searchInput');
         const filter = input.value.toLowerCase();
-        const table = document.getElementById('pustakawanTable'); // Changed table ID
+        const table = document.getElementById('pustakawanTable'); 
         const tr = table.getElementsByTagName('tr');
 
-        for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+        for (let i = 1; i < tr.length; i++) { 
             const td = tr[i].getElementsByTagName('td');
             let found = false;
 
-            // Check only the "Nama Pustakawan" column (index 2)
-            if (td[2]) { // Ensure the third column exists (index 2 for Nama Pustakawan)
+            
+            if (td[2]) { 
                 const txtValue = td[2].textContent || td[2].innerText;
                 if (txtValue.toLowerCase().indexOf(filter) > -1) {
                     found = true;
                 }
             }
-            tr[i].style.display = found ? "" : "none"; // Show or hide the row
+            tr[i].style.display = found ? "" : "none"; 
         }
     }
 </script>

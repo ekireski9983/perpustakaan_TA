@@ -6,25 +6,25 @@
     <title>Dashboard Siswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        /* --- Original CSS --- */
+
         body {
             background-color: #f1f5f9;
             margin: 0;
-            display: flex; /* Make body a flex container */
-            min-height: 100vh; /* Ensures body takes full viewport height */
-            flex-direction: column; /* Stack children vertically */
-            /* Remove overflow-y: auto if it was here, or any max-height */
+            display: flex; 
+            min-height: 100vh; 
+            flex-direction: column; 
+           
         }
 
         .sidebar {
             background-color: #2f3e46;
             color: white;
             padding-top: 20px;
-            position: sticky; /* Keep sticky for desktop */
-            top: 0; /* Stick to the top */
-            align-self: flex-start; /* Align to the start of the flex container */
-            height: 100vh; /* This makes the sidebar take full viewport height */
-            overflow-y: auto; /* Keep this if you want the sidebar to scroll independently if its content overflows */
+            position: sticky; 
+            top: 0; 
+            align-self: flex-start; 
+            height: 100vh; 
+            overflow-y: auto; 
         }
 
         .sidebar h5 {
@@ -47,7 +47,7 @@
         }
 
         .sidebar .logout {
-            position: absolute; /* Changed to relative for offcanvas in media query */
+            position: absolute; 
             bottom: 20px;
             width: 100%;
             padding-left: 20px;
@@ -59,21 +59,18 @@
         }
 
         .main-wrapper {
-            display: flex; /* Make main-wrapper a flex container */
-            flex: 1; /* Allows main-wrapper to grow and take available space */
-            /* Remove min-height or height if it was here */
+            display: flex; 
+            flex: 1; 
+            
         }
 
         .main-content {
             padding: 40px;
-            flex-grow: 1; /* Allows main-content to grow and take available space */
-            /* REMOVE these two lines: */
-            /* overflow-y: auto; */
-            /* max-height: calc(100vh - 60px); */
-            /* The body will now handle the scrolling for this content */
+            flex-grow: 1; 
+            
         }
 
-        /* --- Image and Card Styling Improvements (already good) --- */
+        
         .book-card {
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border-radius: 8px;
@@ -98,16 +95,16 @@
             padding: 20px;
         }
 
-        /* --- Responsive Adjustments --- */
+        
         @media (max-width: 768px) {
             body {
-                flex-direction: column; /* Stack elements vertically on small screens */
+                flex-direction: column; 
             }
             .sidebar {
                 padding-top: 0;
-                position: static; /* Remove sticky for offcanvas */
-                height: auto; /* Auto height for offcanvas */
-                overflow-y: visible; /* Disable scrolling for offcanvas */
+                position: static; 
+                height: auto; 
+                overflow-y: visible; 
             }
             .sidebar h5 {
                 margin-left: 0;
@@ -118,7 +115,7 @@
                 text-align: center;
             }
             .sidebar .logout {
-                position: static; /* Adjust for mobile, no longer absolute */
+                position: static; 
                 margin-top: 30px;
                 padding-left: 0;
                 text-align: center;
@@ -131,11 +128,11 @@
                 max-height: 250px;
             }
             .main-wrapper {
-                flex-direction: column; /* Stack main content and sidebar vertically on small screens */
+                flex-direction: column; 
             }
             .main-content {
-                /* These properties are now inherited from body's scrolling */
-                max-height: unset; /* Ensure these are unset/visible for mobile too */
+                
+                max-height: unset; 
                 overflow-y: visible;
             }
         }
@@ -193,33 +190,33 @@
                 </div>
 
                 <?php
-                // Database connection details
-                $servername = "localhost"; // Your database server
-                $username = "root"; // Your database username
-                $password = ""; // Your database password
-                $dbname = "perpustakaan"; // **IMPORTANT: Change this to your actual database name**
+                
+                $servername = "localhost"; 
+                $username = "root"; 
+                $password = ""; 
+                $dbname = "perpustakaan"; 
 
-                // Create connection
+                
                 $conn = new mysqli($servername, $username, $password, $dbname);
 
-                // Check connection
+                
                 if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                // Initialize search query for PHP
+                
                 $php_search_query = "";
                 if (isset($_GET['php_search']) && !empty($_GET['php_search'])) {
                     $search_term_php = $conn->real_escape_string($_GET['php_search']);
                     $php_search_query = " WHERE judul_buku LIKE '%$search_term_php%' OR id_buku LIKE '%$search_term_php%' OR nama_penulis LIKE '%$search_term_php%'";
                 }
 
-                // SQL query to fetch data from the 'data_buku' table
+                
                 $sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku" . $php_search_query;
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
-                    // Output data for each row
+                    
                     while ($row = $result->fetch_assoc()) {
                         ?>
                         <div class="card mb-4 book-card">
@@ -276,10 +273,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        /**
-         * Filters book cards based on search input.
-         * Searches by book title, author, or ID.
-         */
+       
         function filterCards() {
             let input, filter, cards, card, bookTitle, bookAuthor, bookId, i, titleTxt, authorTxt, idTxt;
             input = document.getElementById("searchInput");
@@ -288,9 +282,9 @@
 
             for (i = 0; i < cards.length; i++) {
                 card = cards[i];
-                bookTitle = card.querySelector(".book-title"); // Select by specific class for title
-                bookAuthor = card.querySelector(".book-author"); // Select by specific class for author
-                bookId = card.querySelector(".book-id"); // Select by specific class for book ID
+                bookTitle = card.querySelector(".book-title"); 
+                bookAuthor = card.querySelector(".book-author"); 
+                bookId = card.querySelector(".book-id"); 
 
                 let match = false;
 

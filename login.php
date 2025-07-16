@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (isset($_SESSION['username'])) {
-    // Redirect to the appropriate dashboard based on the role
+
     if ($_SESSION['role'] === 'admin') {
         header("Location: dashboard_admin.php");
     } else {

@@ -1,24 +1,24 @@
 <?php
-// Koneksi ke database
+
 $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
 
-// Cek koneksi
+
 if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-// Menangani penghapusan data dari histori_pengembalian
-if (isset($_GET['action']) && $_GET['action'] == 'delete_histori' && isset($_GET['id'])) { // Changed action to 'delete_histori'
+
+if (isset($_GET['action']) && $_GET['action'] == 'delete_histori' && isset($_GET['id'])) { 
     $id_buku_to_delete = $_GET['id'];
 
-    // Gunakan prepared statement untuk DELETE dari histori_pengembalian
-    $delete_query = "DELETE FROM histori_pengembalian WHERE id_buku = ?"; // Changed table to histori_pengembalian
+    
+    $delete_query = "DELETE FROM histori_pengembalian WHERE id_buku = ?"; 
     $stmt = mysqli_prepare($koneksi, $delete_query);
     if ($stmt === false) {
         echo json_encode(['success' => false, 'message' => "Prepare failed: " . mysqli_error($koneksi)]);
         exit();
     }
-    // "s" karena id_buku bisa jadi string, jika id_buku adalah integer gunakan "i"
+    
     mysqli_stmt_bind_param($stmt, "s", $id_buku_to_delete); 
 
     if (mysqli_stmt_execute($stmt)) {
@@ -32,11 +32,11 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete_histori' && isset($_GET
     }
 }
 
-// Ambil data dari tabel histori_pengembalian
+
 $query = "SELECT id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian FROM histori_pengembalian"; 
 $result = mysqli_query($koneksi, $query);
 
-// Tambahkan penanganan kesalahan untuk query SELECT
+
 if (!$result) {
     die("Query gagal: " . mysqli_error($koneksi));
 }
@@ -57,8 +57,8 @@ if (!$result) {
         .sidebar .image-box img { width: 80px; opacity: 0.7; }
         .main-content { padding: 40px; }
         .table thead { background-color: #f8f9fa; }
-        /* Removed status update button styles as they are no longer used */
-        .btn-delete { background-color: #dc3545; color: white; } /* Bootstrap danger for delete */
+
+        .btn-delete { background-color: #dc3545; color: white; }
         .btn-tambah { background-color: #00b4d8; color: white; }
         @media (max-width: 768px) { .main-content { padding: 20px; } }
     </style>
@@ -186,14 +186,14 @@ if (!$result) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    let idBukuToDelete = null; // Menyimpan ID buku yang akan dihapus
+    let idBukuToDelete = null; 
 
-    // Inisialisasi modal Hapus
-    const hapusHistoriModal = new bootstrap.Modal(document.getElementById('hapusHistoriModal')); // Changed modal ID
+    
+    const hapusHistoriModal = new bootstrap.Modal(document.getElementById('hapusHistoriModal')); 
     const modalDeleteBookIdDisplay = document.getElementById('modalDeleteBookIdDisplay');
 
-    // Script untuk mengisi data pada modal hapus
-    document.querySelectorAll('[data-bs-target="#hapusHistoriModal"]').forEach(button => { // Changed modal ID in data-bs-target
+    
+    document.querySelectorAll('[data-bs-target="#hapusHistoriModal"]').forEach(button => { 
         button.addEventListener('click', function() {
             idBukuToDelete = this.getAttribute('data-id');
             if (modalDeleteBookIdDisplay) {
@@ -202,24 +202,23 @@ if (!$result) {
         });
     });
 
-    // Listener untuk tombol "Ya, Hapus" di modal hapus
+    
     document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
         if (idBukuToDelete) {
-            // Kirim permintaan fetch ke PHP untuk menghapus
-            // Pastikan action dan file PHP sesuai dengan tujuan (histori_pengembalian.php)
+           
             fetch(`histori_pengembalian.php?action=delete_histori&id=${encodeURIComponent(idBukuToDelete)}`) // Changed action and file name
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Hapus baris dari tabel secara langsung
+                        
                         const rowToRemove = document.querySelector(`tr[data-id-buku="${data.id_buku}"]`);
                         if (rowToRemove) {
                             rowToRemove.remove();
-                            // Opsional: perbarui nomor urut jika ada
+                            
                             updateRowNumbers();
                         }
-                        hapusHistoriModal.hide(); // Sembunyikan modal // Changed modal ID
-                        alert('Data histori pengembalian berhasil dihapus!'); // Feedback sukses
+                        hapusHistoriModal.hide(); 
+                        alert('Data histori pengembalian berhasil dihapus!'); 
                     } else {
                         alert('Gagal menghapus data histori pengembalian: ' + data.message);
                     }
@@ -231,9 +230,9 @@ if (!$result) {
         }
     });
 
-    // Fungsi untuk memperbarui nomor urut (No) setelah penghapusan
+    
     function updateRowNumbers() {
-        const tableRows = document.querySelectorAll('#historiTable tbody tr'); // Changed table ID
+        const tableRows = document.querySelectorAll('#historiTable tbody tr'); 
         tableRows.forEach((row, index) => {
             const noCell = row.querySelector('td:first-child');
             if (noCell) {
