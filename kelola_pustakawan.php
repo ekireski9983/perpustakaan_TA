@@ -113,67 +113,42 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 // Menangani penghapusan data pustakawan
 if (isset($_GET['id'])) {
     $id_pustakawan_to_delete = $_GET['id'];
-    // It's generally safer to retrieve 'nama_pustakawan' from the database
-    // using 'id_pustakawan' if it's needed for the 'users' table deletion,
-    // rather than directly from $_GET, as $_GET['nama_pustakawan'] could be
-    // missing or manipulated. However, if 'nama_pustakawan' is indeed
-    // used as the username, we'll proceed with it, but with a warning.
-    $nama_pustakawan_to_delete = $_GET['nama_pustakawan']; // Be cautious with this if not strictly necessary.
 
-    // Mulai transaksi untuk atomisitas
+    // Start a transaction for atomicity
     mysqli_begin_transaction($koneksi);
 
     try {
-        // --- Delete from data_Pustakawan table ---
-        // Use ONLY id_pustakawan for deletion from data_Pustakawan,
-        // as 'id' is typically the primary key and unique.
+        // First, delete from the data_Pustakawan table
         $delete_pustakawan_query = "DELETE FROM data_Pustakawan WHERE id_pustakawan=?";
         $stmt_pustakawan = mysqli_prepare($koneksi, $delete_pustakawan_query);
-
         if (!$stmt_pustakawan) {
             throw new Exception("Error preparing delete pustakawan statement: " . mysqli_error($koneksi));
         }
-
-        // Bind parameter: 's' for string, using id_pustakawan for deletion
         mysqli_stmt_bind_param($stmt_pustakawan, "s", $id_pustakawan_to_delete);
-
         if (!mysqli_stmt_execute($stmt_pustakawan)) {
             throw new Exception("Error deleting pustakawan data: " . mysqli_stmt_error($stmt_pustakawan));
         }
         mysqli_stmt_close($stmt_pustakawan);
 
-        // --- Delete from users table ---
-        // Asumsi: kolom 'username' di tabel 'users' menyimpan 'nama_pustakawan'
-        // dan kolom 'password' di tabel 'users' menyimpan 'id_pustakawan'.
-        // CATATAN PENTING: Menggunakan 'id_pustakawan' sebagai password adalah praktik yang SANGAT TIDAK AMAN!
-        // Password harus selalu di-hash (misalnya dengan password_hash()).
-        // Idealnya, tabel 'users' memiliki kolom 'pustakawan_id' yang merupakan foreign key ke 'data_Pustakawan.id_pustakawan'.
-
-        $delete_users_query = "DELETE FROM users WHERE username=? AND password=?";
+        // Then, delete from the users table (if the pustakawan has a user account)
+        // Asumsi: kolom 'username' di tabel 'users' menyimpan 'id_pustakawan'
+        $delete_users_query = "DELETE FROM users WHERE username=?";
         $stmt_user = mysqli_prepare($koneksi, $delete_users_query);
-
         if (!$stmt_user) {
             throw new Exception("Error preparing delete user statement: " . mysqli_error($koneksi));
         }
-
-        // Bind kedua parameter:
-        // 'ss' berarti dua parameter string.
-        // Parameter pertama untuk 'username' (menggunakan $nama_pustakawan_to_delete)
-        // Parameter kedua untuk 'password' (menggunakan $id_pustakawan_to_delete)
-        mysqli_stmt_bind_param($stmt_user, "ss", $nama_pustakawan_to_delete, $id_pustakawan_to_delete);
-
+        mysqli_stmt_bind_param($stmt_user, "s", $id_pustakawan_to_delete);
         if (!mysqli_stmt_execute($stmt_user)) {
             throw new Exception("Error deleting user data: " . mysqli_stmt_error($stmt_user));
         }
         mysqli_stmt_close($stmt_user);
 
-        // Jika kedua query berhasil, commit transaksi
+        // If both queries are successful, commit the transaction
         mysqli_commit($koneksi);
         header("Location: kelola_pustakawan.php"); // Redirect setelah penghapusan berhasil
         exit();
-
     } catch (Exception $e) {
-        // Jika ada query yang gagal, rollback transaksi
+        // If any query fails, rollback the transaction
         mysqli_rollback($koneksi);
         echo "Error deleting record: " . $e->getMessage();
     }
