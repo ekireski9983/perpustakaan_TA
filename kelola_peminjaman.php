@@ -307,9 +307,9 @@ if (isset($_GET['id'])) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Apakah Anda yakin ingin menghapus data peminjaman ini?</p>
+        <p>Apakah Anda yakin mau hapus</p>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer d-flex justify-content-center gap-2">
         <form id="formHapusPeminjaman" method="GET" action="">
           <input type="hidden" id="hapusId" name="id">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

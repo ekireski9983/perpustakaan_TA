@@ -255,9 +255,9 @@ $result = mysqli_query($koneksi, $query);
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus data ini?</p>
+                <p>Apakah Anda yakin ingin hapus</p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer d-flex justify-content-center gap-2">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Ya, Hapus</button>
             </div>

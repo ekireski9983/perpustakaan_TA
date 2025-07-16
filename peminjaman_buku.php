@@ -371,8 +371,8 @@ $conn->close();
                         <input type="hidden" id="editFoto" name="foto">
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Edit</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-success">Edit pinjam</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
                     </div>
                 </form>
             </div>
@@ -389,7 +389,7 @@ $conn->close();
                 <div class="modal-body">
                     <p>Apakah Anda yakin ingin menghapus data ini?</p>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer d-flex justify-content-center gap-2">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                     <button type="button" class="btn btn-danger" id="confirmDeleteButton">Hapus</button>
                 </div>

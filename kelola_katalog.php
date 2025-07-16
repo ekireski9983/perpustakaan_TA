@@ -482,11 +482,11 @@ if (isset($_GET['id'])) {
       <div class="modal-body">
         <p>Apakah Anda yakin ingin menghapus data buku ini?</p>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer d-flex justify-content-center gap-2">
         <form id="formHapusKatalog" method="GET" action="">
           <input type="hidden" id="hapusId" name="id">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-danger">Hapus</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+          <button type="submit" class="btn btn-danger">Ya</button>
         </form>
       </div>
     </div>

@@ -235,15 +235,17 @@ if (!$result) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>status pengembalian</p>
-                <div class="d-flex justify-content-between mt-3">
-                    <button type="button" class="btn btn-update-status-belum" data-status-value="Belum Dikembalikan">Belum Dikembalikan</button>
-                    <button type="button" class="btn btn-update-status-sudah" data-status-value="Sudah Dikembalikan">Sudah Dikembalikan</button>
-                </div>
+                <p>Apakah Anda yakin ingin kembalikan buku</p>
+                <input type="hidden" id="returnBookIdPlaceholder" value="">
+            </div>
+            <div class="modal-footer d-flex justify-content-center gap-2">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">tidak</button>
+                <button type="button" class="btn btn-primary" id="confirmReturnButton" data-status-value="Sudah Dikembalikan">Ya</button>
             </div>
         </div>
     </div>
 </div>
+
 
 <div class="modal fade" id="hapusPengembalianModal" tabindex="-1" aria-labelledby="hapusPengembalianModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -253,11 +255,11 @@ if (!$result) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus data ini?</p>
+                <p>Apakah Anda yakin ingin hapus</p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer d-flex justify-content-center gap-2">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Ya, Hapus</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Ya</button>
             </div>
         </div>
     </div>

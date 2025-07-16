@@ -210,11 +210,11 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menghapus buku dengan ID: <strong id="bukuIdToDelete"></strong>?</p>
+                    <p>Apakah Anda yakin ingin Hapus</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <a href="#" id="confirmDeleteButton" class="btn btn-danger">Hapus</a>
+                <div class="modal-footer d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tidak</button>
+                    <a href="#" id="confirmDeleteButton" class="btn btn-danger">Ya</a>
                 </div>
             </div>
         </div>
