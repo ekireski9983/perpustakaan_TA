@@ -127,11 +127,10 @@ if (!$result) {
         .sidebar .image-box img { width: 80px; opacity: 0.7; }
         .main-content { padding: 40px; }
         .table thead { background-color: #f8f9fa; }
-        /* Updated button colors for consistency and better visual feedback */
-        .btn-update-status-belum { background-color: #dc3545; color: white; } /* Bootstrap danger */
-        .btn-update-status-sudah { background-color: #28a745; color: white; } /* Bootstrap success */
-        .btn-edit { background-color: #007bff; color: white; } /* Bootstrap primary for edit */
-        .btn-delete { background-color: #6c757d; color: white; } /* Bootstrap secondary for delete */
+        .btn-update-status-belum { background-color: #dc3545; color: white; } 
+        .btn-update-status-sudah { background-color: #28a745; color: white; } 
+        .btn-edit { background-color: #007bff; color: white; } 
+        .btn-delete { background-color: #6c757d; color: white; } 
         .btn-tambah { background-color: #00b4d8; color: white; }
         @media (max-width: 768px) { .main-content { padding: 20px; } }
     </style>
