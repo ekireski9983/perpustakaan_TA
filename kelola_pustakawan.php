@@ -35,8 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
         // Insert query untuk tabel users
         // Use id_pustakawan as username and nama_pustakawan as password
-        $username = $id_pustakawan; 
-        $password = $nama_pustakawan; // WARNING: Storing passwords directly is highly insecure. Hash them!
+        $username = $nama_pustakawan; 
+        $password = $id_pustakawan; // WARNING: Storing passwords directly is highly insecure. Hash them!
         $role = 'admin'; // Pustakawan typically has 'admin' role
 
         $insert_user_query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         // If username (id_pustakawan) is unique in users table, then WHERE username=? is sufficient.
         // If password (nama_pustakawan) is also used for uniqueness, include it.
         // For simplicity, I'm assuming username (id_pustakawan) is unique.
-        $update_user_query = "UPDATE users SET username=?, password=? WHERE username=?";
+        $update_user_query = "UPDATE users SET username=?, password=? WHERE password=?";
         $stmt_user = mysqli_prepare($koneksi, $update_user_query);
 
         if (!$stmt_user) {
@@ -109,8 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
 
         mysqli_stmt_bind_param($stmt_user, "sss",
-            $new_id_pustakawan,    // New username (id_pustakawan)
-            $new_nama_pustakawan,  // New password (nama_pustakawan)
+            $new_nama_pustakawan,    // New username (id_pustakawan)
+            $new_id_pustakawan,  // New password (nama_pustakawan)
             $original_id_pustakawan // Use the original username (id_pustakawan) to find the user's record
         );
 
