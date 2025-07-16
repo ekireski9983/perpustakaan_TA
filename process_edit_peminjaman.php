@@ -1,19 +1,19 @@
 <?php
-// Database connection details
+
 $servername = "localhost";
-$username = "root"; // Replace with your database username
-$password = "";    // Replace with your database password
+$username = "root"; /
+$password = "";    
 $dbname = "perpustakaan";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get data from the form
+
 $original_id_buku = $_POST['original_id_buku']; 
 $judul_buku = $_POST['judul_buku'];
 $isbn = $_POST['isbn'];
@@ -24,15 +24,15 @@ $foto = $_POST['foto'];
 $tanggal_pinjam = $_POST['tanggal_pinjam'];
 $tanggal_pengembalian = $_POST['tanggal_pengembalian'];
 
-// Initialize status and message for the overall operation result
+
 $status = 'error';
 $message = 'Terjadi kesalahan tidak terduga.';
 
-// Start a transaction for atomicity
+
 $conn->begin_transaction();
 
 try {
-    // 1. Update the existing record in data_pinjam
+
     $sql_pinjam_update = "UPDATE data_pinjam SET
                             judul_buku = ?,
                             isbn = ?,
@@ -42,8 +42,7 @@ try {
                             foto = ?,
                             tanggal_pinjam = ?,
                             tanggal_pengembalian = ?
-                          WHERE id_buku = ?"; // Use original_id_buku to ensure correct record is updated
-
+                          WHERE id_buku = ?"; 
     $stmt_pinjam_update = $conn->prepare($sql_pinjam_update);
     if ($stmt_pinjam_update === false) {
         throw new Exception("Prepare failed on data_pinjam UPDATE: " . $conn->error);
@@ -89,8 +88,7 @@ try {
         }
         $stmt_pengembalian_update->close();
     } else {
-        // If no active 'belum dikembalikan' record exists, insert a new one.
-        // This ensures data_pengembalian reflects the current borrow state.
+      
         $sql_pengembalian_insert = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status_pengembalian) VALUES (?, ?, ?, ?, ?)";
         $stmt_pengembalian_insert = $conn->prepare($sql_pengembalian_insert);
         if ($stmt_pengembalian_insert === false) {
@@ -103,22 +101,20 @@ try {
         $stmt_pengembalian_insert->close();
     }
 
-    // --- END REVISED LOGIC FOR data_pengembalian ---
-
-    // Commit the transaction if all queries were successful
+  
     $conn->commit();
-    $status = 'success'; // This 'status' is for the redirection message
+    $status = 'success'; 
 
 } catch (Exception $e) {
-    // Rollback the transaction if any query failed
+
     $conn->rollback();
-    $status = 'error'; // This 'status' is for the redirection message
+    $status = 'error'; 
     $message = $e->getMessage();
 }
 
 $conn->close();
 
-// Redirect back to the peminjaman_buku.php page with status message
+
 header("Location: peminjaman_buku.php?status=$status&message=" . urlencode($message));
 exit();
 ?>
