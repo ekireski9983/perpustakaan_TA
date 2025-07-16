@@ -239,7 +239,7 @@ if (!$result) {
                 <input type="hidden" id="returnBookIdPlaceholder" value="">
             </div>
             <div class="modal-footer d-flex justify-content-center gap-2">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">tidak</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confirmReturnButton" data-status-value="Belum dikembalikan">tidak</button>
                 <button type="button" class="btn btn-primary" id="confirmReturnButton" data-status-value="Sudah Dikembalikan">Ya</button>
             </div>
         </div>

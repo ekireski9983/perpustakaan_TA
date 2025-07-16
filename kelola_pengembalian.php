@@ -248,7 +248,7 @@ if (!$result) {
                 <input type="hidden" id="returnBookIdPlaceholder" value="">
             </div>
             <div class="modal-footer d-flex justify-content-center gap-2">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">belum dikembalikan</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal" id="confirmReturnButton" data-status-value="Belum Dikembalikan">belum dikembalikan</button>
                 <button type="button" class="btn btn-primary" id="confirmReturnButton" data-status-value="Sudah Dikembalikan">sudah dikembalikan</button>
             </div>
         </div>
@@ -295,8 +295,8 @@ if (!$result) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    let currentBookIdToUpdate = null; 
-    let currentTableRow = null;      
+   let currentBookIdToUpdate = null; 
+    let currentTableRow = null;       
 
     
     const ubahStatusPengembalianModal = new bootstrap.Modal(document.getElementById('ubahStatusPengembalianModal'));
@@ -339,7 +339,7 @@ if (!$result) {
                                 statusCell.textContent = data.new_status; 
                             }
                         }
-                        alert('Status berhasil diperbarui!');
+                        alert('buku berhasil dikembalikan');
                         ubahStatusPengembalianModal.hide(); 
                     } else {
                         alert('Gagal mengubah status: ' + data.message);
