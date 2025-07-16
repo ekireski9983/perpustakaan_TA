@@ -14,12 +14,7 @@ if ($conn->connect_error) {
 }
 
 // Get data from the form
-$original_id_buku = $_POST['original_id_buku']; // This is crucial for identifying the record
-// Note: If 'id_buku' itself can be changed through the edit form,
-// you would need to retrieve it as $_POST['id_buku'] and update data_pinjam's id_buku field as well,
-// using original_id_buku in the WHERE clause.
-// For this script, we assume id_buku is the primary key and doesn't change,
-// so original_id_buku is consistently used for lookup.
+$original_id_buku = $_POST['original_id_buku']; 
 $judul_buku = $_POST['judul_buku'];
 $isbn = $_POST['isbn'];
 $nama_penulis = $_POST['nama_penulis'];
@@ -61,58 +56,7 @@ try {
     $stmt_pinjam_update->close();
     $message = "Data peminjaman buku berhasil diperbarui.";
 
-    // 2. Handle data_pengembalian table (Update or Insert)
-    // We assume data_pengembalian tracks historical returns.
-    // If a book is currently borrowed (exists in data_pinjam), we should ensure
-    // there isn't an "active" (i.e., not yet returned) entry in data_pengembalian that contradicts this.
-    // However, if data_pengembalian only records *returned* books,
-    // then no update or insert is needed here when editing a *borrowed* book.
-    //
-    // Given your description that 'status_pengembalian' column doesn't exist in data_pengembalian,
-    // we'll proceed by only updating existing 'belum dikembalikan' entries if they are present,
-    // and if not, we won't insert a new one since data_pinjam is the primary source for current borrowings.
-    // The previous logic attempted to check for and manage a 'belum dikembalikan' status within data_pengembalian,
-    // which contradicts the absence of such a column.
 
-    // Let's refine the logic for data_pengembalian.
-    // If data_pengembalian is meant *only* for recording *returned* books, then no action is needed here
-    // when a book's borrowing details (in data_pinjam) are updated.
-    // If data_pengembalian is also used to track *currently borrowed* books
-    // (which seems to be implied by the original code's attempt to update 'belum dikembalikan' entries),
-    // then its schema needs to be consistent.
-
-    // *Assumption for correction*: data_pengembalian *should* track currently borrowed books
-    // and was intended to have a 'status_pengembalian' column, but it's missing.
-    // If it's truly only for *returned* books, then the following block should be removed entirely.
-    //
-    // For now, I'll remove the `status_pengembalian` column from the SQL, but keep the update/insert
-    // logic based on the assumption that `data_pengembalian` is a parallel table
-    // for tracking the state of books (borrowed vs. returned), even if the column is misnamed or missing.
-
-    // --- REVISITED LOGIC FOR data_pengembalian ---
-    // If `data_pengembalian` is primarily for tracking books *after* they've been returned,
-    // then when you edit a record in `data_pinjam` (which implies the book is still out),
-    // you *should not* be trying to update `data_pengembalian` unless it's to fix historical data.
-    //
-    // However, your original code checked for and attempted to update an entry in `data_pengembalian`
-    // with `status_pengembalian = 'belum dikembalikan'`.
-    // This implies `data_pengembalian` *does* hold records of currently borrowed books.
-    //
-    // *If `data_pengembalian` is supposed to track currently borrowed books alongside `data_pinjam`*:
-    // You MUST add the `status_pengembalian` column to `data_pengembalian`.
-    // ALTER TABLE data_pengembalian ADD COLUMN status_pengembalian VARCHAR(50) DEFAULT 'belum dikembalikan';
-    //
-    // *If `data_pengembalian` is ONLY for returned books*:
-    // The entire `// 2. Handle data_pengembalian table` block below should be removed.
-    //
-    // I will proceed with the assumption that `data_pengembalian` is intended to reflect the current
-    // borrow status and **requires the `status_pengembalian` column**.
-    // If you confirm `status_pengembalian` *cannot* exist in `data_pengembalian`, please let me know,
-    // and I will remove this block.
-
-    // --- Assuming `status_pengembalian` *should* exist in `data_pengembalian` table ---
-    // You need to run this SQL command in your database to add the column:
-    // ALTER TABLE data_pengembalian ADD COLUMN status_pengembalian VARCHAR(50) DEFAULT 'belum dikembalikan';
 
     $check_pengembalian_sql = "SELECT COUNT(*) AS count FROM data_pengembalian WHERE id_buku = ? AND status_pengembalian = 'belum dikembalikan'";
     $stmt_check_pengembalian = $conn->prepare($check_pengembalian_sql);
