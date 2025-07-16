@@ -1,8 +1,8 @@
 <?php
-// Koneksi ke database
+
 $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
 
-// Cek koneksi
+
 if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
@@ -26,10 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     if ($stmt_anggota) {
         mysqli_stmt_bind_param($stmt_anggota, "sssss", $id_siswa, $nama_siswa, $jurusan, $kelas, $semester);
         if (mysqli_stmt_execute($stmt_anggota)) {
-            // Insert query untuk tabel users
-            $username = $nama_siswa; // Nama siswa sebagai username
-            $password = $id_siswa; // ID siswa sebagai password
-            $role = 'user'; // Role
+            
+            $username = $nama_siswa; 
+            $password = $id_siswa; 
+            $role = 'user'; 
 
             $insert_user_query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
             $stmt_user = mysqli_prepare($koneksi, $insert_user_query);
@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     }
 }
 
-// Menangani penghapusan data anggota
+
 if (isset($_GET['id'])) {
     $id_siswa_to_delete = $_GET['id'];
 

@@ -171,7 +171,7 @@ if (isset($_GET['id'])) {
         if (!$stmt_user) {
             throw new Exception("Error preparing delete user statement: " . mysqli_error($koneksi));
         }
-        mysqli_stmt_bind_param($stmt_user, "s", $id_pustakawan_to_delete); // Using id_pustakawan as username
+        mysqli_stmt_bind_param($stmt_user, "s", $id_pustakawan_to_delete); 
         if (!mysqli_stmt_execute($stmt_user)) {
             throw new Exception("Error deleting user data: " . mysqli_stmt_error($stmt_user));
         }
