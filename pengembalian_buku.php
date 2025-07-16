@@ -330,7 +330,7 @@ if (!$result) {
                                 statusCell.textContent = data.new_status; // Perbarui teks status
                             }
                         }
-                        alert('Status berhasil diperbarui!');
+                        alert('buku berhasil dikembalikan');
                         ubahStatusPengembalianModal.hide(); // Sembunyikan modal
                     } else {
                         alert('Gagal mengubah status: ' + data.message);
