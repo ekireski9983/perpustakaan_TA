@@ -56,25 +56,78 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
 // Menangani pembaruan data anggota
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
-    $id_siswa = $_POST['editId'];
-    $nama_siswa = $_POST['editNama'];
+    // Get the ORIGINAL ID and Name of the student from hidden inputs.
+    // These are crucial for finding the correct records in both tables.
+    $original_id_siswa = $_POST['originalId'];
+    $original_nama_siswa = $_POST['originalNama'];
+
+    // Get the NEW data from the form
+    $new_id_siswa = $_POST['editId'];
+    $new_nama_siswa = $_POST['editNama'];
     $jurusan = $_POST['editJurusan'];
     $kelas = $_POST['editKelas'];
     $semester = $_POST['editSemester'];
 
-    $update_query = "UPDATE data_anggota SET nama_siswa=?, jurusan=?, kelas=?, semester=? WHERE id_siswa=?";
-    $stmt = mysqli_prepare($koneksi, $update_query);
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "sssss", $nama_siswa, $jurusan, $kelas, $semester, $id_siswa);
-        if (mysqli_stmt_execute($stmt)) {
-            header("Location: kelola_anggota.php"); // Redirect setelah pembaruan
-            exit();
-        } else {
-            echo "Error updating record: " . mysqli_stmt_error($stmt);
+    // Start a database transaction for atomicity.
+    // If any part of the update fails, everything will be rolled back.
+    mysqli_begin_transaction($koneksi);
+
+    try {
+        // 1. Update the data_anggota table
+        // We're updating id_siswa, nama_siswa, jurusan, kelas, and semester
+        // The WHERE clause uses the original_id_siswa to target the correct record.
+        $update_anggota_query = "UPDATE data_anggota SET id_siswa=?, nama_siswa=?, jurusan=?, kelas=?, semester=? WHERE id_siswa=?";
+        $stmt_anggota = mysqli_prepare($koneksi, $update_anggota_query);
+
+        if (!$stmt_anggota) {
+            throw new Exception("Error preparing member data update statement: " . mysqli_error($koneksi));
         }
-        mysqli_stmt_close($stmt);
-    } else {
-        echo "Error preparing update statement: " . mysqli_error($koneksi);
+
+        mysqli_stmt_bind_param($stmt_anggota, "ssssss",
+            $new_id_siswa,
+            $new_nama_siswa,
+            $jurusan,
+            $kelas,
+            $semester,
+            $original_id_siswa // Use the original ID to find the record
+        );
+
+        if (!mysqli_stmt_execute($stmt_anggota)) {
+            throw new Exception("Error updating member data: " . mysqli_stmt_error($stmt_anggota));
+        }
+        mysqli_stmt_close($stmt_anggota);
+
+        // 2. Update the users table
+        // The username in the users table corresponds to nama_siswa.
+        // The password in the users table corresponds to id_siswa.
+        // We need to use the original_nama_siswa to find the user's record.
+        $update_user_query = "UPDATE users SET username=?, password=? WHERE username=?";
+        $stmt_user = mysqli_prepare($koneksi, $update_user_query);
+
+        if (!$stmt_user) {
+            throw new Exception("Error preparing user account update statement: " . mysqli_error($koneksi));
+        }
+
+        mysqli_stmt_bind_param($stmt_user, "sss",
+            $new_nama_siswa,       // New username
+            $new_id_siswa,         // New password (id_siswa, as per your request)
+            $original_nama_siswa   // Use the original username to find the user's record
+        );
+
+        if (!mysqli_stmt_execute($stmt_user)) {
+            throw new Exception("Error updating user account: " . mysqli_stmt_error($stmt_user));
+        }
+        mysqli_stmt_close($stmt_user);
+
+        // If both updates were successful, commit the transaction
+        mysqli_commit($koneksi);
+        header("Location: kelola_anggota.php"); // Redirect after successful update
+        exit();
+
+    } catch (Exception $e) {
+        // If any error occurred, roll back the transaction
+        mysqli_rollback($koneksi);
+        echo "Error updating record: " . $e->getMessage();
     }
 }
 
@@ -290,10 +343,12 @@ if (isset($_GET['id'])) {
             <div class="modal-body">
                 <form id="formEditAnggota" method="POST" action="">
                     <input type="hidden" name="action" value="edit">
-                    <input type="hidden" id="editId" name="editId">
+                    <input type="hidden" id="originalId" name="originalId">
+                    <input type="hidden" id="originalNama" name="originalNama">
+
                     <div class="mb-3">
-                        <label for="editid" class="form-label">ID Siswa</label>
-                        <input type="text" class="form-control" id="editid" name="editid" readonly>
+                        <label for="editId" class="form-label">ID Siswa</label>
+                        <input type="text" class="form-control" id="editId" name="editId" required>
                     </div>
                     <div class="mb-3">
                         <label for="editNama" class="form-label">Nama Siswa</label>
@@ -362,7 +417,6 @@ if (isset($_GET['id'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Script untuk mengisi data pada modal edit
     const editButtons = document.querySelectorAll('[data-bs-target="#editAnggotaModal"]');
     editButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -372,8 +426,12 @@ if (isset($_GET['id'])) {
             const kelas = button.getAttribute('data-kelas');
             const semester = button.getAttribute('data-semester');
 
-            document.getElementById('editId').value = id; // Hidden field for ID
-            document.getElementById('editid').value = id; // Set ID in the input field
+            // Set the original values into the hidden input fields
+            document.getElementById('originalId').value = id;
+            document.getElementById('originalNama').value = nama;
+
+            // Set the current values into the editable form fields
+            document.getElementById('editId').value = id; // This is now editable
             document.getElementById('editNama').value = nama;
             document.getElementById('editJurusan').value = jurusan;
             document.getElementById('editKelas').value = kelas;

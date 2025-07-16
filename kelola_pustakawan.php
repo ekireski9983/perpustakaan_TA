@@ -56,23 +56,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
 // Menangani pembaruan data pustakawan
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
-    $id_pustakawan = $_POST['editId'];
-    $nama_pustakawan = $_POST['editNama'];
-    $jabatan = $_POST['editJabatan']; // Menggunakan 'editJabatan'
+    // Ambil ID dan Nama pustakawan ASLI sebelum perubahan dari hidden input
+    $original_id_pustakawan = $_POST['originalId'];
+    $original_nama_pustakawan = $_POST['originalNama'];
 
-    $update_query = "UPDATE data_Pustakawan SET nama_pustakawan=?, jabatan=? WHERE id_pustakawan=?";
-    $stmt = mysqli_prepare($koneksi, $update_query);
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "sss", $nama_pustakawan, $jabatan, $id_pustakawan);
-        if (mysqli_stmt_execute($stmt)) {
-            header("Location: kelola_pustakawan.php"); // Redirect setelah pembaruan
-            exit();
-        } else {
-            echo "Error updating record: " . mysqli_stmt_error($stmt);
+    // Ambil data yang BARU dari form
+    $new_id_pustakawan = $_POST['editId'];
+    $new_nama_pustakawan = $_POST['editNama'];
+    $jabatan = $_POST['editJabatan'];
+
+    // Mulai transaksi
+    mysqli_begin_transaction($koneksi);
+
+    try {
+        // 1. Update data_Pustakawan
+        $update_pustakawan_query = "UPDATE data_Pustakawan SET id_pustakawan=?, nama_pustakawan=?, jabatan=? WHERE id_pustakawan=?";
+        $stmt_pustakawan = mysqli_prepare($koneksi, $update_pustakawan_query);
+        if (!$stmt_pustakawan) {
+            throw new Exception("Error preparing pustakawan update statement: " . mysqli_error($koneksi));
         }
-        mysqli_stmt_close($stmt);
-    } else {
-        echo "Error preparing update statement: " . mysqli_error($koneksi);
+        mysqli_stmt_bind_param($stmt_pustakawan, "ssss", $new_id_pustakawan, $new_nama_pustakawan, $jabatan, $original_id_pustakawan);
+        if (!mysqli_stmt_execute($stmt_pustakawan)) {
+            throw new Exception("Error updating pustakawan data: " . mysqli_stmt_error($stmt_pustakawan));
+        }
+        mysqli_stmt_close($stmt_pustakawan);
+
+        // 2. Update tabel users
+        // Username di tabel users menggunakan nama_pustakawan LAMA sebagai acuan WHERE
+        // Password di tabel users menggunakan id_pustakawan LAMA sebagai acuan WHERE (atau kita bisa pakai username lama juga)
+        // Kita akan update username ke new_nama_pustakawan dan password ke new_id_pustakawan
+        // Menggunakan original_nama_pustakawan sebagai WHERE clause untuk menemukan baris yang benar di tabel users
+        $update_user_query = "UPDATE users SET username=?, password=? WHERE username=?";
+        $stmt_user = mysqli_prepare($koneksi, $update_user_query);
+        if (!$stmt_user) {
+            throw new Exception("Error preparing user update statement: " . mysqli_error($koneksi));
+        }
+        // Bind parameter: (new_username, new_password, old_username)
+        mysqli_stmt_bind_param($stmt_user, "sss", $new_nama_pustakawan, $new_id_pustakawan, $original_nama_pustakawan);
+        if (!mysqli_stmt_execute($stmt_user)) {
+            throw new Exception("Error updating user account: " . mysqli_stmt_error($stmt_user));
+        }
+        mysqli_stmt_close($stmt_user);
+
+        // Jika semua query berhasil, commit transaksi
+        mysqli_commit($koneksi);
+        header("Location: kelola_pustakawan.php"); // Redirect setelah pembaruan
+        exit();
+
+    } catch (Exception $e) {
+        // Jika ada error, rollback transaksi
+        mysqli_rollback($koneksi);
+        echo "Error updating record: " . $e->getMessage();
     }
 }
 
@@ -281,10 +315,12 @@ if (isset($_GET['id'])) {
             <div class="modal-body">
                 <form id="formEditPustakawan" method="POST" action="">
                     <input type="hidden" name="action" value="edit">
-                    <input type="hidden" id="editId" name="editId">
+                    <input type="hidden" id="originalId" name="originalId">
+                    <input type="hidden" id="originalNama" name="originalNama">
+
                     <div class="mb-3">
-                        <label for="displayId" class="form-label">ID Pustakawan</label>
-                        <input type="text" class="form-control" id="displayId" name="displayId" readonly>
+                        <label for="editId" class="form-label">ID Pustakawan</label>
+                        <input type="text" class="form-control" id="editId" name="editId" required>
                     </div>
                     <div class="mb-3">
                         <label for="editNama" class="form-label">Nama Pustakawan</label>
@@ -350,12 +386,16 @@ if (isset($_GET['id'])) {
         button.addEventListener('click', () => {
             const id = button.getAttribute('data-id');
             const nama = button.getAttribute('data-nama');
-            const jabatan = button.getAttribute('data-jabatan'); // Mengambil 'data-jabatan'
+            const jabatan = button.getAttribute('data-jabatan');
 
-            document.getElementById('editId').value = id; // Hidden field for ID
-            document.getElementById('displayId').value = id; // Display ID in the input field (readonly)
+            // Set original values into hidden inputs
+            document.getElementById('originalId').value = id;
+            document.getElementById('originalNama').value = nama;
+
+            // Set values for editable inputs
+            document.getElementById('editId').value = id;
             document.getElementById('editNama').value = nama;
-            document.getElementById('editJabatan').value = jabatan; // Set jabatan
+            document.getElementById('editJabatan').value = jabatan;
         });
     });
 
