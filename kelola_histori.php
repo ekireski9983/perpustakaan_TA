@@ -73,7 +73,7 @@ if (!$result) {
 
     <div class="row">
         <nav class="col-md-3 d-none d-md-block sidebar min-vh-100 position-relative">
-            <h5 class="pt-4">pustakawan<br /><small>admin</small></h5>
+            <h5 class="pt-4">Pustakawan<br /><small>admin</small></h5>
            <a href="kelola_pustakawan.php">Kelola Pustakawan</a>
            <a href="kelola_anggota.php">kelola anggota</a>
            <a href="kelola_katalog.php">kelola katalog buku</a>
