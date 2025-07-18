@@ -17,11 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     $nama_pustakawan = $_POST['nama'];
     $jabatan = $_POST['jabatan'];
 
-    
     mysqli_begin_transaction($koneksi);
 
     try {
-        
+    
         $insert_pustakawan_query = "INSERT INTO data_pustakawan (id_pustakawan, nama_pustakawan, jabatan) VALUES (?, ?, ?)";
         $stmt_pustakawan = mysqli_prepare($koneksi, $insert_pustakawan_query);
         if (!$stmt_pustakawan) {
@@ -33,10 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
         mysqli_stmt_close($stmt_pustakawan);
 
-        
-        $username = $nama_pustakawan; 
+        $username = $nama_pustakawan;
         $password = $id_pustakawan; 
-        $role = 'admin'; 
+        $role = 'admin';
 
         $insert_user_query = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
         $stmt_user = mysqli_prepare($koneksi, $insert_user_query);
@@ -50,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         mysqli_stmt_close($stmt_user);
 
         mysqli_commit($koneksi);
-        header("Location: kelola_pustakawan.php"); 
+        header("Location: kelola_pustakawan.php");
         exit();
     } catch (Exception $e) {
         mysqli_rollback($koneksi);
@@ -60,20 +58,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'edit') {
-    
+ 
     $original_id_pustakawan = $_POST['originalId'];
     $original_nama_pustakawan = $_POST['originalNama'];
 
-    
     $new_id_pustakawan = $_POST['editId'];
     $new_nama_pustakawan = $_POST['editNama'];
     $new_jabatan = $_POST['editJabatan'];
 
-    
     mysqli_begin_transaction($koneksi);
 
+  
     try {
-        
+ 
         $update_pustakawan_query = "UPDATE data_pustakawan SET id_pustakawan=?, nama_pustakawan=?, jabatan=? WHERE id_pustakawan=?";
         $stmt_pustakawan = mysqli_prepare($koneksi, $update_pustakawan_query);
 
@@ -85,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
             $new_id_pustakawan,
             $new_nama_pustakawan,
             $new_jabatan,
-            $original_id_pustakawan 
+            $original_id_pustakawan
         );
 
         if (!mysqli_stmt_execute($stmt_pustakawan)) {
@@ -93,8 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
         mysqli_stmt_close($stmt_pustakawan);
 
-        
-        $update_user_query = "UPDATE users SET username=?, password=? WHERE password=?";
+
+        $update_user_query = "UPDATE users SET username=?, password=? WHERE password=?"; 
         $stmt_user = mysqli_prepare($koneksi, $update_user_query);
 
         if (!$stmt_user) {
@@ -102,9 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
 
         mysqli_stmt_bind_param($stmt_user, "sss",
-            $new_nama_pustakawan,    
-            $new_id_pustakawan,  
-            $original_id_pustakawan 
+            $new_nama_pustakawan,
+            $new_id_pustakawan,
+            $original_id_pustakawan
         );
 
         if (!mysqli_stmt_execute($stmt_user)) {
@@ -112,9 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         }
         mysqli_stmt_close($stmt_user);
 
-        
         mysqli_commit($koneksi);
-        header("Location: kelola_pustakawan.php"); 
+        header("Location: kelola_pustakawan.php");
+       
         exit();
 
     } catch (Exception $e) {
@@ -128,32 +125,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
 if (isset($_GET['id'])) {
     $id_pustakawan_to_delete = $_GET['id'];
 
-    
     mysqli_begin_transaction($koneksi);
 
     try {
-        
-        $get_nama_query = "SELECT nama_pustakawan FROM data_pustakawan WHERE id_pustakawan = ?";
-        $stmt_get_nama = mysqli_prepare($koneksi, $get_nama_query);
-        if (!$stmt_get_nama) {
-            throw new Exception("Error preparing select nama statement: " . mysqli_error($koneksi));
-        }
-        mysqli_stmt_bind_param($stmt_get_nama, "s", $id_pustakawan_to_delete);
-        if (!mysqli_stmt_execute($stmt_get_nama)) {
-            throw new Exception("Error executing select nama statement: " . mysqli_stmt_error($stmt_get_nama));
-        }
-        $result_get_nama = mysqli_stmt_get_result($stmt_get_nama);
-        $row_nama_pustakawan = mysqli_fetch_assoc($result_get_nama);
-        mysqli_stmt_close($stmt_get_nama);
-
-        $nama_pustakawan_for_user_deletion = $row_nama_pustakawan['nama_pustakawan'] ?? null;
-        
-        if (is_null($nama_pustakawan_for_user_deletion)) {
-
-        }
-
-
-        
+        // First, delete from the data_pustakawan table
         $delete_pustakawan_query = "DELETE FROM data_pustakawan WHERE id_pustakawan=?";
         $stmt_pustakawan = mysqli_prepare($koneksi, $delete_pustakawan_query);
         if (!$stmt_pustakawan) {
@@ -165,24 +140,22 @@ if (isset($_GET['id'])) {
         }
         mysqli_stmt_close($stmt_pustakawan);
 
-       
-        $delete_users_query = "DELETE FROM users WHERE username=?"; 
+        
+        $delete_users_query = "DELETE FROM users WHERE password=?";
         $stmt_user = mysqli_prepare($koneksi, $delete_users_query);
         if (!$stmt_user) {
             throw new Exception("Error preparing delete user statement: " . mysqli_error($koneksi));
         }
-        mysqli_stmt_bind_param($stmt_user, "s", $id_pustakawan_to_delete); 
+        mysqli_stmt_bind_param($stmt_user, "s", $id_pustakawan_to_delete);
         if (!mysqli_stmt_execute($stmt_user)) {
             throw new Exception("Error deleting user data: " . mysqli_stmt_error($stmt_user));
         }
         mysqli_stmt_close($stmt_user);
 
-    
         mysqli_commit($koneksi);
-        header("Location: kelola_pustakawan.php"); 
+        header("Location: kelola_pustakawan.php");
         exit();
     } catch (Exception $e) {
-        
         mysqli_rollback($koneksi);
         echo "Error deleting record: " . $e->getMessage();
     }
@@ -287,11 +260,11 @@ if (isset($_GET['id'])) {
                                 echo "<td>" . htmlspecialchars($row['nama_pustakawan']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['jabatan']) . "</td>";
                                 echo '<td>
-                                        <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#editPustakawanModal" data-id="' . htmlspecialchars($row['id_pustakawan']) . '" data-nama="' . htmlspecialchars($row['nama_pustakawan']) . '" data-jabatan="' . htmlspecialchars($row['jabatan']) . '">Edit</button>
-                                    </td>';
+                                            <button class="btn btn-sm btn-edit" data-bs-toggle="modal" data-bs-target="#editPustakawanModal" data-id="' . htmlspecialchars($row['id_pustakawan']) . '" data-nama="' . htmlspecialchars($row['nama_pustakawan']) . '" data-jabatan="' . htmlspecialchars($row['jabatan']) . '">Edit</button>
+                                        </td>';
                                 echo '<td>
-                                        <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusPustakawanModal" data-id="' . htmlspecialchars($row['id_pustakawan']) . '">Hapus</button>
-                                    </td>';
+                                            <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusPustakawanModal" data-id="' . htmlspecialchars($row['id_pustakawan']) . '">Hapus</button>
+                                        </td>';
                                 echo "</tr>";
                             }
                         } else {
@@ -410,7 +383,6 @@ if (isset($_GET['id'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    
     const editButtons = document.querySelectorAll('[data-bs-target="#editPustakawanModal"]');
     editButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -418,18 +390,15 @@ if (isset($_GET['id'])) {
             const nama = button.getAttribute('data-nama');
             const jabatan = button.getAttribute('data-jabatan');
 
-        
             document.getElementById('originalId').value = id;
-            document.getElementById('originalNama').value = nama; 
+            document.getElementById('originalNama').value = nama;
 
-            
             document.getElementById('editId').value = id;
             document.getElementById('editNama').value = nama;
             document.getElementById('editJabatan').value = jabatan;
         });
     });
 
-    
     const deleteButtons = document.querySelectorAll('[data-bs-target="#hapusPustakawanModal"]');
     deleteButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -438,25 +407,23 @@ if (isset($_GET['id'])) {
         });
     });
 
-    
     function filterTable() {
         const input = document.getElementById('searchInput');
         const filter = input.value.toLowerCase();
-        const table = document.getElementById('pustakawanTable'); 
+        const table = document.getElementById('pustakawanTable');
         const tr = table.getElementsByTagName('tr');
 
-        for (let i = 1; i < tr.length; i++) { 
+        for (let i = 1; i < tr.length; i++) {
             const td = tr[i].getElementsByTagName('td');
             let found = false;
 
-            
-            if (td[2]) { 
+            if (td[2]) {
                 const txtValue = td[2].textContent || td[2].innerText;
                 if (txtValue.toLowerCase().indexOf(filter) > -1) {
                     found = true;
                 }
             }
-            tr[i].style.display = found ? "" : "none"; 
+            tr[i].style.display = found ? "" : "none";
         }
     }
 </script>
