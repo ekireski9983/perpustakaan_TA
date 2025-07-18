@@ -41,40 +41,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
         
         $foto_destination = 'upload/' . uniqid('', true) . '.' . $foto_ext;
 
-        // Pindahkan file ke direktori
+        
         if (move_uploaded_file($foto_tmp, $foto_destination)) {
-            // Start a transaction for atomicity
+            
             mysqli_begin_transaction($koneksi);
 
-            // Insert query into data_pinjam table
+            
             $insert_pinjam_query = "INSERT INTO data_pinjam (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian)
                                     VALUES ('$id_buku', '$isbn', '$judul_buku', '$nama_penulis', '$nama_penerbit', '$jumlah_halaman', '$foto_destination', '$tanggal_pinjam', '$tanggal_pengembalian')";
 
             if (mysqli_query($koneksi, $insert_pinjam_query)) {
-                // Insert query into data_pengembalian table
+                
                 $insert_pengembalian_query = "INSERT INTO data_pengembalian (id_buku, judul_buku, tanggal_pinjam, tanggal_pengembalian, status_pengembalian)
                                               VALUES ('$id_buku', '$judul_buku', '$tanggal_pinjam', '$tanggal_pengembalian', 'belum dikembalikan')";
 
                 if (mysqli_query($koneksi, $insert_pengembalian_query)) {
-                    // Insert query into data_list_buku table
-                    // Make sure column names match your data_list_buku table structure
+                    
+                    
                     $insert_list_buku_query = "INSERT INTO data_list_buku (id_buku, isbn, judul_buku, nama_penulis, nama_penerbit, tanggal_ditambahkan)
                                                VALUES ('$id_buku', '$isbn', '$judul_buku', '$nama_penulis', '$nama_penerbit', '$tanggal_ditambahkan')";
 
                     if (mysqli_query($koneksi, $insert_list_buku_query)) {
-                        mysqli_commit($koneksi); // Commit the transaction if all inserts are successful
-                        header("Location: kelola_peminjaman.php"); // Redirect after saving
+                        mysqli_commit($koneksi); 
+                        header("Location: kelola_peminjaman.php"); 
                         exit();
                     } else {
-                        mysqli_rollback($koneksi); // Rollback if data_list_buku insert fails
+                        mysqli_rollback($koneksi); 
                         echo "Error inserting into data_list_buku: " . mysqli_error($koneksi);
                     }
                 } else {
-                    mysqli_rollback($koneksi); // Rollback if pengembalian insert fails
+                    mysqli_rollback($koneksi); 
                     echo "Error inserting into data_pengembalian: " . mysqli_error($koneksi);
                 }
             } else {
-                mysqli_rollback($koneksi); // Rollback if pinjam insert fails
+                mysqli_rollback($koneksi); 
                 echo "Error inserting into data_pinjam: " . mysqli_error($koneksi);
             }
         } else {
