@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 08, 2025 at 07:14 PM
+-- Generation Time: Jul 30, 2025 at 03:49 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 7.4.33
 
@@ -40,8 +40,7 @@ CREATE TABLE `data_anggota` (
 --
 
 INSERT INTO `data_anggota` (`id_siswa`, `nama_siswa`, `jurusan`, `kelas`, `semester`) VALUES
-('Eki', 'Eki', 'Eki', '11', '1'),
-('PM111', 'Jamal', 'pemasaran', '10', '1');
+('MI22', 'eki', 'Manajemen informatika', 'B1', '3');
 
 -- --------------------------------------------------------
 
@@ -52,6 +51,7 @@ INSERT INTO `data_anggota` (`id_siswa`, `nama_siswa`, `jurusan`, `kelas`, `semes
 CREATE TABLE `data_buku` (
   `id_buku` varchar(11) NOT NULL,
   `judul_buku` varchar(255) NOT NULL,
+  `kategori_buku` varchar(255) NOT NULL,
   `isbn` varchar(255) NOT NULL,
   `nama_penulis` varchar(255) NOT NULL,
   `nama_penerbit` varchar(255) NOT NULL,
@@ -63,10 +63,11 @@ CREATE TABLE `data_buku` (
 -- Dumping data for table `data_buku`
 --
 
-INSERT INTO `data_buku` (`id_buku`, `judul_buku`, `isbn`, `nama_penulis`, `nama_penerbit`, `jumlah_halaman`, `foto`) VALUES
-('BK001', 'Buku PHP', '991010-222002020', 'Anton', 'Garena', 111, 0x75706c6f61642f62756b755f36383637613237353264336439312e32343331363434372e6a7067),
-('BK002', '100 Quotes Simple Thinking about Blood Type', '788912-199223', 'Anton', 'Garena', 100, 0x75706c6f61642f62756b755f36383662636362373936643763342e37343737303031312e6a7067),
-('BK003', 'Buku langit', '788912-199223', 'Ilham sukiman', 'Bootsrap', 100, 0x75706c6f61642f62756b755f36383662636364313961363466352e32383431353232372e6a7067);
+INSERT INTO `data_buku` (`id_buku`, `judul_buku`, `kategori_buku`, `isbn`, `nama_penulis`, `nama_penerbit`, `jumlah_halaman`, `foto`) VALUES
+('BK001', 'akuntansi dasar', 'Buku penjurusan', '991010-222002020', 'diana', 'anatiansa diana', 56, 0x75706c6f61642f62756b755f36383837343863613037376336362e34343132393432302e6a7067),
+('BK002', 'Buku PHP', 'Buku penjurusan', '788912-199223', 'Intan purnama', 'purnama', 56, 0x75706c6f61642f62756b755f36383837343732323335323139392e30363132363439392e6a7067),
+('BK003', 'Matematika dasar', 'Matematika', '718912-199223', 'Ai Tusi Fatimah', 'Toto nusantara', 77, 0x75706c6f61642f62756b755f36383837343738623832316464362e32363433343230352e6a7067),
+('BK004', 'Matematika exce', 'Matematika', '223333-1212121', 'Sri Suryanti', 'Universitas Muhammadiyah Gresik', 55, 0x75706c6f61642f62756b755f36383837343764653632666433392e35363433343734382e6a7067);
 
 -- --------------------------------------------------------
 
@@ -78,6 +79,7 @@ CREATE TABLE `data_list_buku` (
   `id_buku` varchar(50) DEFAULT NULL,
   `isbn` varchar(13) NOT NULL,
   `judul_buku` varchar(255) NOT NULL,
+  `kategori_buku` varchar(255) DEFAULT NULL,
   `nama_penulis` varchar(255) NOT NULL,
   `nama_penerbit` varchar(255) NOT NULL,
   `tanggal_ditambahkan` date NOT NULL
@@ -87,10 +89,10 @@ CREATE TABLE `data_list_buku` (
 -- Dumping data for table `data_list_buku`
 --
 
-INSERT INTO `data_list_buku` (`id_buku`, `isbn`, `judul_buku`, `nama_penulis`, `nama_penerbit`, `tanggal_ditambahkan`) VALUES
-('BK001', '991010-222002', 'Buku PHP', 'Anton', 'Garena', '2025-07-04'),
-('BK002', '788912-199223', '100 Quotes Simple Thinking about Blood Type', 'Anton', 'Garena', '2025-07-07'),
-('BK003', '788912-199223', 'Buku langit', 'Ilham sukiman', 'Bootsrap', '2025-07-07');
+INSERT INTO `data_list_buku` (`id_buku`, `isbn`, `judul_buku`, `kategori_buku`, `nama_penulis`, `nama_penerbit`, `tanggal_ditambahkan`) VALUES
+('BK003', '718912-199223', 'Matematika dasar', NULL, 'Ai Tusi Fatimah', 'Toto nusantara', '2025-07-28'),
+('BK004', '223333-121212', 'Matematika exce', NULL, 'Sri Suryanti', 'Universitas Muhammadiyah Gresik', '2025-07-28'),
+('BK001', '991010-222002', 'akuntansi dasar', NULL, 'diana', 'anatiansa diana', '2025-07-28');
 
 -- --------------------------------------------------------
 
@@ -111,7 +113,10 @@ CREATE TABLE `data_pengembalian` (
 --
 
 INSERT INTO `data_pengembalian` (`judul_buku`, `tanggal_pinjam`, `tanggal_pengembalian`, `status_pengembalian`, `id_buku`) VALUES
-('Buku PHP', '2025-07-08', '2025-07-15', 'sudah dikembalikan', 'BK001');
+('akuntansi dasar', '2025-01-10', '2025-01-13', 'belum dikembalikan', 'BK001'),
+('akuntansi dasar', '2025-01-15', '2025-01-17', 'belum dikembalikan', 'BK001'),
+('akuntansi dasar', '2025-01-18', '2025-01-29', 'belum dikembalikan', 'BK001'),
+('Buku PHP', '2025-02-05', '2025-02-14', 'belum dikembalikan', 'BK002');
 
 -- --------------------------------------------------------
 
@@ -122,6 +127,7 @@ INSERT INTO `data_pengembalian` (`judul_buku`, `tanggal_pinjam`, `tanggal_pengem
 CREATE TABLE `data_pinjam` (
   `id_buku` varchar(11) NOT NULL,
   `judul_buku` varchar(255) NOT NULL,
+  `kategori_buku` varchar(255) DEFAULT NULL,
   `isbn` varchar(255) NOT NULL,
   `nama_penulis` varchar(255) NOT NULL,
   `nama_penerbit` varchar(255) NOT NULL,
@@ -135,8 +141,11 @@ CREATE TABLE `data_pinjam` (
 -- Dumping data for table `data_pinjam`
 --
 
-INSERT INTO `data_pinjam` (`id_buku`, `judul_buku`, `isbn`, `nama_penulis`, `nama_penerbit`, `jumlah_halaman`, `foto`, `tanggal_pinjam`, `tanggal_pengembalian`) VALUES
-('BK001', 'Buku PHP', '991010-222002020', 'Anton', 'Garena', 111, 0x75706c6f61642f62756b755f36383637613237353264336439312e32343331363434372e6a7067, '2025-07-08', '2025-07-15');
+INSERT INTO `data_pinjam` (`id_buku`, `judul_buku`, `kategori_buku`, `isbn`, `nama_penulis`, `nama_penerbit`, `jumlah_halaman`, `foto`, `tanggal_pinjam`, `tanggal_pengembalian`) VALUES
+('BK001', 'akuntansi dasar', 'Buku penjurusan', '991010-222002020', 'diana', 'anatiansa diana', 56, 0x75706c6f61642f62756b755f36383837343863613037376336362e34343132393432302e6a7067, '2025-01-10', '2025-01-13'),
+('BK001', 'akuntansi dasar', 'Buku penjurusan', '991010-222002020', 'diana', 'anatiansa diana', 56, 0x75706c6f61642f62756b755f36383837343863613037376336362e34343132393432302e6a7067, '2025-01-15', '2025-01-17'),
+('BK001', 'akuntansi dasar', 'Buku penjurusan', '991010-222002020', 'diana', 'anatiansa diana', 56, 0x75706c6f61642f62756b755f36383837343863613037376336362e34343132393432302e6a7067, '2025-01-18', '2025-01-29'),
+('BK002', 'Buku PHP', 'Buku penjurusan', '788912-199223', 'Intan purnama', 'purnama', 56, 0x75706c6f61642f62756b755f36383837343732323335323139392e30363132363439392e6a7067, '2025-02-05', '2025-02-14');
 
 -- --------------------------------------------------------
 
@@ -145,7 +154,7 @@ INSERT INTO `data_pinjam` (`id_buku`, `judul_buku`, `isbn`, `nama_penulis`, `nam
 --
 
 CREATE TABLE `data_pustakawan` (
-  `id_pustakawan` int(11) NOT NULL,
+  `id_pustakawan` varchar(11) NOT NULL,
   `nama_pustakawan` varchar(255) DEFAULT NULL,
   `jabatan` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -155,8 +164,7 @@ CREATE TABLE `data_pustakawan` (
 --
 
 INSERT INTO `data_pustakawan` (`id_pustakawan`, `nama_pustakawan`, `jabatan`) VALUES
-(222, 'ilham sukiman', 'guru piket'),
-(444, 'admin', 'petugas ');
+('PK001', 'Rezky', 'petugas');
 
 -- --------------------------------------------------------
 
@@ -170,13 +178,6 @@ CREATE TABLE `histori_pengembalian` (
   `tanggal_pengembalian` date NOT NULL,
   `id_buku` varchar(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `histori_pengembalian`
---
-
-INSERT INTO `histori_pengembalian` (`judul_buku`, `tanggal_pinjam`, `tanggal_pengembalian`, `id_buku`) VALUES
-('Buku PHP', '2025-07-08', '2025-07-08', 'BK001');
 
 -- --------------------------------------------------------
 
@@ -196,10 +197,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES
-(111, 'admin', '111', 'admin'),
-(468, 'Jamal', 'PM111', 'user'),
-(473, 'ilham sukiman', '222', 'admin'),
-(477, 'Eki', 'Eki', 'user');
+(111, '111', '111', 'admin'),
+(548, 'Rezky', 'PK001', 'admin'),
+(549, 'eki', 'MI22', 'user');
 
 --
 -- Indexes for dumped tables
@@ -238,7 +238,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=479;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=550;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
