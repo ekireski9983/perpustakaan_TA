@@ -2,24 +2,19 @@
 
 $koneksi = mysqli_connect("localhost", "root", "", "perpustakaan");
 
-
 if (!$koneksi) {
     die("Koneksi gagal: " . mysqli_connect_error());
 }
 
-
 if (isset($_GET['delete_id'])) {
     $id_buku_to_delete = $_GET['delete_id'];
 
-    
     $delete_query = "DELETE FROM data_list_buku WHERE id_buku = ?";
     $stmt = mysqli_prepare($koneksi, $delete_query);
 
     if ($stmt) {
-        
         mysqli_stmt_bind_param($stmt, "s", $id_buku_to_delete);
         if (mysqli_stmt_execute($stmt)) {
-            
             header("Location: kelola_list_buku.php");
             exit();
         } else {
@@ -31,10 +26,20 @@ if (isset($_GET['delete_id'])) {
     }
 }
 
-
-$query_select_buku = "SELECT id_buku, judul_buku, nama_penulis, nama_penerbit, isbn, tanggal_ditambahkan FROM data_list_buku";
+// MODIFIED: Join data_list_buku with data_buku to get kategori_buku
+$query_select_buku = "SELECT
+                        dlb.id_buku,
+                        dlb.judul_buku,
+                        dlb.nama_penulis,
+                        dlb.nama_penerbit,
+                        dlb.isbn,
+                        dlb.tanggal_ditambahkan,
+                        db.kategori_buku
+                      FROM
+                        data_list_buku AS dlb
+                      INNER JOIN
+                        data_buku AS db ON dlb.id_buku = db.id_buku";
 $result_buku = mysqli_query($koneksi, $query_select_buku);
-
 
 ?>
 
@@ -165,7 +170,7 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
                                 <th>No</th>
                                 <th>ID Buku</th>
                                 <th>Judul Buku</th>
-                                <th>Nama Penulis</th>
+                                <th>Kategori Buku</th> <th>Nama Penulis</th>
                                 <th>Nama Penerbit</th>
                                 <th>ISBN</th>
                                 <th>Tanggal Ditambahkan</th>
@@ -181,17 +186,18 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
                                     echo "<td>" . $no++ . "</td>";
                                     echo "<td>" . htmlspecialchars($row['id_buku']) . "</td>";
                                     echo "<td>" . htmlspecialchars($row['judul_buku']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['kategori_buku']) . "</td>"; // Display Kategori Buku
                                     echo "<td>" . htmlspecialchars($row['nama_penulis']) . "</td>";
                                     echo "<td>" . htmlspecialchars($row['nama_penerbit']) . "</td>";
                                     echo "<td>" . htmlspecialchars($row['isbn']) . "</td>";
                                     echo "<td>" . htmlspecialchars($row['tanggal_ditambahkan']) . "</td>";
                                     echo '<td>
-                                            <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusBukuModal" data-id="' . htmlspecialchars($row['id_buku']) . '">Hapus</button>
-                                          </td>';
+                                                <button class="btn btn-sm btn-delete" data-bs-toggle="modal" data-bs-target="#hapusBukuModal" data-id="' . htmlspecialchars($row['id_buku']) . '">Hapus</button>
+                                            </td>';
                                     echo "</tr>";
                                 }
                             } else {
-                                echo "<tr><td colspan='8' class='text-center'>Tidak ada data buku yang ditemukan.</td></tr>";
+                                echo "<tr><td colspan='9' class='text-center'>Tidak ada data buku yang ditemukan.</td></tr>"; // Changed colspan to 9
                             }
                             ?>
                         </tbody>
@@ -239,20 +245,16 @@ $result_buku = mysqli_query($koneksi, $query_select_buku);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        
         const hapusBukuModal = document.getElementById('hapusBukuModal');
         hapusBukuModal.addEventListener('show.bs.modal', event => {
-            
             const button = event.relatedTarget;
-            
             const bookId = button.getAttribute('data-id');
 
-            
-            const bookIdDisplayElement = hapusBukuModal.querySelector('#bookIdDisplay'); 
+            const bookIdDisplayElement = hapusBukuModal.querySelector('#bookIdDisplay');
             const confirmDeleteButton = hapusBukuModal.querySelector('#confirmDeleteButton');
 
-            bookIdDisplayElement.textContent = bookId; 
-            confirmDeleteButton.href = 'kelola_list_buku.php?delete_id=' + bookId; 
+            bookIdDisplayElement.textContent = bookId;
+            confirmDeleteButton.href = 'kelola_list_buku.php?delete_id=' + bookId;
         });
     </script>
 </body>

@@ -13,7 +13,7 @@
             display: flex; 
             min-height: 100vh; 
             flex-direction: column; 
-           
+            
         }
 
         .sidebar {
@@ -211,8 +211,8 @@
                     $php_search_query = " WHERE judul_buku LIKE '%$search_term_php%' OR id_buku LIKE '%$search_term_php%' OR nama_penulis LIKE '%$search_term_php%'";
                 }
 
-                
-                $sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto FROM data_buku" . $php_search_query;
+                // Add 'kategori_buku' to the SELECT statement
+                $sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto, kategori_buku FROM data_buku" . $php_search_query;
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -231,6 +231,7 @@
                                         <p class="card-text"><strong>ISBN:</strong> <?php echo htmlspecialchars($row['isbn']); ?></p>
                                         <p class="card-text book-author"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($row['nama_penulis']); ?></p>
                                         <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($row['nama_penerbit']); ?></p>
+                                        <p class="card-text"><strong>kategori buku:</strong> <?php echo htmlspecialchars($row['kategori_buku']); ?></p>
                                         <p class="card-text"><strong>Jumlah Halaman:</strong> <?php echo htmlspecialchars($row['jumlah_halaman']); ?></p>
                                         <form action="process_peminjaman.php" method="POST" style="display:inline;">
                                             <input type="hidden" name="id_buku" value="<?php echo htmlspecialchars($row['id_buku']); ?>">
@@ -273,7 +274,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-       
+        
         function filterCards() {
             let input, filter, cards, card, bookTitle, bookAuthor, bookId, i, titleTxt, authorTxt, idTxt;
             input = document.getElementById("searchInput");

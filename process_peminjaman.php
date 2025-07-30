@@ -1,26 +1,22 @@
 <?php
-session_start(); 
+session_start();
 
-$servername = "localhost"; 
-$username = "root"; 
-$password = ""; 
-$dbname = "perpustakaan"; 
-
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "perpustakaan";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-
 if (isset($_POST['id_buku']) && !empty($_POST['id_buku'])) {
     $id_buku = $conn->real_escape_string($_POST['id_buku']);
 
-    
-    
-    $sql_fetch_book = "SELECT judul_buku, isbn, nama_penulis, nama_penerbit, foto, jumlah_halaman FROM data_buku WHERE id_buku = ?";
+    // MODIFIED: Added kategori_buku to the SELECT query
+    $sql_fetch_book = "SELECT judul_buku, isbn, nama_penulis, nama_penerbit, foto, jumlah_halaman, kategori_buku FROM data_buku WHERE id_buku = ?";
     $stmt_fetch = $conn->prepare($sql_fetch_book);
     $stmt_fetch->bind_param("s", $id_buku);
     $stmt_fetch->execute();
@@ -34,36 +30,34 @@ if (isset($_POST['id_buku']) && !empty($_POST['id_buku'])) {
         $nama_penulis = $conn->real_escape_string($book_details['nama_penulis']);
         $nama_penerbit = $conn->real_escape_string($book_details['nama_penerbit']);
         $foto = $conn->real_escape_string($book_details['foto']);
-        $jumlah_halaman = $book_details['jumlah_halaman']; 
-        
-        $tanggal_pinjam = "0000-00-00"; 
-        $tanggal_pengembalian = "0000-00-00"; 
+        $jumlah_halaman = $book_details['jumlah_halaman'];
+        $kategori_buku = $conn->real_escape_string($book_details['kategori_buku']); // NEW: Fetch kategori_buku
 
-        
-        $stmt_insert = $conn->prepare("INSERT INTO data_pinjam (id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, foto, jumlah_halaman, tanggal_pinjam, tanggal_pengembalian) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-       
-        $stmt_insert->bind_param("ssssssiss", $id_buku, $judul_buku, $isbn, $nama_penulis, $nama_penerbit, $foto, $jumlah_halaman, $tanggal_pinjam, $tanggal_pengembalian); 
+        $tanggal_pinjam = "0000-00-00";
+        $tanggal_pengembalian = "0000-00-00";
+
+        // MODIFIED: Added kategori_buku column to the INSERT query and its corresponding placeholder
+        $stmt_insert = $conn->prepare("INSERT INTO data_pinjam (id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, foto, jumlah_halaman, kategori_buku, tanggal_pinjam, tanggal_pengembalian) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        // MODIFIED: Added 's' for kategori_buku in bind_param and passed the variable
+        $stmt_insert->bind_param("ssssssisss", $id_buku, $judul_buku, $isbn, $nama_penulis, $nama_penerbit, $foto, $jumlah_halaman, $kategori_buku, $tanggal_pinjam, $tanggal_pengembalian);
 
         if ($stmt_insert->execute()) {
-            
             header("Location: katalog_buku.php?status=success&message=Buku telah disimpan!");
             exit();
         } else {
-            
             header("Location: katalog_buku.php?status=error&message=Gagal menyimpan buku: " . $stmt_insert->error);
             exit();
         }
         $stmt_insert->close();
 
     } else {
-        
         header("Location: katalog_buku.php?status=error&message=Detail buku tidak ditemukan.");
         exit();
     }
     $stmt_fetch->close();
 
 } else {
-    
     header("Location: katalog_buku.php?status=error&message=ID Buku tidak ditemukan.");
     exit();
 }

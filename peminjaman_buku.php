@@ -1,35 +1,31 @@
 <?php
 
 $servername = "localhost";
-$username = "root"; 
-$password = "";     
+$username = "root";
+$password = "";
 $dbname = "perpustakaan";
-
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-
 if ($conn->connect_error) {
-    
     error_log("Connection failed: " . $conn->connect_error);
     die("Terjadi kesalahan koneksi ke database. Silakan coba lagi nanti.");
 }
 
-
-$sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian FROM data_pinjam";
+// FIX: Ensure 'kategori_buku' is selected from the database
+$sql = "SELECT id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian, kategori_buku FROM data_pinjam";
 $result = $conn->query($sql);
 
 $books = [];
-if ($result) { 
+if ($result) {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $books[] = $row;
         }
     }
-    $result->free(); 
+    $result->free();
 } else {
     error_log("Error fetching data: " . $conn->error);
-    
 }
 $conn->close();
 ?>
@@ -42,16 +38,14 @@ $conn->close();
     <title>Dashboard Siswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <style>
-        
         body {
             background-color: #f1f5f9;
             margin: 0;
             display: flex;
-            min-height: 100vh; 
+            min-height: 100vh;
             flex-direction: column;
         }
 
-        
         .sidebar {
             background-color: #2f3e46;
             color: white;
@@ -59,8 +53,8 @@ $conn->close();
             position: sticky;
             top: 0;
             align-self: flex-start;
-            height: 100vh; 
-            overflow-y: auto; 
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .sidebar h5 {
@@ -94,7 +88,6 @@ $conn->close();
             opacity: 0.7;
         }
 
-        
         .main-wrapper {
             display: flex;
             flex: 1;
@@ -105,7 +98,6 @@ $conn->close();
             flex-grow: 1;
         }
 
-        
         .book-card {
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
@@ -130,7 +122,6 @@ $conn->close();
             padding: 20px;
         }
 
-        
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
@@ -238,26 +229,28 @@ $conn->close();
                                             <p class="card-text"><strong>ISBN:</strong> <?php echo htmlspecialchars($book['isbn']); ?></p>
                                             <p class="card-text book-author"><strong>Nama Penulis:</strong> <?php echo htmlspecialchars($book['nama_penulis']); ?></p>
                                             <p class="card-text"><strong>Nama Penerbit:</strong> <?php echo htmlspecialchars($book['nama_penerbit']); ?></p>
+                                            <p class="card-text"><strong>Kategori Buku:</strong> <?php echo htmlspecialchars($book['kategori_buku'] ?? 'N/A'); ?></p>
                                             <p class="card-text"><strong>Jumlah Halaman:</strong> <?php echo htmlspecialchars($book['jumlah_halaman']); ?></p>
                                             <p class="card-text"><strong>Tanggal Pinjam:</strong> <?php echo htmlspecialchars($book['tanggal_pinjam'] ?? 'N/A'); ?></p>
                                             <p class="card-text"><strong>Tanggal Pengembalian:</strong> <?php echo htmlspecialchars($book['tanggal_pengembalian'] ?? 'N/A'); ?></p>
 
                                             <button type="button" class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#borrowBookModal"
-                                                    onclick="showBorrowModal(
+                                                 onclick="showBorrowModal(
                                                         '<?php echo htmlspecialchars($book['id_buku']); ?>',
                                                         '<?php echo htmlspecialchars($book['judul_buku']); ?>',
                                                         '<?php echo htmlspecialchars($book['isbn']); ?>',
                                                         '<?php echo htmlspecialchars($book['nama_penulis']); ?>',
                                                         '<?php echo htmlspecialchars($book['nama_penerbit']); ?>',
                                                         <?php echo htmlspecialchars($book['jumlah_halaman']); ?>,
-                                                        '<?php echo htmlspecialchars($book['foto']); ?>'
+                                                        '<?php echo htmlspecialchars($book['foto']); ?>',
+                                                        '<?php echo htmlspecialchars($book['kategori_buku'] ?? ''); ?>' // Pass kategori_buku
                                                     )">Pinjam buku</button>
 
                                             <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editBookModal"
-                                                    onclick='showEditModal(<?php echo json_encode($book); ?>)'>Edit</button>
+                                                 onclick='showEditModal(<?php echo json_encode($book); ?>)'>Edit</button>
 
                                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
-                                                    onclick="setDeleteBookId('<?php echo htmlspecialchars($book['id_buku']); ?>')">Hapus</button>
+                                                 onclick="setDeleteBookId('<?php echo htmlspecialchars($book['id_buku']); ?>')">Hapus</button>
                                         </div>
                                     </div>
                                 </div>
@@ -305,6 +298,10 @@ $conn->close();
                         <div class="mb-3">
                             <label for="borrowJumlahHalaman" class="form-label">Jumlah Halaman</label>
                             <input type="number" class="form-control" id="borrowJumlahHalaman" name="jumlah_halaman" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="borrowKategoriBuku" class="form-label">Kategori Buku</label>
+                            <input type="text" class="form-control" id="borrowKategoriBuku" name="kategori_buku" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="borrowDate" class="form-label">Tanggal Pinjam</label>
@@ -358,6 +355,10 @@ $conn->close();
                         <div class="mb-3">
                             <label for="editHalaman" class="form-label">Jumlah Halaman</label>
                             <input type="number" class="form-control" id="editHalaman" name="jumlah_halaman" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editKategoriBuku" class="form-label">Kategori Buku</label>
+                            <input type="text" class="form-control" id="editKategoriBuku" name="kategori_buku" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="editTanggalPinjam" class="form-label">Tanggal Pinjam</label>
@@ -417,7 +418,6 @@ $conn->close();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        
         function filterCards() {
             let input, filter, cards, card, bookTitle, bookAuthor, bookId, i;
             input = document.getElementById("searchInput");
@@ -432,17 +432,16 @@ $conn->close();
 
                 let match = false;
 
-                
                 if (bookTitle && (bookTitle.textContent || bookTitle.innerText).toUpperCase().indexOf(filter) > -1) {
                     match = true;
                 }
-                
+
                 if (!match && bookAuthor && (bookAuthor.textContent || bookAuthor.innerText).toUpperCase().indexOf(filter) > -1) {
                     match = true;
                 }
-                
+
                 if (!match && bookId) {
-                    const idText = (bookId.textContent || bookId.innerText).trim(); 
+                    const idText = (bookId.textContent || bookId.innerText).trim();
                     if (idText.toUpperCase().indexOf(filter) > -1) {
                         match = true;
                     }
@@ -456,27 +455,28 @@ $conn->close();
             }
         }
 
-        
-        function showBorrowModal(id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto) {
+        // MODIFIED: Added kategori_buku parameter
+        function showBorrowModal(id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto, kategori_buku) {
             document.getElementById('borrowBookId').value = id_buku;
             document.getElementById('borrowJudulBuku').value = judul_buku;
             document.getElementById('borrowISBN').value = isbn;
             document.getElementById('borrowNamaPenulis').value = nama_penulis;
             document.getElementById('borrowNamaPenerbit').value = nama_penerbit;
             document.getElementById('borrowJumlahHalaman').value = jumlah_halaman;
-            document.getElementById('borrowFoto').value = foto; 
+            document.getElementById('borrowFoto').value = foto;
+            // ADDED: Set value for kategori_buku
+            document.getElementById('borrowKategoriBuku').value = kategori_buku;
 
             const today = new Date();
             const todayFormatted = today.toISOString().split('T')[0];
             document.getElementById('borrowDate').value = todayFormatted;
 
             const returnDate = new Date(today);
-            returnDate.setDate(today.getDate() + 7); 
+            returnDate.setDate(today.getDate() + 7);
             const returnDateFormatted = returnDate.toISOString().split('T')[0];
             document.getElementById('borrowReturnDate').value = returnDateFormatted;
         }
 
-       
         function showEditModal(bookData) {
             document.getElementById('edit_original_book_id').value = bookData.id_buku;
             document.getElementById('editBookId').value = bookData.id_buku;
@@ -486,29 +486,27 @@ $conn->close();
             document.getElementById('editPenerbit').value = bookData.nama_penerbit;
             document.getElementById('editHalaman').value = bookData.jumlah_halaman;
             document.getElementById('editFoto').value = bookData.foto;
+            // ADDED: Set value for kategori_buku in edit modal
+            document.getElementById('editKategoriBuku').value = bookData.kategori_buku || '';
 
-            
+
             document.getElementById('editTanggalPinjam').value = (bookData.tanggal_pinjam && bookData.tanggal_pinjam !== '0000-00-00') ? bookData.tanggal_pinjam : '';
             document.getElementById('editTanggalPengembalian').value = (bookData.tanggal_pengembalian && bookData.tanggal_pengembalian !== '0000-00-00') ? bookData.tanggal_pengembalian : '';
         }
 
-        
         let bookIdToDelete = null;
 
-       
         function setDeleteBookId(bookId) {
             bookIdToDelete = bookId;
             document.getElementById('deleteBookIdPlaceholder').value = bookId;
         }
 
-        
         document.getElementById('confirmDeleteButton').addEventListener('click', function() {
             if (bookIdToDelete) {
                 window.location.href = `process_delete_peminjaman.php?id=${encodeURIComponent(bookIdToDelete)}`;
             }
         });
 
-        
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status');
@@ -531,7 +529,6 @@ $conn->close();
                 `;
                 document.querySelector('.main-content').prepend(alertDiv);
 
-                
                 history.replaceState({}, document.title, window.location.pathname);
             }
         };

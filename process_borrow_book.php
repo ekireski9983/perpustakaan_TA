@@ -19,6 +19,7 @@ $judul_buku = $_POST['judul_buku'];
 $isbn = $_POST['isbn'];
 $nama_penulis = $_POST['nama_penulis'];
 $nama_penerbit = $_POST['nama_penerbit'];
+$kategori_buku = $_POST['kategori_buku'];
 $jumlah_halaman = $_POST['jumlah_halaman'];
 $foto = $_POST['foto'];
 $tanggal_pinjam = $_POST['tanggal_pinjam'];
@@ -60,12 +61,12 @@ try {
         $message = "Tanggal peminjaman buku berhasil diperbarui.";
     } else {
         
-        $sql_pinjam = "INSERT INTO data_pinjam (id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql_pinjam = "INSERT INTO data_pinjam (id_buku, judul_buku, isbn, nama_penulis, nama_penerbit, kategori_buku, jumlah_halaman, foto, tanggal_pinjam, tanggal_pengembalian) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt_pinjam = $conn->prepare($sql_pinjam);
         if ($stmt_pinjam === false) {
             throw new Exception("Prepare failed on data_pinjam INSERT: " . $conn->error);
         }
-        $stmt_pinjam->bind_param("sssssisss", $id_buku, $judul_buku, $isbn, $nama_penulis, $nama_penerbit, $jumlah_halaman, $foto, $tanggal_pinjam, $tanggal_pengembalian);
+        $stmt_pinjam->bind_param("sssssisss", $id_buku, $judul_buku, $isbn, $nama_penulis, $nama_penerbit, $kategori_buku, $jumlah_halaman, $foto, $tanggal_pinjam, $tanggal_pengembalian);
         if (!$stmt_pinjam->execute()) {
             throw new Exception("Error inserting into data_pinjam: " . $stmt_pinjam->error);
         }
